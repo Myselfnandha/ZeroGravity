@@ -64,6 +64,10 @@ learn-list: ## List all learned anti-patterns and prevention strategies
 learn-audit: ## Audit the learning matrix integrity
 	@$(PYTHON) .agents/scripts/learn.py audit
 
+openhands-config: ## Export OpenHands configuration to target (default: ./)
+	@cp .agents/templates/openhands_config.toml $(DEST)/config.toml 2>/dev/null || cp .agents/templates/openhands_config.toml ./openhands_config.toml
+	@echo "✔ OpenHands configuration generated."
+
 clean: ## Clean cache, temp files, and test directories
 	@rm -rf /tmp/agy-* dist/*.tar.gz .agents/cache/*.db
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
