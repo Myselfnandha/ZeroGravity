@@ -1,0 +1,163 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "mcp-npx",
+      "args": [
+        "@upstash/context7-mcp",
+        "--api-key",
+        "${UPSTASH_CONTEXT7_API_KEY}"
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Real-time library documentation resolver (Upstash Context7)",
+      "category": "documentation"
+    },
+    "shadcn": {
+      "command": "mcp-npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Direct Shadcn UI registry component discovery and addition",
+      "category": "frontend"
+    },
+    "magic": {
+      "command": "mcp-npx",
+      "args": [
+        "@21st-dev/magic@latest"
+      ],
+      "env": {
+        "API_KEY": "${MAGIC_API_KEY}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "21st.dev Magic UI design inspiration, component search & generation",
+      "category": "frontend"
+    },
+    "skylos": {
+      "command": "/home/nandha/.local/share/skylos/venv/bin/python",
+      "args": [
+        "-m",
+        "skylos_mcp"
+      ],
+      "env": {
+        "SKYLOS_MCP_RESULTS_DIR": "/home/nandha/.skylos/mcp_results"
+      },
+      "description": "Local-first static analysis, SAST security scans & AI hallucination checks",
+      "category": "security"
+    },
+    "github": {
+      "command": "mcp-npx",
+      "args": [
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "GitHub issues, pull requests, repository search & automation",
+      "category": "vcs"
+    },
+    "playwright": {
+      "command": "mcp-npx",
+      "args": [
+        "@playwright/mcp"
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Headless browser automation, visual snapshots & E2E web testing",
+      "category": "testing"
+    },
+    "supabase": {
+      "command": "mcp-npx",
+      "args": [
+        "@supabase/mcp-server-supabase"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}",
+        "SUPABASE_PROJECT_REF": "${SUPABASE_PROJECT_REF}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Supabase project management, database migrations & SQL execution",
+      "category": "database"
+    },
+    "sentry": {
+      "command": "mcp-npx",
+      "args": [
+        "@sentry/mcp-server",
+        "--access-token",
+        "${SENTRY_AUTH_TOKEN}"
+      ],
+      "env": {
+        "SENTRY_ACCESS_TOKEN": "${SENTRY_AUTH_TOKEN}",
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
+        "SENTRY_ORG": "${SENTRY_ORG}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Sentry error telemetry, performance traces & crash diagnostic queries",
+      "category": "observability"
+    },
+    "neon": {
+      "command": "mcp-npx",
+      "args": [
+        "@neondatabase/mcp-server-neon"
+      ],
+      "env": {
+        "NEON_API_KEY": "${NEON_API_KEY}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Neon serverless Postgres branching, SQL queries & connection pooling",
+      "category": "database"
+    },
+    "chrome-devtools": {
+      "command": "mcp-npx",
+      "args": [
+        "chrome-devtools-mcp"
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      },
+      "description": "Live Chrome DOM inspection, Lighthouse audits & performance traces",
+      "category": "browser"
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena.git",
+        "serena",
+        "start-mcp-server",
+        "--open-web-dashboard",
+        "false"
+      ],
+      "description": "Semantic AST symbol navigation, project memory & deep refactoring",
+      "category": "code-intelligence"
+    },
+    "docker-gateway": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/var/run/docker.sock:/var/run/docker.sock",
+        "mcp/docker"
+      ],
+      "description": "Docker container lifecycle, sandbox builds & image inspection",
+      "category": "containers"
+    }
+  }
+}

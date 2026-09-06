@@ -29,8 +29,15 @@ install-global: ## Install only to global Antigravity config (~/.gemini/config/)
 dry-run: ## Simulate installation without modifying files
 	@./install.sh --dry-run --all
 
-test: ## Run verification suite on scripts, rules, and MCP configs
-	@$(PYTHON) .agents/scripts/verify_all.py
+test: ## Run verification suite on scripts, rules, and MCP catalog
+	@echo "🧪 Running framework integrity tests..."
+	@$(PYTHON) -m py_compile .agents/scripts/*.py
+	@$(PYTHON) -c 'import json, glob, yaml, os; \
+reg = json.load(open(".agents/mcp-registry/servers.json")); \
+assert len(reg.get("mcpServers", {})) == 12, "Expected 12 servers in catalog"; \
+rules = glob.glob(".agents/rules/*.md"); \
+assert len(rules) >= 5, "Rules missing"; \
+print("✔ Verified rules, scripts, and MCP catalog cleanly.")'
 
 check: verify lint ## Run full verification and static checks
 
@@ -42,13 +49,20 @@ lint: ## Run Python syntax checks and Skylos SAST scan
 		skylos .agents/scripts/ --exclude .agents -a --format concise || true; \
 	fi
 
-verify: ## Test all registered MCP servers and stdio runners
-	@echo "🚀 Testing registered MCP server runtimes..."
-	@$(PYTHON) -c 'import json, subprocess, os, time; \
-cfg = json.load(open(".agents/mcp_config.json")); \
-servers = cfg.get("mcpServers", {}); \
-print(f"Checking {len(servers)} MCP servers..."); \
-[print(f"  ✔ {name}: OK") for name in servers.keys()]'
+verify: ## Check MCP catalog status
+	@$(PYTHON) .agents/scripts/mcp.py list
+
+mcp-list: ## List MCP catalog and active server status
+	@$(PYTHON) .agents/scripts/mcp.py list
+
+mcp-enable: ## Enable an MCP server (e.g. make mcp-enable s=neon)
+	@$(PYTHON) .agents/scripts/mcp.py enable $(s)
+
+mcp-disable: ## Disable an MCP server (e.g. make mcp-disable s=neon)
+	@$(PYTHON) .agents/scripts/mcp.py disable $(s)
+
+mcp-reset: ## Reset to zero-default clean profile (0 active servers)
+	@$(PYTHON) .agents/scripts/mcp.py reset
 
 clean: ## Clean cache, temp files, and test directories
 	@rm -rf /tmp/agy-* dist/*.tar.gz .agents/cache/*.db

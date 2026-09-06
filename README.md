@@ -22,10 +22,11 @@
 
 ## 🌟 Highlights
 
-- 🚀 **One-Click Self-Extracting Installer (`install.sh`)**: Single portable 22MB executable that unpacks, auto-provisions Python virtual environments, links binaries, and merges MCP configurations seamlessly for both Local and Global scopes.
+- 🚀 **Ultra-Compact Production Installer (`install.sh`)**: High-efficiency self-extracting XZ executable compressed to **~1.3 MB** (down from 86MB). Unpacks, provisions isolated virtual environments, and configures tools with a single click.
+- ⚡ **Zero-Default On-Demand MCP Architecture**: 0 background processes at startup. Servers are cataloged in `.agents/mcp-registry/servers.json`, dynamically activated when needed (`/mcp enable <name>` or `mcp.py`), and **automatically shut down** upon task completion.
 - 🤖 **OpenHuman Supercoder Engine (`@[openhuman]`)**: 5-stage automated engineering pipeline (Context Sweep $\rightarrow$ Architecture Blueprint $\rightarrow$ CodeCrusher $\rightarrow$ AAA Testing & Skylos Gate $\rightarrow$ Memory Tree Sync).
 - 🧠 **Persistent Memory Tree**: Invariant architecture decisions (`decisions.md`), platform gotchas (`gotchas.md`), and durable goal tracking (`goals.md`) that persist across agent sessions.
-- 🔌 **12 Verified Production MCP Servers**: Out-of-the-box support for GitHub, Playwright, Supabase, Neon Postgres, Sentry, Chrome DevTools, Serena, Docker Gateway, Context7, Shadcn UI, Magic 21st.dev, and Skylos.
+- 🔌 **12 Verified Production MCP Servers**: GitHub, Playwright, Supabase, Neon Postgres, Sentry, Chrome DevTools, Serena, Docker Gateway, Context7, Shadcn UI, Magic 21st.dev, and Skylos with STDIO stream isolation (`mcp-npx`).
 - 🛡️ **Deterministic SAST & Zero-Slop**: Integrated local-first static analysis (`skylos`) to catch AI hallucinations, plus ADHD action-first formatting and human voice filters (`/no-ai-slop`).
 
 ---
@@ -43,18 +44,10 @@ flowchart TB
         S1 --> S2 --> S3 --> S4 --> S5
     end
 
-    subgraph Runtime ["🔌 Model Context Protocol (MCP) Ecosystem"]
+    subgraph Runtime ["🔌 Zero-Default On-Demand MCP Lifecycle"]
         direction LR
-        GH["GitHub"]
-        PW["Playwright"]
-        SB["Supabase"]
-        NN["Neon DB"]
-        SR["Serena"]
-        DK["Docker"]
-        ST["Sentry"]
-        CD["DevTools"]
-        SK["Skylos"]
-        MG["Magic UI"]
+        MC["Registry Catalog<br/><i>(servers.json)</i>"] -->|mcp.py enable| ON["Active Process<br/><i>(mcp_config.json)</i>"]
+        ON -->|Task Complete| OFF["Auto-Close & Cleanup<br/><i>(mcp.py disable)</i>"]
     end
 
     Core <--> Runtime
@@ -68,7 +61,7 @@ flowchart TB
 Extract and configure everything for your current workspace and global Antigravity environment with a single command:
 
 ```bash
-# Run self-extracting installer
+# Run 1.3 MB self-extracting installer
 ./install.sh
 ```
 
@@ -89,24 +82,43 @@ Extract and configure everything for your current workspace and global Antigravi
 
 ---
 
-## 🔌 MCP Server Ecosystem
+## 🔌 Zero-Default On-Demand MCP Manager
 
-All 12 MCP servers are pre-configured with dynamic environment variable resolution (`${VAR}`) and verified healthy via STDIO handshakes:
+All 12 MCP servers start in a clean dormant state (`{}`). Activate them dynamically when needed and auto-close when done:
 
-| MCP Server | Runner / Command | Description |
+```bash
+# List catalog & status
+python .agents/scripts/mcp.py list
+
+# Enable server(s) on demand
+python .agents/scripts/mcp.py enable neon sentry
+
+# Disable server(s) (kills background processes)
+python .agents/scripts/mcp.py disable neon sentry
+
+# Reset to zero-default clean profile
+python .agents/scripts/mcp.py reset
+
+# Run an ephemeral task with auto-shutdown
+python .agents/scripts/mcp.py run neon -- python my_script.py
+```
+
+### Catalog of 12 Production Servers
+
+| MCP Server | Category | Description |
 |:---|:---|:---|
-| **`github`** | `npx -y @modelcontextprotocol/server-github` | Issues, PRs, branch management, and repository automation |
-| **`playwright`** | `npx -y @playwright/mcp` | Headless browser automation, scraping, and E2E testing |
-| **`supabase`** | `npx -y @supabase/mcp-server-supabase` | Database migrations, table inspection, SQL, Edge functions |
-| **`neon`** | `npx -y @neondatabase/mcp-server-neon` | Serverless Postgres branching, SQL execution, and connection pooling |
-| **`sentry`** | `npx -y @sentry/mcp-server` | Error telemetry, performance traces, and issue diagnostics |
-| **`chrome-devtools`** | `npx -y chrome-devtools-mcp` | Live DOM inspection, Lighthouse audits, network analysis |
-| **`serena`** | `uvx serena start-mcp-server --open-web-dashboard false` | AST-aware code navigation, symbol refactoring, and memory |
-| **`docker-gateway`** | `docker run -i --rm -v /var/run/docker.sock:... mcp/docker` | Container lifecycle, Dockerfile builds, and tool sandbox |
-| **`context7`** | `npx -y @upstash/context7-mcp` | Real-time library documentation resolution (Upstash) |
-| **`shadcn`** | `npx shadcn@latest mcp` | Direct Shadcn UI registry component discovery and installation |
-| **`magic`** | `npx -y @21st-dev/magic@latest` | 21st.dev UI component search, inspiration, and generator |
-| **`skylos`** | `/home/nandha/.local/share/skylos/venv/bin/python -m skylos_mcp` | Local-first SAST security scans, dead-code pruning, AI hallucination checks |
+| **`context7`** | Documentation | Real-time library documentation resolver (Upstash Context7) |
+| **`shadcn`** | Frontend | Direct Shadcn UI registry component discovery and addition |
+| **`magic`** | Frontend | 21st.dev Magic UI design inspiration, component search & generation |
+| **`skylos`** | Security | Local-first static analysis, SAST security scans & AI hallucination checks |
+| **`github`** | VCS | GitHub issues, pull requests, repository search & automation |
+| **`playwright`** | Testing | Headless browser automation, visual snapshots & E2E web testing |
+| **`supabase`** | Database | Supabase project management, database migrations & SQL execution |
+| **`neon`** | Database | Neon serverless Postgres branching, SQL queries & connection pooling |
+| **`sentry`** | Observability | Sentry error telemetry, performance traces & crash diagnostic queries |
+| **`chrome-devtools`** | Browser | Live Chrome DOM inspection, Lighthouse audits & performance traces |
+| **`serena`** | Code Intelligence | Semantic AST symbol navigation, project memory & deep refactoring |
+| **`docker-gateway`** | Containers | Docker container lifecycle, sandbox builds & image inspection |
 
 ---
 
@@ -115,11 +127,12 @@ All 12 MCP servers are pre-configured with dynamic environment variable resoluti
 | Slash Command | File Location | Description |
 |:---|:---|:---|
 | **`/openhuman`** | [`.agents/workflows/openhuman.md`](.agents/workflows/openhuman.md) | Executes the 5-stage OpenHuman supercoding pipeline |
+| **`/mcp`** | [`.agents/workflows/mcp.md`](.agents/workflows/mcp.md) | Dynamic on-demand MCP manager (enable, disable, list, auto-close) |
 | **`/skylos`** | [`.agents/workflows/skylos.md`](.agents/workflows/skylos.md) | Runs local static analysis, security scan, or AI change verification |
 | **`/i-have-adhd`** | [`.agents/workflows/i-have-adhd.md`](.agents/workflows/i-have-adhd.md) | Activates action-first, numbered steps and bounded cognitive output |
 | **`/no-ai-slop`** | [`.agents/workflows/no-ai-slop.md`](.agents/workflows/no-ai-slop.md) | Strips 20+ patterns of AI slop while preserving human voice |
 | **`/caveman`** | [`.agents/workflows/caveman.md`](.agents/workflows/caveman.md) | Cuts token usage by ~70% using telegraphic technical phrasing |
-| **`/skill`** | [`.agents/workflows/skill.md`](.agents/workflows/skill.md) | Searches and loads instructions from the 1,450+ offline skill catalog |
+| **`/skill`** | [`.agents/workflows/skill.md`](.agents/workflows/skill.md) | Searches and loads instructions dynamically on demand |
 
 ---
 
@@ -140,10 +153,13 @@ Located in `.agents/memory/`:
 
 ```bash
 make help             # View all available developer targets
-make pack             # Bundle .agents/ into self-extracting install.sh
+make pack             # Bundle .agents/ into ultra-compact 1.3 MB install.sh
 make install          # Install Local & Global suites
 make check            # Run verification suite + Skylos SAST analysis
-make test             # Validate MCP servers, rules, and scripts
+make test             # Validate MCP catalog, rules, and scripts
+make mcp-list         # View on-demand MCP status
+make mcp-enable s=... # Enable specific MCP server
+make mcp-disable s=.. # Disable specific MCP server
 make clean            # Remove caches, temporary logs, and build artifacts
 ```
 

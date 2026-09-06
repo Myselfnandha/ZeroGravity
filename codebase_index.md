@@ -1,5 +1,5 @@
 # Codebase Context: agent
-> Auto-generated on 2026-09-06 22:12:52. 7 files, ~8,265 tokens.
+> Auto-generated on 2026-09-06 22:33:42. 8 files, ~8,720 tokens.
 
 ## Structure
 ```text
@@ -8,6 +8,7 @@ agent/
 │   └── workflows/
 │       └── ci.yml
 ├── .gitignore
+├── AGENTS.md
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
@@ -19,6 +20,7 @@ agent/
 
 - `.github/workflows/ci.yml` — GitHub Actions workflow
 - `.gitignore` — ============================================================================== Git Igno... (36 lines)
+- `AGENTS.md` — Antigravity Autonomous Agent Operating System (AGENTS.md) (14 lines)
 - `CONTRIBUTING.md` — Contributing to Antigravity Supercoder OS (58 lines)
 - `LICENSE` — Text file: 17 lines
 - `Makefile` — ============================================================================== Antigrav... (45 lines)

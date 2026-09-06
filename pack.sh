@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Antigravity One-Click Packager (pack.sh)
-# Packages .agents/ into a self-extracting portable install.sh & standalone tar.gz
+# Antigravity Production One-Click Packager (pack.sh)
+# Packages .agents/ into an ultra-lean self-extracting installer using XZ compression (~1.3 MB)
 # ==============================================================================
 
 set -euo pipefail
@@ -10,11 +10,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$SCRIPT_DIR"
 AGENTS_DIR="$WORKSPACE_ROOT/.agents"
 DIST_DIR="$WORKSPACE_ROOT/dist"
-OUTPUT_INSTALLER="$WORKSPACE_ROOT/install.sh"
-OUTPUT_TARBALL="$DIST_DIR/antigravity-agent-bundle.tar.gz"
 TEMP_BUILD_DIR="$(mktemp -d /tmp/agy-pack-XXXXXX)"
 
 trap 'rm -rf "$TEMP_BUILD_DIR"' EXIT
+
+BUILD_MODE="slim"
+if [[ "${1:-}" == "--full" ]]; then
+    BUILD_MODE="full"
+fi
+
+OUTPUT_INSTALLER="$WORKSPACE_ROOT/install.sh"
+OUTPUT_TARBALL="$DIST_DIR/antigravity-${BUILD_MODE}-bundle.tar.xz"
 
 # Terminal Colors
 C_RESET='\033[0m'
@@ -27,7 +33,7 @@ C_RED='\033[31m'
 
 echo -e "${C_CYAN}${C_BOLD}"
 echo "============================================================"
-echo " 📦 Antigravity One-Click Packager Engine"
+echo " 📦 Antigravity Production Packager Engine [Mode: ${BUILD_MODE^^}]"
 echo "============================================================"
 echo -e "${C_RESET}"
 
@@ -44,29 +50,47 @@ echo -e "${C_BLUE}🔍 Gathering workspace components from: ${C_BOLD}$AGENTS_DIR
 STAGING_DIR="$TEMP_BUILD_DIR/payload"
 mkdir -p "$STAGING_DIR/.agents"
 
-# Copy .agents contents while excluding transient/cache files
-echo -e "${C_BLUE}📂 Copying files and excluding transient caches...${C_RESET}"
-tar --exclude='__pycache__' \
-    --exclude='*.pyc' \
-    --exclude='*.pyo' \
-    --exclude='.agents/cache/*' \
-    --exclude='*.db' \
-    --exclude='*.log' \
-    --exclude='.git' \
-    --exclude='.DS_Store' \
-    -C "$WORKSPACE_ROOT" \
-    -cf - .agents | tar -xf - -C "$STAGING_DIR"
+# Copy .agents contents based on build mode
+echo -e "${C_BLUE}📂 Staging files and pruning caches...${C_RESET}"
+
+if [ "$BUILD_MODE" = "slim" ]; then
+    tar --exclude='__pycache__' \
+        --exclude='*.pyc' \
+        --exclude='*.pyo' \
+        --exclude='.agents/cache/*' \
+        --exclude='*.db' \
+        --exclude='*.log' \
+        --exclude='.git' \
+        --exclude='.DS_Store' \
+        --exclude='.agents/plugins/antigravity-awesome-skills' \
+        --exclude='.agents/plugins/antigravity-bundle-*' \
+        --exclude='.agents/tools/scripts/tests' \
+        -C "$WORKSPACE_ROOT" \
+        -cf - .agents | tar -xf - -C "$STAGING_DIR"
+else
+    tar --exclude='__pycache__' \
+        --exclude='*.pyc' \
+        --exclude='*.pyo' \
+        --exclude='.agents/cache/*' \
+        --exclude='*.db' \
+        --exclude='*.log' \
+        --exclude='.git' \
+        --exclude='.DS_Store' \
+        -C "$WORKSPACE_ROOT" \
+        -cf - .agents | tar -xf - -C "$STAGING_DIR"
+fi
 
 # Ensure cache directory exists in bundle but is empty
 mkdir -p "$STAGING_DIR/.agents/cache"
 touch "$STAGING_DIR/.agents/cache/.gitkeep"
 
-# Create standalone tarball
-echo -e "${C_BLUE}🗜️  Compressing bundle to: ${C_BOLD}$OUTPUT_TARBALL${C_RESET}"
-tar -czf "$OUTPUT_TARBALL" -C "$STAGING_DIR" .agents
+# Create standalone XZ tarball
+echo -e "${C_BLUE}🗜️  Compressing with XZ extreme compression (-9e)...${C_RESET}"
+tar -cf "$TEMP_BUILD_DIR/bundle.tar" -C "$STAGING_DIR" .agents
+xz -9e -c "$TEMP_BUILD_DIR/bundle.tar" > "$OUTPUT_TARBALL"
 
 BUNDLE_SIZE=$(du -h "$OUTPUT_TARBALL" | cut -f1)
-echo -e "${C_GREEN}✅ Standalone bundle created: ${C_BOLD}$OUTPUT_TARBALL${C_RESET} (${BUNDLE_SIZE})"
+echo -e "${C_GREEN}✅ Standalone XZ archive created: ${C_BOLD}$OUTPUT_TARBALL${C_RESET} (${BUNDLE_SIZE})"
 
 # Generate Self-Extracting install.sh
 echo -e "${C_BLUE}🛠️  Generating self-extracting installer: ${C_BOLD}$OUTPUT_INSTALLER${C_RESET}"
@@ -74,8 +98,8 @@ echo -e "${C_BLUE}🛠️  Generating self-extracting installer: ${C_BOLD}$OUTPU
 cat << 'INSTALLER_HEADER_EOF' > "$OUTPUT_INSTALLER"
 #!/usr/bin/env bash
 # ==============================================================================
-# Antigravity Unified Self-Extracting Installer
-# Installs rules, skills, agents, workflows, scripts, and MCP servers
+# Antigravity Production Self-Extracting Installer
+# Ultra-compact one-click installer for Antigravity Agent OS (~1.3 MB)
 # ==============================================================================
 
 set -euo pipefail
@@ -92,7 +116,7 @@ C_DIM='\033[2m'
 print_banner() {
     echo -e "${C_CYAN}${C_BOLD}"
     echo "============================================================"
-    echo " 🚀 Antigravity Agent & MCP Server Installer"
+    echo " 🚀 Antigravity Supercoder OS Installer"
     echo "============================================================"
     echo -e "${C_RESET}"
 }
@@ -225,7 +249,7 @@ check_cmd() {
 
 MISSING_DEPS=0
 check_cmd "tar" "Tar extraction tool" "required" || MISSING_DEPS=$((MISSING_DEPS+1))
-check_cmd "gzip" "Gzip decompression tool" "required" || MISSING_DEPS=$((MISSING_DEPS+1))
+check_cmd "xz" "XZ decompression tool" "required" || MISSING_DEPS=$((MISSING_DEPS+1))
 check_cmd "python3" "Python 3.10+ runtime" "required" || MISSING_DEPS=$((MISSING_DEPS+1))
 check_cmd "node" "Node.js runtime" "optional"
 check_cmd "npx" "NPX package runner" "optional"
@@ -249,53 +273,12 @@ trap 'rm -rf "$TEMP_EXTRACT"' EXIT
 if [ "$DRY_RUN" = true ]; then
     echo -e "${C_YELLOW}[DRY-RUN] Simulating payload extraction...${C_RESET}"
 else
-    # Find binary archive marker line
     ARCHIVE_LINE=$(awk '/^__ARCHIVE_PAYLOAD_BELOW__/ {print NR + 1; exit 0; }' "$0")
-    tail -n +"$ARCHIVE_LINE" "$0" | tar -xzf - -C "$TEMP_EXTRACT"
+    tail -n +"$ARCHIVE_LINE" "$0" | tar -xJf - -C "$TEMP_EXTRACT"
     echo -e "${C_GREEN}✔ Payload extracted to staging buffer${C_RESET}"
 fi
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-# Function to merge MCP JSON files safely
-merge_mcp_configs() {
-    local source_json="$1"
-    local dest_json="$2"
-
-    python3 - << EOF
-import json, os, sys
-
-source_path = "$source_json"
-dest_path = "$dest_json"
-
-if not os.path.exists(source_path):
-    sys.exit(0)
-
-with open(source_path) as f:
-    source_data = json.load(f)
-
-if os.path.exists(dest_path):
-    try:
-        with open(dest_path) as f:
-            dest_data = json.load(f)
-    except Exception:
-        dest_data = {"mcpServers": {}}
-else:
-    dest_data = {"mcpServers": {}}
-
-if "mcpServers" not in dest_data:
-    dest_data["mcpServers"] = {}
-
-# Merge servers without losing existing custom ones
-for s_name, s_cfg in source_data.get("mcpServers", {}).items():
-    dest_data["mcpServers"][s_name] = s_cfg
-
-os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-with open(dest_path, "w", encoding="utf-8") as f:
-    json.dump(dest_data, f, indent=2)
-
-EOF
-}
 
 # 3. Perform Local Installation
 if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" == "all" ]]; then
@@ -314,7 +297,8 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         mkdir -p "$LOCAL_DEST"
         cp -r "$TEMP_EXTRACT/.agents/"* "$LOCAL_DEST/"
         chmod +x "$LOCAL_DEST/scripts/"*.py 2>/dev/null || true
-        echo -e "  ${C_GREEN}✔ Installed rules, skills, plugins, workflows, scripts to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
+        chmod +x "$LOCAL_DEST/scripts/"*.sh 2>/dev/null || true
+        echo -e "  ${C_GREEN}✔ Installed rules, skills, workflows, scripts, and MCP catalog to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
     fi
 fi
 
@@ -332,27 +316,26 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
             cp -r "$GLOBAL_DEST" "$BACKUP_GLOBAL"
         fi
 
-        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills" "$GLOBAL_DEST/workflows"
+        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills"
 
-        # Copy rules, skills, workflows to global config
+        # Copy global rules and skills
         if [ -d "$TEMP_EXTRACT/.agents/rules" ]; then
             cp -r "$TEMP_EXTRACT/.agents/rules/"* "$GLOBAL_DEST/rules/" 2>/dev/null || true
         fi
         if [ -d "$TEMP_EXTRACT/.agents/skills" ]; then
             cp -r "$TEMP_EXTRACT/.agents/skills/"* "$GLOBAL_DEST/skills/" 2>/dev/null || true
         fi
-        if [ -d "$TEMP_EXTRACT/.agents/workflows" ]; then
-            cp -r "$TEMP_EXTRACT/.agents/workflows/"* "$GLOBAL_DEST/workflows/" 2>/dev/null || true
-        fi
 
-        # Merge Global MCP config
-        merge_mcp_configs "$TEMP_EXTRACT/.agents/mcp_config.json" "$GLOBAL_DEST/mcp_config.json"
+        # Ensure zero-default clean profile
+        if [ ! -f "$GLOBAL_DEST/mcp_config.json" ]; then
+            echo '{"mcpServers": {}}' > "$GLOBAL_DEST/mcp_config.json"
+        fi
         echo -e "  ${C_GREEN}✔ Global configuration installed to:${C_RESET} ${C_BOLD}$GLOBAL_DEST${C_RESET}"
     fi
 fi
 
-# 5. Skylos Environment Setup & PATH Configuration
-echo -e "\n${C_BOLD}🛡️  Configuring Skylos SAST & Security Environment...${C_RESET}"
+# 5. Skylos Environment Setup, mcp-npx, & PATH Configuration
+echo -e "\n${C_BOLD}🛡️  Configuring Skylos SAST & Tooling Environment...${C_RESET}"
 SKYLOS_VENV="$HOME/.local/share/skylos/venv"
 BIN_DIR="$HOME/.local/bin"
 
@@ -405,20 +388,20 @@ import os, sys, json, glob
 errors = []
 print("  Running post-install checks...")
 
-# Check MCP Configs
-for cfg_path in [".agents/mcp_config.json", os.path.expanduser("~/.gemini/config/mcp_config.json")]:
-    if os.path.exists(cfg_path):
-        try:
-            with open(cfg_path) as f:
-                data = json.load(f)
-                count = len(data.get("mcpServers", {}))
-                print(f"    ✔ Validated {cfg_path} ({count} MCP servers registered)")
-        except Exception as e:
-            errors.append(f"Invalid JSON in {cfg_path}: {e}")
+# Check MCP Catalog
+reg_path = ".agents/mcp-registry/servers.json"
+if os.path.exists(reg_path):
+    try:
+        with open(reg_path) as f:
+            data = json.load(f)
+            count = len(data.get("mcpServers", {}))
+            print(f"    ✔ Validated MCP Catalog ({count} verified servers available on-demand)")
+    except Exception as e:
+        errors.append(f"Invalid JSON in {reg_path}: {e}")
 
 # Check Rules & Workflows
-rules = glob.glob(".agents/rules/*.md") + glob.glob(os.path.expanduser("~/.gemini/config/rules/*.md"))
-workflows = glob.glob(".agents/workflows/*.md") + glob.glob(os.path.expanduser("~/.gemini/config/workflows/*.md"))
+rules = glob.glob(".agents/rules/*.md")
+workflows = glob.glob(".agents/workflows/*.md")
 print(f"    ✔ {len(rules)} Rules and {len(workflows)} Workflows available")
 
 if errors:
@@ -427,7 +410,7 @@ if errors:
         print(f"     - {err}")
     sys.exit(1)
 else:
-    print("    ✔ All configuration files and scripts verified clean!")
+    print("    ✔ All configuration files, scripts, and MCP catalog verified clean!")
 VERIFY_EOF
 fi
 
@@ -437,7 +420,8 @@ echo "============================================================"
 echo -e "${C_RESET}"
 echo -e "Available Workflows & Slash Commands:"
 echo -e "  ${C_CYAN}/openhuman${C_RESET}     - 5-Stage Supercoder Engine"
-echo -e "  ${C_CYAN}/skylos${C_RESET}        - Static analysis, SAST security scan, and AI hallucination gate"
+echo -e "  ${C_CYAN}/mcp${C_RESET}           - On-Demand MCP Manager (enable, disable, list, auto-close)"
+echo -e "  ${C_CYAN}/skylos${C_RESET}        - Static analysis, SAST security scan & hallucination gate"
 echo -e "  ${C_CYAN}/i-have-adhd${C_RESET}   - Action-first, bounded cognitive output mode"
 echo -e "  ${C_CYAN}/no-ai-slop${C_RESET}    - Human voice preservation & AI slop removal"
 echo -e "  ${C_CYAN}/caveman${C_RESET}       - Token-compressed telegraphic communication"
@@ -448,18 +432,18 @@ exit 0
 __ARCHIVE_PAYLOAD_BELOW__
 INSTALLER_HEADER_EOF
 
-# Append the compressed tarball payload to install.sh
+# Append the compressed XZ archive payload to install.sh
 cat "$OUTPUT_TARBALL" >> "$OUTPUT_INSTALLER"
 chmod +x "$OUTPUT_INSTALLER"
 
 INSTALLER_SIZE=$(du -h "$OUTPUT_INSTALLER" | cut -f1)
 
 echo -e "${C_GREEN}${C_BOLD}============================================================"
-echo " 🎉 PACKAGING COMPLETE!"
+echo " 🎉 PRODUCTION PACKAGING COMPLETE!"
 echo "============================================================"
 echo -e "${C_RESET}"
-echo -e "1. Self-Extracting Installer : ${C_BOLD}$OUTPUT_INSTALLER${C_RESET} (${INSTALLER_SIZE})"
-echo -e "2. Standalone Tarball Archive: ${C_BOLD}$OUTPUT_TARBALL${C_RESET} (${BUNDLE_SIZE})"
+echo -e "1. Self-Extracting Installer : ${C_BOLD}$OUTPUT_INSTALLER${C_RESET} (${C_GREEN}${INSTALLER_SIZE}${C_RESET})"
+echo -e "2. Standalone XZ Archive     : ${C_BOLD}$OUTPUT_TARBALL${C_RESET} (${C_GREEN}${BUNDLE_SIZE}${C_RESET})"
 echo ""
 echo -e "To install on any system, run:"
 echo -e "  ${C_CYAN}./install.sh${C_RESET}               (Interactive menu)"

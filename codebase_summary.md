@@ -1,15 +1,16 @@
 # Codebase Summary: agent
 
 ## Overview
-- **Scan Date:** 2026-09-06 22:12:52
+- **Scan Date:** 2026-09-06 22:33:42
 - **Source Folder:** `/home/nandha/Desktop/agent`
-- **Total Text Files:** 7
-- **Estimated Token Count:** 8,265
+- **Total Text Files:** 8
+- **Estimated Token Count:** 8,720
 
 ## File Summaries
 
 - `.github/workflows/ci.yml` — GitHub Actions workflow
 - `.gitignore` — ============================================================================== Git Igno... (36 lines)
+- `AGENTS.md` — Antigravity Autonomous Agent Operating System (AGENTS.md) (14 lines)
 - `CONTRIBUTING.md` — Contributing to Antigravity Supercoder OS (58 lines)
 - `LICENSE` — Text file: 17 lines
 - `Makefile` — ============================================================================== Antigrav... (45 lines)
@@ -23,6 +24,7 @@ agent/
 │   └── workflows/
 │       └── ci.yml
 ├── .gitignore
+├── AGENTS.md
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── Makefile
@@ -180,6 +182,36 @@ Thumbs.db
 .env.*.local
 *.pem
 *.key
+```
+
+---
+
+### File: `AGENTS.md`
+- **Summary:** Antigravity Autonomous Agent Operating System (AGENTS.md) (14 lines)
+- **Path:** `AGENTS.md`
+- **Estimated Tokens:** 271
+- **mtime:** 1788714080.584
+
+```markdown
+# Antigravity Autonomous Agent Operating System (AGENTS.md)
+
+## 🧠 Core Agent Persona: OpenHuman (`@[openhuman]`)
+
+You are operating under the **OpenHuman Supercoding Engine**.
+
+### 5-Stage Execution Standard
+1. **Context & Memory Sweep**: Consult `.agents/memory/decisions.md`, `gotchas.md`, and `goals.md`.
+2. **Architectural Blueprint**: Establish interface contracts and modular boundaries.
+3. **CodeCrushing Implementation**: Produce clean, idiomatic, production-ready code with complete error handling.
+4. **AAA Testing & Skylos SAST**: Write Arrange-Act-Assert tests and verify changes against the `skylos` security gate.
+5. **Memory Tree Sync**: Update persistent decisions, gotchas, and goals in `.agents/memory/`.
+
+---
+
+## 🛠️ Tooling & MCP Ecosystem
+- **12 Production MCP Servers**: `github`, `playwright`, `supabase`, `neon`, `sentry`, `chrome-devtools`, `serena`, `docker-gateway`, `context7`, `shadcn`, `magic`, `skylos`.
+- **Slash Commands**: `/openhuman`, `/skylos`, `/i-have-adhd`, `/no-ai-slop`, `/caveman`, `/skill`.
+- **Package Runner**: `mcp-npx` (stdio-isolated).
 ```
 
 ---
@@ -538,8 +570,8 @@ Distributed under the [MIT License](LICENSE). Built for high-velocity software e
 ### File: `pack.sh`
 - **Summary:** Shell script (env); functions: print_banner, usage, check_cmd, merge_mcp_configs
 - **Path:** `pack.sh`
-- **Estimated Tokens:** 4,135
-- **mtime:** 1788712456.065
+- **Estimated Tokens:** 4,237
+- **mtime:** 1788713919.763
 
 ```bash
 #!/usr/bin/env bash
@@ -776,6 +808,10 @@ check_cmd "npx" "NPX package runner" "optional"
 check_cmd "uv" "UV package manager" "optional"
 check_cmd "docker" "Docker engine" "optional"
 
+if command -v npm >/dev/null 2>&1; then
+    npm config set allow-remote all >/dev/null 2>&1 || true
+fi
+
 if [ "$MISSING_DEPS" -gt 0 ]; then
     echo -e "\n${C_RED}❌ Missing required system tools. Please install them and rerun.${C_RESET}"
     exit 1
@@ -915,6 +951,13 @@ else
     if [ -f "$SKYLOS_VENV/bin/skylos" ]; then
         ln -sf "$SKYLOS_VENV/bin/skylos" "$BIN_DIR/skylos"
         echo -e "  ${C_GREEN}✔ Symlinked Skylos binary to:${C_RESET} $BIN_DIR/skylos"
+    fi
+
+    # Install mcp-npx runner
+    if [ -f "$TEMP_EXTRACT/.agents/scripts/mcp_runner.sh" ]; then
+        cp "$TEMP_EXTRACT/.agents/scripts/mcp_runner.sh" "$BIN_DIR/mcp-npx"
+        chmod +x "$BIN_DIR/mcp-npx"
+        echo -e "  ${C_GREEN}✔ Installed clean MCP runner to:${C_RESET} $BIN_DIR/mcp-npx"
     fi
 
     # Ensure ~/.local/bin is in PATH for bash/zsh
