@@ -59,18 +59,20 @@ import shutil
 
 # Define priority-ordered checks
 CORE_CHECKS = [
-    ("Skylos SAST & AI Audit", "skylos", False),
+    ("Skylos SAST & Security Audit", "skylos", False),
+    ("Python Syntax & Compilation", "syntax_check", False),
+    ("Framework Unit Tests", "test_suite", False),
+    ("Learning Matrix Audit", "learn_audit", False),
     ("Security Scan", ".agent/skills/vulnerability-scanner/scripts/security_scan.py", True),
     ("Lint Check", ".agent/skills/lint-and-validate/scripts/lint_runner.py", True),
-    ("Schema Validation", ".agent/skills/database-design/scripts/schema_validator.py", False),
-    ("Test Runner", ".agent/skills/testing-patterns/scripts/test_runner.py", False),
-    ("UX Audit", ".agent/skills/frontend-design/scripts/ux_audit.py", False),
-    ("SEO Check", ".agent/skills/seo-fundamentals/scripts/seo_checker.py", False),
+    ("Schema Validation", ".agent/skills/database-design/scripts/schema_validator.py", True),
+    ("UX Audit", ".agent/skills/frontend-design/scripts/ux_audit.py", True),
+    ("SEO Check", ".agent/skills/seo-fundamentals/scripts/seo_checker.py", True),
 ]
 
 PERFORMANCE_CHECKS = [
     ("Lighthouse Audit", ".agent/skills/performance-profiling/scripts/lighthouse_audit.py", True),
-    ("Playwright E2E", ".agent/skills/webapp-testing/scripts/playwright_runner.py", False),
+    ("Playwright E2E", ".agent/skills/webapp-testing/scripts/playwright_runner.py", True),
 ]
 
 def find_skylos_bin() -> Optional[str]:
@@ -85,6 +87,18 @@ def find_skylos_bin() -> Optional[str]:
             return c
     return None
 
+def resolve_script_path(project_path: str, script_path_str: str) -> Optional[Path]:
+    """Resolve script path supporting both .agents and .agent conventions."""
+    candidates = [
+        Path(project_path) / script_path_str,
+        Path(project_path) / script_path_str.replace(".agent/", ".agents/"),
+        Path(__file__).resolve().parent.parent / script_path_str.replace(".agent/", "").replace(".agents/", ""),
+    ]
+    for c in candidates:
+        if c.exists() and c.is_file():
+            return c
+    return None
+
 def check_script_exists(script_path: Path) -> bool:
     """Check if script file exists"""
     return script_path.exists() and script_path.is_file()
@@ -96,6 +110,8 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
     Returns:
         dict with keys: name, passed, output, skipped
     """
+    scripts_dir = Path(__file__).resolve().parent
+
     if script_path_str == "skylos":
         skylos_bin = find_skylos_bin()
         if not skylos_bin:
@@ -105,19 +121,31 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
         cmd = [
             skylos_bin,
             project_path,
-            "-a",
             "--exclude", ".agents",
             "--exclude", ".agent",
             "--exclude", "venv",
+            "--exclude", "dist",
+            "--exclude", "install.sh",
+            "--severity", "error",
             "--format", "concise"
         ]
+    elif script_path_str == "syntax_check":
+        print_step(f"Running: {name}")
+        py_files = [str(p) for p in scripts_dir.glob("*.py")]
+        cmd = [sys.executable, "-m", "py_compile"] + py_files
+    elif script_path_str == "test_suite":
+        print_step(f"Running: {name}")
+        cmd = [sys.executable, "-m", "unittest", "discover", str(Path(project_path) / "tests"), "-v"]
+    elif script_path_str == "learn_audit":
+        print_step(f"Running: {name}")
+        cmd = [sys.executable, str(scripts_dir / "learn.py"), "audit"]
     else:
-        script_path = Path(project_path) / script_path_str
-        if not check_script_exists(script_path):
+        script_path = resolve_script_path(project_path, script_path_str)
+        if not script_path:
             print_warning(f"{name}: Script not found, skipping")
             return {"name": name, "passed": True, "output": "", "skipped": True}
         print_step(f"Running: {name}")
-        cmd = ["python", str(script_path), project_path]
+        cmd = [sys.executable, str(script_path), project_path]
         if url and ("lighthouse" in script_path.name.lower() or "playwright" in script_path.name.lower()):
             cmd.append(url)
     

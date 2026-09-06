@@ -26,7 +26,7 @@ class TestLearningEngine(unittest.TestCase):
         
         # Verify markdown contains all IDs
         with open(GOTCHAS_MD, "r", encoding="utf-8") as f:
-            md_content = f.read()
+            md_content = f.read(65536)
             
         for p in patterns:
             self.assertIn(p["id"], md_content, f"Markdown missing {p['id']}")
