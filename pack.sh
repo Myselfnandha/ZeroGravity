@@ -377,6 +377,13 @@ else
         echo -e "  ${C_GREEN}✔ Symlinked Skylos binary to:${C_RESET} $BIN_DIR/skylos"
     fi
 
+    # Install mcp-npx runner
+    if [ -f "$TEMP_EXTRACT/.agents/scripts/mcp_runner.sh" ]; then
+        cp "$TEMP_EXTRACT/.agents/scripts/mcp_runner.sh" "$BIN_DIR/mcp-npx"
+        chmod +x "$BIN_DIR/mcp-npx"
+        echo -e "  ${C_GREEN}✔ Installed clean MCP runner to:${C_RESET} $BIN_DIR/mcp-npx"
+    fi
+
     # Ensure ~/.local/bin is in PATH for bash/zsh
     PATH_EXPORT='export PATH="$HOME/.local/bin:$PATH"'
     for RC_FILE in "$HOME/.bashrc" "$HOME/.zshrc"; do
