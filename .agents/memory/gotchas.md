@@ -9,11 +9,11 @@ Before taking any architectural, coding, or tooling action, the agent must sweep
 
 | ID | ⚠️ Mistake / Anti-Pattern | 🔍 Root Cause & Triggers | 🛡️ Invariant Prevention Strategy |
 | :--- | :--- | :--- | :--- |
-| **AP-001** | **ANSI stdout pollution in JSON-RPC** | `npx` in modern npm prints colored notices to stdout, corrupting JSON-RPC streams (`invalid character '\x1b'`). | Wrap Node-based MCP servers with `mcp-npx` enforcing `NO_COLOR=1`, `npm_config_loglevel=silent`, and `npx --silent -y`. |
-| **AP-002** | **MCP Interactive Auth Hangs** | Servers like Sentry default to browser/device-code flow if access tokens are omitted from arguments. | Explicitly pass `--access-token ${TOKEN}` in CLI arguments alongside environment variables. |
-| **AP-003** | **Indexer Bloat on Archives** | `analyze.py` crawling packed installer scripts (`install.sh`, `*.tar.xz`) inflates codebase DB to 40MB+. | Add binary payloads, installers, and `.tar.*` archives to `SELF_EXCLUDES` list in all scanners. |
-| **AP-004** | **Background MCP Resource Leaks** | Leaving MCP servers running permanently in background consumes idle RAM/CPU and causes port conflicts. | **Zero-Default Profile**: Start with `{ "mcpServers": {} }`. Enable on-demand (`mcp.py enable <name>`) and auto-close upon task completion. |
-| **AP-005** | **Recursive `view_file` Scanning** | Looping `view_file` sequentially across dozens of source files blows context window and is slow. | Run `analyze.py <folder> --check --auto-heal` and read consolidated `codebase_summary.md` in one single read. |
+| **AP-001** | **Unchecked npx execution polluting JSON-RPC stdout with colored notices and ANSI escape sequences** | npx in modern npm writes colored notices to stdout when not silenced, breaking JSON-RPC parsing (invalid character '\x1b') | Always wrap Node-based MCP servers using mcp-npx with NO_COLOR=1, npm_config_loglevel=silent, and --silent flag |
+| **AP-002** | **Sentry MCP server falling back to interactive OAuth device code flow and hanging** | @sentry/mcp-server defaults to interactive device code login if --access-token or SENTRY_ACCESS_TOKEN is omitted | Pass --access-token ${SENTRY_AUTH_TOKEN} explicitly in CLI arguments and provide environment fallback |
+| **AP-003** | **Codebase indexer scanning self-extracting archive payload and inflating codebase database to 40MB+** | Scanning binary payloads or packed archive files in analyze.py treats binary blobs as source text | Exclude *.tar.gz, *.tar.xz, install.sh, and dist/ in codebase indexing routines |
+| **AP-004** | **Leaving MCP servers running permanently in background consuming CPU and RAM** | Static mcp_config.json with default background servers creates memory bloat and port collisions | Zero-Default profile: start with empty mcpServers ({}), enable dynamically on-demand, and auto-close upon task completion |
+| **AP-005** | **Agent looping over view_file sequentially to understand an entire folder codebase** | Sequential view_file calls waste context tokens and cause high latency | Execute analyze.py --check --auto-heal --inject-ki and read the consolidated codebase_summary.md in a single read |
 
 ---
 

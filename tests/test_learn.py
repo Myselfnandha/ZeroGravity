@@ -5,9 +5,11 @@ ZeroGravity OS: Learning Engine & Anti-Patterns Matrix Tests
 import json
 import subprocess
 import unittest
+import sys
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(WORKSPACE / ".agents" / "scripts"))
 LEARN_PY = WORKSPACE / ".agents" / "scripts" / "learn.py"
 ANTI_PATTERNS_JSON = WORKSPACE / ".agents" / "memory" / "anti_patterns.json"
 GOTCHAS_MD = WORKSPACE / ".agents" / "memory" / "gotchas.md"
@@ -48,6 +50,30 @@ class TestLearningEngine(unittest.TestCase):
         res = subprocess.run(["python3", str(LEARN_PY), "check", "--query", "completely_safe_action_xyz"], capture_output=True, text=True)
         self.assertEqual(res.returncode, 0)
         self.assertIn("Safe", res.stdout)
+
+    def test_learn_add_and_rollback(self):
+        # Read original data
+        with open(ANTI_PATTERNS_JSON, "r", encoding="utf-8") as f:
+            original = json.load(f)
+        try:
+            # Add a test pattern
+            res = subprocess.run(
+                ["python3", str(LEARN_PY), "add", "-m", "Unit test dummy mistake", "-c", "Test cause", "-s", "Test strategy"],
+                capture_output=True, text=True, check=True
+            )
+            self.assertEqual(res.returncode, 0)
+            self.assertIn("Learned & Immunized", res.stdout)
+            
+            # Verify it audits cleanly
+            audit_res = subprocess.run(["python3", str(LEARN_PY), "audit"], capture_output=True, text=True, check=True)
+            self.assertEqual(audit_res.returncode, 0)
+        finally:
+            # Restore original state
+            with open(ANTI_PATTERNS_JSON, "w", encoding="utf-8") as f:
+                json.dump(original, f, indent=2, ensure_ascii=False)
+            # Re-sync gotchas.md
+            from learn import sync_to_gotchas_markdown
+            sync_to_gotchas_markdown(original)
 
 
 if __name__ == "__main__":

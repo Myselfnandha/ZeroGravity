@@ -295,7 +295,7 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         fi
 
         mkdir -p "$LOCAL_DEST"
-        cp -r "$TEMP_EXTRACT/.agents/"* "$LOCAL_DEST/"
+        cp -a "$TEMP_EXTRACT/.agents/." "$LOCAL_DEST/"
         chmod +x "$LOCAL_DEST/scripts/"*.py 2>/dev/null || true
         chmod +x "$LOCAL_DEST/scripts/"*.sh 2>/dev/null || true
         echo -e "  ${C_GREEN}✔ Installed rules, skills, workflows, scripts, and MCP catalog to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
@@ -320,10 +320,10 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
 
         # Copy global rules and skills
         if [ -d "$TEMP_EXTRACT/.agents/rules" ]; then
-            cp -r "$TEMP_EXTRACT/.agents/rules/"* "$GLOBAL_DEST/rules/" 2>/dev/null || true
+            cp -a "$TEMP_EXTRACT/.agents/rules/." "$GLOBAL_DEST/rules/" 2>/dev/null || true
         fi
         if [ -d "$TEMP_EXTRACT/.agents/skills" ]; then
-            cp -r "$TEMP_EXTRACT/.agents/skills/"* "$GLOBAL_DEST/skills/" 2>/dev/null || true
+            cp -a "$TEMP_EXTRACT/.agents/skills/." "$GLOBAL_DEST/skills/" 2>/dev/null || true
         fi
 
         # Ensure zero-default clean profile

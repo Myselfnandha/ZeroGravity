@@ -52,6 +52,19 @@ class TestZeroGravityOS(unittest.TestCase):
             data = json.load(f)
         self.assertNotIn("context7", data.get("mcpServers", {}))
 
+    def test_mcp_run_ephemeral(self):
+        # Test ephemeral run with leading '--' delimiter
+        res = subprocess.run(
+            ["python3", str(MCP_PY), "run", "context7", "--", "echo", "ephemeral_ok"],
+            capture_output=True, text=True, check=True
+        )
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("ephemeral_ok", res.stdout)
+        # Ensure server was auto-closed after command execution
+        with open(LOCAL_CONFIG, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertNotIn("context7", data.get("mcpServers", {}))
+
 
 if __name__ == "__main__":
     unittest.main()
