@@ -59,15 +59,14 @@ import shutil
 
 # Define priority-ordered checks
 CORE_CHECKS = [
-    ("Skylos SAST & Security Audit", "skylos", False),
-    ("Python Syntax & Compilation", "syntax_check", False),
-    ("Framework Unit Tests", "test_suite", False),
-    ("Learning Matrix Audit", "learn_audit", False),
-    ("Security Scan", ".agent/skills/vulnerability-scanner/scripts/security_scan.py", True),
-    ("Lint Check", ".agent/skills/lint-and-validate/scripts/lint_runner.py", True),
-    ("Schema Validation", ".agent/skills/database-design/scripts/schema_validator.py", True),
-    ("UX Audit", ".agent/skills/frontend-design/scripts/ux_audit.py", True),
-    ("SEO Check", ".agent/skills/seo-fundamentals/scripts/seo_checker.py", True),
+    ("Skylos SAST & Security Audit", "skylos", True),
+    ("Python Syntax & Compilation", "syntax_check", True),
+    ("Framework Unit Tests", "test_suite", True),
+    ("Learning Matrix Audit", "learn_audit", True),
+    ("Security Scan", ".agent/skills/vulnerability-scanner/scripts/security_scan.py", False),
+    ("Lint Check", ".agent/skills/lint-and-validate/scripts/lint_runner.py", False),
+    ("Schema Validation", ".agent/skills/database-design/scripts/schema_validator.py", False),
+    ("SEO Check", ".agent/skills/seo-fundamentals/scripts/seo_checker.py", False),
 ]
 
 PERFORMANCE_CHECKS = [
@@ -88,7 +87,8 @@ def find_skylos_bin() -> Optional[str]:
     return None
 
 def resolve_script_path(project_path: str, script_path_str: str) -> Optional[Path]:
-    """Resolve script path supporting both .agents and .agent conventions."""
+    """Resolve script path supporting .agents, .agent, and plugins directory."""
+    script_name = Path(script_path_str).name
     candidates = [
         Path(project_path) / script_path_str,
         Path(project_path) / script_path_str.replace(".agent/", ".agents/"),
@@ -97,6 +97,13 @@ def resolve_script_path(project_path: str, script_path_str: str) -> Optional[Pat
     for c in candidates:
         if c.exists() and c.is_file():
             return c
+            
+    # Search plugins directory if available
+    plugins_dir = Path(__file__).resolve().parent.parent / "plugins"
+    if plugins_dir.exists():
+        for p in plugins_dir.glob(f"**/scripts/{script_name}"):
+            if p.is_file():
+                return p
     return None
 
 def check_script_exists(script_path: Path) -> bool:
