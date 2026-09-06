@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Framework Validation & MCP Health Checks
@@ -14,6 +17,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -59,16 +64,26 @@ jobs:
           print("✔ All markdown frontmatter validated successfully.")
           EOF
 
-      - name: Validate MCP Config JSON Schemas
+      - name: Validate MCP Registry & Zero-Default Config
         run: |
           python3 - << 'EOF'
           import json, os, sys
+          with open(".agents/mcp-registry/servers.json") as f:
+              reg = json.load(f)
+          catalog = reg.get("mcpServers", {})
+          print(f"✔ Found {len(catalog)} cataloged MCP servers in registry.")
+          assert len(catalog) == 12, "Expected 12 cataloged MCP servers"
+
           with open(".agents/mcp_config.json") as f:
               cfg = json.load(f)
-          servers = cfg.get("mcpServers", {})
-          print(f"✔ Found {len(servers)} configured MCP servers.")
-          assert len(servers) >= 10, "Expected at least 10 MCP servers"
+          active = cfg.get("mcpServers", {})
+          print(f"✔ Zero-default active servers: {len(active)} (expected 0).")
+          assert len(active) == 0, "Default active servers must be 0"
           EOF
+
+      - name: Run Test Suite
+        run: |
+          python3 -m unittest discover tests -v
 
       - name: Test Packager Engine (pack.sh)
         run: |
