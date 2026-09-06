@@ -1,5 +1,5 @@
 # ==============================================================================
-# Antigravity Developer Makefile
+# 🌌 ZeroGravity OS Developer Makefile
 # Build, pack, test, verify, and deploy the agent framework
 # ==============================================================================
 
@@ -7,14 +7,14 @@ SHELL := /usr/bin/env bash
 PYTHON ?= python3
 WORKSPACE_DIR := $(shell pwd)
 
-.PHONY: help pack install install-local install-global dry-run test verify lint clean status
+.PHONY: help pack install install-local install-global dry-run test verify lint clean status learn-list learn-audit
 
 help: ## Show this help menu
-	@echo -e "\033[1;36mAntigravity Supercoder Framework - Developer Commands\033[0m"
+	@echo -e "\033[1;36mZeroGravity OS - Developer Commands\033[0m"
 	@echo "============================================================"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-pack: ## Build self-extracting install.sh and dist/ tarball
+pack: ## Build self-extracting install.sh and dist/ tarball (1.3MB XZ)
 	@./pack.sh
 
 install: ## Run full installer (Local workspace + Global configuration)
@@ -30,16 +30,10 @@ dry-run: ## Simulate installation without modifying files
 	@./install.sh --dry-run --all
 
 test: ## Run verification suite on scripts, rules, and MCP catalog
-	@echo "🧪 Running framework integrity tests..."
-	@$(PYTHON) -m py_compile .agents/scripts/*.py
-	@$(PYTHON) -c 'import json, glob, yaml, os; \
-reg = json.load(open(".agents/mcp-registry/servers.json")); \
-assert len(reg.get("mcpServers", {})) == 12, "Expected 12 servers in catalog"; \
-rules = glob.glob(".agents/rules/*.md"); \
-assert len(rules) >= 5, "Rules missing"; \
-print("✔ Verified rules, scripts, and MCP catalog cleanly.")'
+	@echo "🧪 Running full test suite..."
+	@$(PYTHON) -m unittest discover tests -v
 
-check: verify lint ## Run full verification and static checks
+check: verify lint learn-audit ## Run full verification, SAST, and learning matrix audit
 
 lint: ## Run Python syntax checks and Skylos SAST scan
 	@echo "🔍 Checking Python scripts..."
@@ -63,6 +57,12 @@ mcp-disable: ## Disable an MCP server (e.g. make mcp-disable s=neon)
 
 mcp-reset: ## Reset to zero-default clean profile (0 active servers)
 	@$(PYTHON) .agents/scripts/mcp.py reset
+
+learn-list: ## List all learned anti-patterns and prevention strategies
+	@$(PYTHON) .agents/scripts/learn.py list
+
+learn-audit: ## Audit the learning matrix integrity
+	@$(PYTHON) .agents/scripts/learn.py audit
 
 clean: ## Clean cache, temp files, and test directories
 	@rm -rf /tmp/agy-* dist/*.tar.gz .agents/cache/*.db

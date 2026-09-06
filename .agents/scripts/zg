@@ -51,8 +51,9 @@ function print_help() {
     echo -e "  ${CYAN}mcp reset${RESET}            Reset to Zero-Default profile (0 background servers)"
     echo -e "  ${CYAN}mcp run <name> -- <cmd>${RESET} Run a command with temporary MCP server, auto-stop after"
     echo ""
-    echo -e "${BOLD}Autonomous Engine:${RESET}"
+    echo -e "${BOLD}Autonomous Engine & Learning:${RESET}"
     echo -e "  ${YELLOW}openhuman${RESET}            Run OpenHuman 5-Stage Supercoder pipeline on current folder"
+    echo -e "  ${YELLOW}learn <action>${RESET}       2-Way mistake immunization (list, add, check, audit)"
     echo -e "  ${YELLOW}memory${RESET}               Display decisions, gotchas, and goal evolution"
     echo ""
 }
@@ -77,9 +78,14 @@ case "$CMD" in
         echo -e "  • skylos:  $(which skylos 2>/dev/null || echo 'Not in PATH')"
         echo ""
         python3 "$SCRIPT_DIR/mcp.py" list
+        echo ""
+        python3 "$SCRIPT_DIR/learn.py" audit
         ;;
     mcp)
         python3 "$SCRIPT_DIR/mcp.py" "$@"
+        ;;
+    learn)
+        python3 "$SCRIPT_DIR/learn.py" "$@"
         ;;
     pack)
         "$WORKSPACE_ROOT/pack.sh" "$@"
