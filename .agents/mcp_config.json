@@ -4,26 +4,39 @@
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@upstash/context7-mcp",
         "--api-key",
         "${UPSTASH_CONTEXT7_API_KEY}"
-      ]
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      }
     },
     "shadcn": {
       "command": "npx",
       "args": [
+        "--silent",
         "shadcn@latest",
         "mcp"
-      ]
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      }
     },
     "magic": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@21st-dev/magic@latest"
       ],
       "env": {
-        "API_KEY": "${MAGIC_API_KEY}"
+        "API_KEY": "${MAGIC_API_KEY}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
       }
     },
     "skylos": {
@@ -40,34 +53,46 @@
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@modelcontextprotocol/server-github"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
       }
     },
     "playwright": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@playwright/mcp"
-      ]
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      }
     },
     "supabase": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@supabase/mcp-server-supabase"
       ],
       "env": {
         "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}",
-        "SUPABASE_PROJECT_REF": "${SUPABASE_PROJECT_REF}"
+        "SUPABASE_PROJECT_REF": "${SUPABASE_PROJECT_REF}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
       }
     },
     "sentry": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@sentry/mcp-server",
         "--access-token",
         "${SENTRY_AUTH_TOKEN}"
@@ -75,25 +100,35 @@
       "env": {
         "SENTRY_ACCESS_TOKEN": "${SENTRY_AUTH_TOKEN}",
         "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
-        "SENTRY_ORG": "${SENTRY_ORG}"
+        "SENTRY_ORG": "${SENTRY_ORG}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
       }
     },
     "neon": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "@neondatabase/mcp-server-neon"
       ],
       "env": {
-        "NEON_API_KEY": "${NEON_API_KEY}"
+        "NEON_API_KEY": "${NEON_API_KEY}",
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
       }
     },
     "chrome-devtools": {
       "command": "npx",
       "args": [
         "-y",
+        "--silent",
         "chrome-devtools-mcp"
-      ]
+      ],
+      "env": {
+        "NO_COLOR": "1",
+        "npm_config_loglevel": "silent"
+      }
     },
     "serena": {
       "command": "uvx",
