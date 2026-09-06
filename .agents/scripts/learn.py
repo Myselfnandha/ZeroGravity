@@ -25,8 +25,20 @@ def load_anti_patterns():
 def save_anti_patterns(data):
     MEMORY_DIR.mkdir(parents=True, exist_ok=True)
     data["updated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
-    with open(ANTI_PATTERNS_JSON, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    temp_file = ANTI_PATTERNS_JSON.with_suffix(".tmp")
+    try:
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            import os
+            os.fsync(f.fileno())
+        temp_file.replace(ANTI_PATTERNS_JSON)
+    finally:
+        if temp_file.exists():
+            try:
+                temp_file.unlink()
+            except OSError:
+                pass
 
 
 def sync_to_gotchas_markdown(data):
@@ -105,8 +117,16 @@ def cmd_add(args):
     data = load_anti_patterns()
     patterns = data.setdefault("anti_patterns", [])
     
-    # Generate ID
-    next_num = len(patterns) + 1
+    # Safely compute next ID to prevent collisions
+    existing_nums = []
+    for p in patterns:
+        pid = p.get("id", "")
+        if pid.startswith("AP-"):
+            try:
+                existing_nums.append(int(pid.split("-")[1]))
+            except (IndexError, ValueError):
+                pass
+    next_num = (max(existing_nums) + 1) if existing_nums else 1
     new_id = f"AP-{next_num:03d}"
     
     entry = {
