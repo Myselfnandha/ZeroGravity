@@ -68,6 +68,8 @@ SELF_EXCLUDES = {
     '.codebase.db',
     '.codebase.db-wal',
     '.codebase.db-shm',
+    'install.sh',
+    'antigravity-agent-bundle.tar.gz',
 }
 
 # Max patch log entries

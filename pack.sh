@@ -232,6 +232,10 @@ check_cmd "npx" "NPX package runner" "optional"
 check_cmd "uv" "UV package manager" "optional"
 check_cmd "docker" "Docker engine" "optional"
 
+if command -v npm >/dev/null 2>&1; then
+    npm config set allow-remote all >/dev/null 2>&1 || true
+fi
+
 if [ "$MISSING_DEPS" -gt 0 ]; then
     echo -e "\n${C_RED}❌ Missing required system tools. Please install them and rerun.${C_RESET}"
     exit 1
