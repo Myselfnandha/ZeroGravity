@@ -15,9 +15,12 @@ Official Sentry Model Context Protocol server for querying error traces, perform
     "command": "npx",
     "args": [
       "-y",
-      "@sentry/mcp-server"
+      "@sentry/mcp-server",
+      "--access-token",
+      "${SENTRY_AUTH_TOKEN}"
     ],
     "env": {
+      "SENTRY_ACCESS_TOKEN": "${SENTRY_AUTH_TOKEN}",
       "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
       "SENTRY_ORG": "${SENTRY_ORG}"
     }
@@ -31,7 +34,7 @@ Official Sentry Model Context Protocol server for querying error traces, perform
 
 | Variable | Description | Required |
 |:---|:---|:---|
-| `SENTRY_AUTH_TOKEN` | Sentry User Auth Token with `event:read`, `org:read`, `project:read`, and `issue:read` scopes | Yes |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ACCESS_TOKEN` | Sentry User Auth Token with `event:read`, `org:read`, `project:read`, and `issue:read` scopes | Yes |
 | `SENTRY_ORG` | Sentry Organization slug (e.g. `my-company`) | Yes |
 | `SENTRY_PROJECT` | Default target project slug | Optional |
 

@@ -68,9 +68,12 @@
       "command": "npx",
       "args": [
         "-y",
-        "@sentry/mcp-server"
+        "@sentry/mcp-server",
+        "--access-token",
+        "${SENTRY_AUTH_TOKEN}"
       ],
       "env": {
+        "SENTRY_ACCESS_TOKEN": "${SENTRY_AUTH_TOKEN}",
         "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
         "SENTRY_ORG": "${SENTRY_ORG}"
       }
