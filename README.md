@@ -1,20 +1,20 @@
 <div align="center">
 
-# ⚡ ANTIGRAVITY SUPERCODER OS
-### *Autonomous Multi-Agent Framework • 12 Production MCP Servers • 5-Stage Supercoder Engine*
+# 🌌 ZeroGravity OS
+### *Ultra-Compact Autonomous Supercoder OS • Zero-Default On-Demand MCPs • 5-Stage OpenHuman Engine*
 
 [![CI Quality Gate](https://github.com/nandha/agent/actions/workflows/ci.yml/badge.svg)](https://github.com/nandha/agent/actions)
+[![Package Size](https://img.shields.io/badge/Package%20Size-1.3%20MB-brightgreen.svg)](https://github.com/nandha/agent)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Node.js 20+](https://img.shields.io/badge/node-20+-339933.svg?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![MCP Servers](https://img.shields.io/badge/MCP%20Servers-12%20Verified-blueviolet.svg)](https://modelcontextprotocol.io/)
-[![Skylos SAST](https://img.shields.io/badge/Security-Skylos%20Gate-emerald.svg)](https://github.com/duriantaco/skylos)
+[![MCP Servers](https://img.shields.io/badge/MCP%20Servers-12%20On--Demand-blueviolet.svg)](https://modelcontextprotocol.io/)
+[![Security](https://img.shields.io/badge/Security-Skylos%20Gate-emerald.svg)](https://github.com/duriantaco/skylos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <b>A unified, self-contained AI coding operating system equipped with 1,450+ specialized skills, persistent memory evolution, and zero-configuration one-click deployment.</b>
+  <b>A zero-weight, ultra-compact (1.3 MB) autonomous AI developer framework with zero-default background processes, dynamic on-demand tool lifecycle, and persistent memory evolution.</b>
 </p>
 
-[Quick Start](#-quick-start) • [Architecture](#-architecture) • [MCP Servers](#-mcp-server-ecosystem) • [Slash Commands](#-slash-commands--workflows) • [Makefile](#-developer-tooling)
+[Quick Start](#-quick-start) • [Install on New PC](#-install-on-a-new-pc-one-liner) • [Architecture](#-architecture) • [On-Demand MCPs](#-zero-default-on-demand-mcp-manager) • [Slash Commands](#-slash-commands--workflows) • [Makefile](#-developer-tooling)
 
 </div>
 
@@ -22,62 +22,32 @@
 
 ## 🌟 Highlights
 
-- 🚀 **Ultra-Compact Production Installer (`install.sh`)**: High-efficiency self-extracting XZ executable compressed to **~1.3 MB** (down from 86MB). Unpacks, provisions isolated virtual environments, and configures tools with a single click.
+- 🚀 **Ultra-Compact Production Installer (`install.sh`)**: High-efficiency self-extracting XZ executable compressed to **~1.3 MB** (down from 86MB). Installs and configures everything in seconds.
 - ⚡ **Zero-Default On-Demand MCP Architecture**: 0 background processes at startup. Servers are cataloged in `.agents/mcp-registry/servers.json`, dynamically activated when needed (`/mcp enable <name>` or `mcp.py`), and **automatically shut down** upon task completion.
 - 🤖 **OpenHuman Supercoder Engine (`@[openhuman]`)**: 5-stage automated engineering pipeline (Context Sweep $\rightarrow$ Architecture Blueprint $\rightarrow$ CodeCrusher $\rightarrow$ AAA Testing & Skylos Gate $\rightarrow$ Memory Tree Sync).
 - 🧠 **Persistent Memory Tree**: Invariant architecture decisions (`decisions.md`), platform gotchas (`gotchas.md`), and durable goal tracking (`goals.md`) that persist across agent sessions.
-- 🔌 **12 Verified Production MCP Servers**: GitHub, Playwright, Supabase, Neon Postgres, Sentry, Chrome DevTools, Serena, Docker Gateway, Context7, Shadcn UI, Magic 21st.dev, and Skylos with STDIO stream isolation (`mcp-npx`).
+- 🔌 **12 Verified Production MCP Servers**: GitHub, Playwright, Supabase, Neon Postgres, Sentry, Chrome DevTools, Serena, Docker Gateway, Context7, Shadcn UI, Magic 21st.dev, and Skylos with pure STDIO stream isolation (`mcp-npx`).
 - 🛡️ **Deterministic SAST & Zero-Slop**: Integrated local-first static analysis (`skylos`) to catch AI hallucinations, plus ADHD action-first formatting and human voice filters (`/no-ai-slop`).
 
 ---
 
-## 📐 Architecture
+## ⚡ Install on a New PC (One-Liner)
 
-```mermaid
-flowchart TB
-    subgraph Core ["🤖 OpenHuman Supercoding Pipeline"]
-        S1["1. Memory & Context Sweep<br/><i>(decisions.md, gotchas.md, goals.md)</i>"]
-        S2["2. Architectural Blueprint<br/><i>(Interface Contracts & Seams)</i>"]
-        S3["3. CodeCrusher Engine<br/><i>(High-Velocity Implementation)</i>"]
-        S4["4. AAA Testing & Skylos Gate<br/><i>(Arrange-Act-Assert + SAST)</i>"]
-        S5["5. Memory Tree Sync<br/><i>(Durable Milestone Updates)</i>"]
-        S1 --> S2 --> S3 --> S4 --> S5
-    end
+Run this single command in your terminal on any new Linux/macOS machine to download, unpack, and configure **ZeroGravity OS**:
 
-    subgraph Runtime ["🔌 Zero-Default On-Demand MCP Lifecycle"]
-        direction LR
-        MC["Registry Catalog<br/><i>(servers.json)</i>"] -->|mcp.py enable| ON["Active Process<br/><i>(mcp_config.json)</i>"]
-        ON -->|Task Complete| OFF["Auto-Close & Cleanup<br/><i>(mcp.py disable)</i>"]
-    end
-
-    Core <--> Runtime
+### 🎯 Interactive Setup Menu
+```bash
+curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh && rm -f /tmp/install.sh
 ```
 
----
-
-## ⚡ Quick Start
-
-### 1. One-Click Interactive Installation
-Extract and configure everything for your current workspace and global Antigravity environment with a single command:
-
+### ⚡ Non-Interactive Automated Deployment (Local & Global)
 ```bash
-# Run 1.3 MB self-extracting installer
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh --all -y && rm -f /tmp/install.sh
 ```
 
-### 2. Non-Interactive / CI Flags
+### 📦 Deploy into a Specific Target Workspace
 ```bash
-# Install both Local (.agents/) and Global (~/.gemini/config/)
-./install.sh --all -y
-
-# Install Global configuration only
-./install.sh --global -y
-
-# Deploy into a target workspace
-./install.sh --target /path/to/project -y
-
-# Dry-run / Simulation mode
-./install.sh --dry-run --all
+curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh --target /path/to/project -y && rm -f /tmp/install.sh
 ```
 
 ---
