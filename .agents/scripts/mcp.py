@@ -40,9 +40,21 @@ def load_json(path, default=None):
 
 
 def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    dir_path = os.path.dirname(os.path.abspath(path))
+    os.makedirs(dir_path, exist_ok=True)
+    temp_path = f"{path}.tmp.{os.getpid()}"
+    try:
+        with open(temp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, path)
+    finally:
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
 
 
 def get_target_configs(target_mode):
@@ -127,6 +139,8 @@ def cmd_run(args):
     """Enable server ephemerally, run command, and disable immediately."""
     name = args.name
     command = args.command
+    if command and command[0] == "--":
+        command = command[1:]
 
     if not command:
         print("❌ Error: No command specified after '--'.", file=sys.stderr)
