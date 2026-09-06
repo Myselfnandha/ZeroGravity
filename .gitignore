@@ -1,0 +1,42 @@
+# ==============================================================================
+# Git Ignore Rules - Antigravity Agent Framework
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Caches and DBs
+.agents/cache/codebase.db
+.agents/cache/*.db
+*.sqlite3
+.cache/
+.skylos/
+mcp_results/
+
+# Temporary files & Logs
+*.log
+*.tmp
+*.bak*
+scratch/
+
+# Large Distribution Binaries (generated on-demand via ./pack.sh)
+# Note: Keep install.sh and pack.sh tracked if desired, or ignore dist/
+dist/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key

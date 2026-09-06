@@ -1,0 +1,88 @@
+name: CI Quality & Verification Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    name: Framework Validation & MCP Health Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tar gzip curl
+          pip install uv pyyaml
+
+      - name: Compile & Lint Python Scripts
+        run: |
+          python -m py_compile .agents/scripts/*.py
+
+      - name: Validate Markdown YAML Frontmatter
+        run: |
+          python3 - << 'EOF'
+          import glob, yaml, sys
+          errors = []
+          for mf in glob.glob(".agents/**/*.md", recursive=True):
+              with open(mf, 'r', encoding='utf-8') as f:
+                  content = f.read()
+                  if content.startswith("---"):
+                      parts = content.split("---", 2)
+                      if len(parts) >= 3:
+                          try:
+                              yaml.safe_load(parts[1])
+                          except Exception as e:
+                              errors.append(f"{mf}: {e}")
+          if errors:
+              print(f"❌ Found {len(errors)} YAML frontmatter errors:")
+              for e in errors:
+                  print(f"  - {e}")
+              sys.exit(1)
+          print("✔ All markdown frontmatter validated successfully.")
+          EOF
+
+      - name: Validate MCP Config JSON Schemas
+        run: |
+          python3 - << 'EOF'
+          import json, os, sys
+          with open(".agents/mcp_config.json") as f:
+              cfg = json.load(f)
+          servers = cfg.get("mcpServers", {})
+          print(f"✔ Found {len(servers)} configured MCP servers.")
+          assert len(servers) >= 10, "Expected at least 10 MCP servers"
+          EOF
+
+      - name: Test Packager Engine (pack.sh)
+        run: |
+          chmod +x pack.sh
+          ./pack.sh
+
+      - name: Test Self-Extracting Installer Dry Run (install.sh)
+        run: |
+          chmod +x install.sh
+          ./install.sh --dry-run --all
+
+      - name: Test Local Target Installation
+        run: |
+          ./install.sh --target /tmp/ci-test-agents -y
+          test -d /tmp/ci-test-agents/.agents
+          test -f /tmp/ci-test-agents/.agents/mcp_config.json
+          echo "✔ Target extraction verified successfully."
