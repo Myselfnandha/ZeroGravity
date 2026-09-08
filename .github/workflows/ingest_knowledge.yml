@@ -1,0 +1,110 @@
+name: Knowledge & Strategy Auto-Ingestion
+
+on:
+  issues:
+    types: [opened, labeled]
+  repository_dispatch:
+    types: [knowledge_sync]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  ingest:
+    # Only run if triggered via repository_dispatch OR issue labeled 'community-learning'
+    if: >
+      github.event_name == 'repository_dispatch' ||
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'community-learning'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ingest Knowledge Payload
+        id: ingest_step
+        run: |
+          cat << 'EOF' > ingest_worker.py
+          import json
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, ".agents/scripts")
+          import sync_knowledge
+
+          # Extract raw text from GitHub event
+          event_path = os.getenv("GITHUB_EVENT_PATH")
+          with open(event_path, "r", encoding="utf-8") as f:
+              event_data = json.load(f)
+
+          payload = None
+          if "client_payload" in event_data:
+              payload = event_data["client_payload"]
+          elif "issue" in event_data:
+              body = event_data["issue"].get("body", "")
+              match = re.search(r"```json\s*(\{[\s\S]+?\})\s*```", body)
+              if match:
+                  try:
+                      payload = json.loads(match.group(1))
+                  except Exception as e:
+                      print(f"Error parsing JSON from issue: {e}")
+                      sys.exit(1)
+
+          if not payload:
+              print("No valid knowledge payload found in event.")
+              sys.exit(0)
+
+          # Zero-Knowledge Sanitize incoming payload again on server side for defense-in-depth
+          sanitized = sync_knowledge.sanitize_structure(payload)
+
+          # Update ecosystem files
+          updated = sync_knowledge.update_ecosystem_files(sanitized)
+          print(f"Successfully integrated {updated} new knowledge entries.")
+          EOF
+
+          python3 ingest_worker.py
+          rm -f ingest_worker.py
+
+      - name: Commit and Push to Central Repository
+        run: |
+          git config --global user.name "ZeroGravity-Knowledge-Bot"
+          git config --global user.email "bot@zerogravity.internal"
+          git add .agents/knowledge/ecosystems/ .agents/memory/
+          if git diff --cached --quiet; then
+            echo "No new changes to commit."
+          else
+            git commit -m "feat(knowledge): integrate community strategy & build flow [skip ci]"
+            git push origin HEAD:${{ github.ref_name || 'main' }}
+            echo "pushed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Close Ingestion Issue
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: "### 🌌 ZeroGravity OS Knowledge Ingestion Complete\n\n✅ **Verified & Integrated**: This strategy / build-flow payload has passed security screening and has been merged into the central ecosystem knowledge base.\n\nThank you for empowering the autonomous agent community!"
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              state: "closed"
+            });

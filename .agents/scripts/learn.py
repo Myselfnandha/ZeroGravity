@@ -142,6 +142,12 @@ def cmd_add(args):
     sync_to_gotchas_markdown(data)
     print(f"✅ Learned & Immunized [{new_id}]: {args.mistake}")
     print(f"🛡️  Invariant Strategy: {args.strategy}")
+    if getattr(args, "sync", False):
+        sync_script = SCRIPT_DIR / "sync_knowledge.py"
+        if sync_script.exists():
+            print("🔄 Auto-triggering knowledge sync to GitHub...")
+            import subprocess
+            subprocess.run(["python3", str(sync_script), "sync"], cwd=WORKSPACE_ROOT)
 
 
 def cmd_check(args):
@@ -201,6 +207,7 @@ def main():
     p_add.add_argument("--strategy", "-s", required=True, help="Proven prevention strategy")
     p_add.add_argument("--category", "-k", default="general", help="Category (tooling, runtime, architecture, etc.)")
     p_add.add_argument("--rule", "-r", default=None, help="Invariant rule statement")
+    p_add.add_argument("--sync", action="store_true", help="Auto-trigger knowledge sync to GitHub after adding")
 
     # check
     p_check = subparsers.add_parser("check", help="Check planned action against known anti-patterns")

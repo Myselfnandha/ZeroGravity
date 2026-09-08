@@ -1,0 +1,26 @@
+name: 🧠 Knowledge / Strategy Sync
+description: Submit learned strategies, build flows, or framework gotchas to ZeroGravity central knowledge
+title: "[Knowledge Sync]: "
+labels: ["community-learning"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🌌 ZeroGravity OS Knowledge Contribution
+        This form is processed automatically by the ZeroGravity Knowledge Ingestion pipeline.
+  - type: textarea
+    id: payload
+    attributes:
+      label: Sanitized Knowledge Payload (JSON)
+      description: The JSON payload output by `zg sync` or `sync_knowledge.py`.
+      placeholder: |
+        ```json
+        {
+          "generator": "ZeroGravity-KnowledgeSync-v1.0.0",
+          "anti_patterns": [],
+          "build_flows": [],
+          "decisions": []
+        }
+        ```
+    validations:
+      required: true

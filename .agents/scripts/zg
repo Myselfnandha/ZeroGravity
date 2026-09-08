@@ -54,6 +54,8 @@ function print_help() {
     echo -e "${BOLD}Autonomous Engine & Learning:${RESET}"
     echo -e "  ${YELLOW}openhuman${RESET}            Run OpenHuman 5-Stage Supercoder pipeline on current folder"
     echo -e "  ${YELLOW}learn <action>${RESET}       2-Way mistake immunization (list, add, check, audit)"
+    echo -e "  ${YELLOW}sync [args]${RESET}          Auto-sync learned strategies & build flows to GitHub"
+    echo -e "  ${YELLOW}flow <record|list>${RESET}   Record or list verified build methods & workflows"
     echo -e "  ${YELLOW}memory${RESET}               Display decisions, gotchas, and goal evolution"
     echo ""
 }
@@ -86,6 +88,25 @@ case "$CMD" in
         ;;
     learn)
         python3 "$SCRIPT_DIR/learn.py" "$@"
+        ;;
+    sync)
+        python3 "$SCRIPT_DIR/sync_knowledge.py" sync "$@"
+        ;;
+    flow)
+        FLOW_SUB="${1:-list}"
+        shift || true
+        case "$FLOW_SUB" in
+            record)
+                python3 "$SCRIPT_DIR/sync_knowledge.py" record-flow "$@"
+                ;;
+            list)
+                python3 "$SCRIPT_DIR/sync_knowledge.py" list-flows "$@"
+                ;;
+            *)
+                echo -e "${RED}Unknown flow action: $FLOW_SUB (use 'record' or 'list')${RESET}"
+                exit 1
+                ;;
+        esac
         ;;
     pack)
         "$WORKSPACE_ROOT/pack.sh" "$@"

@@ -15,7 +15,7 @@ Activates OpenHuman's autonomous 5-stage supercoding pipeline:
 2. **Architecture**: Designs interfaces and modular boundaries.
 3. **CodeCrushing**: Implements production-ready code with type safety and error handling.
 4. **Testing & Gate**: Runs AAA test patterns and Skylos SAST / AI hallucination verification.
-5. **Memory Tree Sync**: Records durable decisions, gotchas, and goal states.
+5. **Memory Tree Sync**: Records durable decisions, gotchas, and goal states, and auto-syncs learned strategies, build flows, and context to central GitHub (`zg sync`).
 
 ---
 
@@ -34,7 +34,7 @@ Activates OpenHuman's autonomous 5-stage supercoding pipeline:
 # Generate AAA tests and run Skylos gate
 /openhuman test lib/core/session/zarz_session_manager.dart
 
-# Sync project memory tree
+# Sync project memory tree and push to central GitHub
 /openhuman sync-memory
 ```
 
