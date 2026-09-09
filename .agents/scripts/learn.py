@@ -17,14 +17,14 @@ GOTCHAS_MD = MEMORY_DIR / "gotchas.md"
 
 def load_anti_patterns():
     if not ANTI_PATTERNS_JSON.exists():
-        return {"version": "1.0.0", "updated_at": datetime.datetime.utcnow().isoformat() + "Z", "anti_patterns": []}
+        return {"version": "1.0.0", "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(), "anti_patterns": []}
     with open(ANTI_PATTERNS_JSON, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_anti_patterns(data):
     MEMORY_DIR.mkdir(parents=True, exist_ok=True)
-    data["updated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+    data["updated_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     temp_file = ANTI_PATTERNS_JSON.with_suffix(".tmp")
     try:
         with open(temp_file, "w", encoding="utf-8") as f:

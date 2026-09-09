@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated_at": "2026-09-06T23:16:00Z",
+  "updated_at": "2026-09-09T17:27:00.356108Z",
   "anti_patterns": [
     {
       "id": "AP-001",
@@ -41,6 +41,38 @@
       "root_cause": "Sequential view_file calls waste context tokens and cause high latency",
       "strategy": "Execute analyze.py --check --auto-heal --inject-ki and read the consolidated codebase_summary.md in a single read",
       "invariant_rule": "NEVER call view_file recursively across multiple files in a folder; use codebase_summary.md."
+    },
+    {
+      "id": "AP-006",
+      "category": "agent_behavior",
+      "mistake": "Refactoring code outside the user's requested scope",
+      "root_cause": "Agent interprets adjacent code as needing improvement or unsolicited optimization.",
+      "strategy": "Blast Radius Lock: Declare edit scope upfront; only edit within declared scope; flag out-of-scope issues as follow-up recommendations.",
+      "invariant_rule": "Never touch or refactor files or functions outside the declared blast radius without explicit user authorization."
+    },
+    {
+      "id": "AP-007",
+      "category": "agent_behavior",
+      "mistake": "Claiming success without running verification commands",
+      "root_cause": "Token-pressure or speed bias leads agent to skip test runs and pattern-match 'this looks right' or use speculative language.",
+      "strategy": "Evidence Gate: Always run tests or re-read files, report actual terminal output, never say 'should work'.",
+      "invariant_rule": "Zero speculative claims: every declaration of success requires empirical terminal execution evidence."
+    },
+    {
+      "id": "AP-008",
+      "category": "agent_behavior",
+      "mistake": "Editing files based on stale cached memory instead of current on-disk state",
+      "root_cause": "Files read early in long sessions get modified externally or by background tasks while agent remembers old lines.",
+      "strategy": "Freshness Gate: Re-read target file if >5 tool calls since last read; run git status before multi-file edits.",
+      "invariant_rule": "Always re-read target files before applying diffs if >5 tool calls elapsed or external changes occurred."
+    },
+    {
+      "id": "AP-009",
+      "category": "agent_behavior",
+      "mistake": "Using invented library functions that don't exist in installed packages",
+      "root_cause": "LLM hallucination on fast-moving libraries or niche frameworks where training memory contains plausible APIs.",
+      "strategy": "Hallucination Guard: Verify every unfamiliar API symbol via tool inspection, REPL check, or docs before using.",
+      "invariant_rule": "Verify all library APIs and methods via tools before writing code; pass Import Verification Gate."
     }
   ]
 }

@@ -44,3 +44,23 @@ Universal architecture invariants, git workflows, security practices, and agent 
 - **Root Cause**: Sequential view_file calls waste context tokens and cause high latency
 - **Prevention Strategy**: Execute analyze.py --check --auto-heal --inject-ki and read the consolidated codebase_summary.md in a single read
 - **Invariant Rule**: NEVER call view_file recursively across multiple files in a folder; use codebase_summary.md.
+
+### [AP-006] Refactoring code outside the user's requested scope
+- **Root Cause**: Agent interprets adjacent code as needing improvement or unsolicited optimization.
+- **Prevention Strategy**: Blast Radius Lock: Declare edit scope upfront; only edit within declared scope; flag out-of-scope issues as follow-up recommendations.
+- **Invariant Rule**: Never touch or refactor files or functions outside the declared blast radius without explicit user authorization.
+
+### [AP-007] Claiming success without running verification commands
+- **Root Cause**: Token-pressure or speed bias leads agent to skip test runs and pattern-match 'this looks right' or use speculative language.
+- **Prevention Strategy**: Evidence Gate: Always run tests or re-read files, report actual terminal output, never say 'should work'.
+- **Invariant Rule**: Zero speculative claims: every declaration of success requires empirical terminal execution evidence.
+
+### [AP-008] Editing files based on stale cached memory instead of current on-disk state
+- **Root Cause**: Files read early in long sessions get modified externally or by background tasks while agent remembers old lines.
+- **Prevention Strategy**: Freshness Gate: Re-read target file if >5 tool calls since last read; run git status before multi-file edits.
+- **Invariant Rule**: Always re-read target files before applying diffs if >5 tool calls elapsed or external changes occurred.
+
+### [AP-009] Using invented library functions that don't exist in installed packages
+- **Root Cause**: LLM hallucination on fast-moving libraries or niche frameworks where training memory contains plausible APIs.
+- **Prevention Strategy**: Hallucination Guard: Verify every unfamiliar API symbol via tool inspection, REPL check, or docs before using.
+- **Invariant Rule**: Verify all library APIs and methods via tools before writing code; pass Import Verification Gate.

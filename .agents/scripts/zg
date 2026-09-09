@@ -43,6 +43,7 @@ function print_help() {
     echo -e "  ${GREEN}install${RESET}              Run the interactive self-installer"
     echo -e "  ${GREEN}test${RESET}                 Run test suites (mcp, security, packager)"
     echo -e "  ${GREEN}check${RESET}                Run full pre-flight checklist"
+    echo -e "  ${GREEN}impact <symbol|--file>${RESET} Run impact analysis & blast radius check"
     echo ""
     echo -e "${BOLD}MCP On-Demand Management:${RESET}"
     echo -e "  ${CYAN}mcp list${RESET}             List all cataloged MCP servers and active states"
@@ -119,6 +120,9 @@ case "$CMD" in
         ;;
     check)
         python3 "$SCRIPT_DIR/checklist.py" "$WORKSPACE_ROOT"
+        ;;
+    impact)
+        python3 "$SCRIPT_DIR/impact_check.py" "$@"
         ;;
     openhuman)
         python3 "$SCRIPT_DIR/analyze.py" "$WORKSPACE_ROOT" --check --auto-heal

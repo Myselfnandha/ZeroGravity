@@ -23,8 +23,10 @@ Priority Order:
 import sys
 import subprocess
 import argparse
+import ast
+import re
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Set
 
 # ANSI colors for terminal output
 class Colors:
@@ -61,6 +63,7 @@ import shutil
 CORE_CHECKS = [
     ("Skylos SAST & Security Audit", "skylos", True),
     ("Python Syntax & Compilation", "syntax_check", True),
+    ("Import & API Verification", "import_verify", True),
     ("Framework Unit Tests", "test_suite", True),
     ("Learning Matrix Audit", "learn_audit", True),
     ("Security Scan", ".agent/skills/vulnerability-scanner/scripts/security_scan.py", False),
@@ -110,6 +113,153 @@ def check_script_exists(script_path: Path) -> bool:
     """Check if script file exists"""
     return script_path.exists() and script_path.is_file()
 
+def verify_imports(name: str, project_path_str: str) -> dict:
+    """
+    Verify all import statements in modified or project source files.
+    Ensures no hallucinated modules, missing packages, or broken symbol imports.
+    """
+    project_path = Path(project_path_str).resolve()
+    target_files: Set[Path] = set()
+
+    # 1. Check git status for modified/untracked files
+    try:
+        res = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=str(project_path),
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            for line in res.stdout.strip().splitlines():
+                if len(line) > 3:
+                    path_str = line[3:].strip()
+                    if " -> " in path_str:
+                        path_str = path_str.split(" -> ")[1]
+                    p = (project_path / path_str).resolve()
+                    if p.exists() and p.is_file() and p.suffix.lower() in {".py", ".js", ".ts", ".mjs", ".cjs"}:
+                        target_files.add(p)
+    except Exception:
+        pass
+
+    # 2. If no modified files in git status, scan primary project scripts and tests
+    if not target_files:
+        for pattern in ["tests/*.py", "scripts/*.py", ".agents/scripts/*.py", "*.py"]:
+            for p in project_path.glob(pattern):
+                if p.is_file():
+                    target_files.add(p.resolve())
+
+    # Filter out skills and meta cache directories
+    filtered_targets: List[Path] = []
+    for p in sorted(list(target_files)):
+        rel = str(p.relative_to(project_path)) if p.is_relative_to(project_path) else str(p)
+        parts = Path(rel).parts
+        if any(part in {".venv", "venv", "node_modules", "dist", "build", "__pycache__", ".git"} for part in parts):
+            continue
+        if "skills" in parts:
+            continue
+        filtered_targets.append(p)
+
+    if not filtered_targets:
+        print_success(f"{name}: PASSED (no source files to verify)")
+        return {"name": name, "passed": True, "output": "No files to check", "skipped": False}
+
+    search_paths = [
+        str(project_path),
+        str(project_path / ".agents" / "scripts"),
+        str(project_path / ".agent" / "scripts"),
+        str(project_path / "src"),
+        str(project_path / "lib"),
+        str(project_path / "tests"),
+    ]
+    search_paths = [p for p in search_paths if Path(p).exists()]
+    path_setup = f"import sys; sys.path = {search_paths!r} + sys.path;"
+
+    errors: List[str] = []
+    verified_count = 0
+
+    for f_path in filtered_targets:
+        rel_name = str(f_path.relative_to(project_path)) if f_path.is_relative_to(project_path) else f_path.name
+        if f_path.suffix == ".py":
+            try:
+                tree = ast.parse(f_path.read_text(encoding="utf-8", errors="ignore"), filename=str(f_path))
+            except Exception as e:
+                errors.append(f"{rel_name}: AST parse error: {e}")
+                continue
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        mod = alias.name.split(".")[0]
+                        test_cmd = [sys.executable, "-c", f"{path_setup} import {mod}"]
+                        res = subprocess.run(test_cmd, capture_output=True, text=True, timeout=10)
+                        if res.returncode != 0:
+                            err = res.stderr.strip().splitlines()[-1] if res.stderr.strip() else "Import failed"
+                            errors.append(f"{rel_name}:L{node.lineno} Cannot import module '{alias.name}': {err}")
+                        else:
+                            verified_count += 1
+                elif isinstance(node, ast.ImportFrom):
+                    if node.level and node.level > 0:
+                        # Relative import within package
+                        continue
+                    if node.module:
+                        for alias in node.names:
+                            sym = "*" if alias.name == "*" else alias.name
+                            test_cmd = [sys.executable, "-c", f"{path_setup} from {node.module} import {sym}"]
+                            res = subprocess.run(test_cmd, capture_output=True, text=True, timeout=10)
+                            if res.returncode != 0:
+                                err = res.stderr.strip().splitlines()[-1] if res.stderr.strip() else "Import failed"
+                                errors.append(f"{rel_name}:L{node.lineno} Cannot import '{alias.name}' from '{node.module}': {err}")
+                            else:
+                                verified_count += 1
+
+        elif f_path.suffix in {".js", ".mjs", ".ts", ".cjs"}:
+            try:
+                content = f_path.read_text(encoding="utf-8", errors="ignore")
+                for match in re.finditer(r"""(?:import\s+.*?from\s+['"]([^'"]+)['"]|require\s*\(\s*['"]([^'"]+)['"]\s*\))""", content):
+                    req_target = match.group(1) or match.group(2)
+                    if req_target.startswith("."):
+                        target_cand = (f_path.parent / req_target).resolve()
+                        valid = any([
+                            target_cand.exists(),
+                            target_cand.with_suffix(".js").exists(),
+                            target_cand.with_suffix(".ts").exists(),
+                            target_cand.with_suffix(".mjs").exists(),
+                            target_cand.with_suffix(".json").exists(),
+                            (target_cand / "index.js").exists(),
+                            (target_cand / "index.ts").exists()
+                        ])
+                        if not valid:
+                            errors.append(f"{rel_name}: Relative import target '{req_target}' not found on disk")
+                        else:
+                            verified_count += 1
+            except Exception:
+                pass
+
+    if errors:
+        print_error(f"{name}: FAILED ({len(errors)} unresolved import/API errors)")
+        for err in errors[:10]:
+            print(f"  ❌ {err}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more")
+        return {
+            "name": name,
+            "passed": False,
+            "output": "",
+            "error": "\n".join(errors),
+            "skipped": False
+        }
+
+    print_success(f"{name}: PASSED ({len(filtered_targets)} file(s), {verified_count} import statements verified)")
+    return {
+        "name": name,
+        "passed": True,
+        "output": f"Verified {len(filtered_targets)} file(s), {verified_count} imports",
+        "error": "",
+        "skipped": False
+    }
+
+
 def run_script(name: str, script_path_str: str, project_path: str, url: Optional[str] = None) -> dict:
     """
     Run a validation script and capture results
@@ -140,6 +290,9 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
         print_step(f"Running: {name}")
         py_files = [str(p) for p in scripts_dir.glob("*.py")]
         cmd = [sys.executable, "-m", "py_compile"] + py_files
+    elif script_path_str == "import_verify":
+        print_step(f"Running: {name}")
+        return verify_imports(name, project_path)
     elif script_path_str == "test_suite":
         print_step(f"Running: {name}")
         cmd = [sys.executable, "-m", "unittest", "discover", str(Path(project_path) / "tests"), "-v"]
@@ -152,6 +305,7 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
             print_warning(f"{name}: Script not found, skipping")
             return {"name": name, "passed": True, "output": "", "skipped": True}
         print_step(f"Running: {name}")
+
         cmd = [sys.executable, str(script_path), project_path]
         if url and ("lighthouse" in script_path.name.lower() or "playwright" in script_path.name.lower()):
             cmd.append(url)
