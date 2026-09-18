@@ -189,7 +189,7 @@ print_banner
 if [ -z "$TARGET_MODE" ]; then
     echo -e "${C_BOLD}Select installation target:${C_RESET}"
     echo -e "  ${C_CYAN}1)${C_RESET} ${C_BOLD}Both Local & Global${C_RESET} (Full Suite: current workspace + ~/.gemini/config/)"
-    echo -e "  ${C_CYAN}2)${C_RESET} ${C_BOLD}Global Only${C_RESET} (~/.gemini/config/ + ~/.local/bin/skylos)"
+    echo -e "  ${C_CYAN}2)${C_RESET} ${C_BOLD}Global Only${C_RESET} (~/.gemini/config/)"
     echo -e "  ${C_CYAN}3)${C_RESET} ${C_BOLD}Local Workspace Only${C_RESET} (.agents/ in current directory: $(pwd))"
     echo -e "  ${C_CYAN}4)${C_RESET} ${C_BOLD}Custom Workspace Directory${C_RESET}"
     echo -e "  ${C_CYAN}5)${C_RESET} Cancel / Exit"
@@ -334,31 +334,14 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
     fi
 fi
 
-# 5. Skylos Environment Setup, mcp-npx, & PATH Configuration
-echo -e "\n${C_BOLD}🛡️  Configuring Skylos SAST & Tooling Environment...${C_RESET}"
-SKYLOS_VENV="$HOME/.local/share/skylos/venv"
+# 5. MCP Runner & PATH Configuration
+echo -e "\n${C_BOLD}🔌 Configuring MCP Tools & Runtime Environment...${C_RESET}"
 BIN_DIR="$HOME/.local/bin"
 
 if [ "$DRY_RUN" = true ]; then
-    echo -e "${C_YELLOW}[DRY-RUN] Would configure Skylos in $SKYLOS_VENV and link to $BIN_DIR/skylos${C_RESET}"
+    echo -e "${C_YELLOW}[DRY-RUN] Would configure MCP runner in $BIN_DIR/mcp-npx and PATH${C_RESET}"
 else
     mkdir -p "$BIN_DIR"
-    if [ ! -f "$SKYLOS_VENV/bin/python" ]; then
-        echo -e "  ${C_BLUE}Creating isolated Python virtual environment for Skylos...${C_RESET}"
-        mkdir -p "$HOME/.local/share/skylos"
-        python3 -m venv "$SKYLOS_VENV"
-        "$SKYLOS_VENV/bin/pip" install --quiet --upgrade pip
-        "$SKYLOS_VENV/bin/pip" install --quiet skylos
-        echo -e "  ${C_GREEN}✔ Skylos virtual environment created${C_RESET}"
-    else
-        echo -e "  ${C_GREEN}✔ Skylos virtual environment already present${C_RESET}"
-    fi
-
-    # Symlink binary
-    if [ -f "$SKYLOS_VENV/bin/skylos" ]; then
-        ln -sf "$SKYLOS_VENV/bin/skylos" "$BIN_DIR/skylos"
-        echo -e "  ${C_GREEN}✔ Symlinked Skylos binary to:${C_RESET} $BIN_DIR/skylos"
-    fi
 
     # Install mcp-npx runner
     if [ -f "$TEMP_EXTRACT/.agents/scripts/mcp_runner.sh" ]; then
@@ -419,12 +402,17 @@ echo " 🎉 Antigravity Installation Complete!"
 echo "============================================================"
 echo -e "${C_RESET}"
 echo -e "Available Workflows & Slash Commands:"
-echo -e "  ${C_CYAN}/openhuman${C_RESET}     - 5-Stage Supercoder Engine"
-echo -e "  ${C_CYAN}/mcp${C_RESET}           - On-Demand MCP Manager (enable, disable, list, auto-close)"
-echo -e "  ${C_CYAN}/skylos${C_RESET}        - Static analysis, SAST security scan & hallucination gate"
-echo -e "  ${C_CYAN}/i-have-adhd${C_RESET}   - Action-first, bounded cognitive output mode"
-echo -e "  ${C_CYAN}/no-ai-slop${C_RESET}    - Human voice preservation & AI slop removal"
-echo -e "  ${C_CYAN}/caveman${C_RESET}       - Token-compressed telegraphic communication"
+echo -e "  ${C_CYAN}/build-feature${C_RESET}  - 5-Stage Supercoder Engine"
+echo -e "  ${C_CYAN}/learn${C_RESET}          - 2-Way Mistake Immunization Engine"
+echo -e "  ${C_CYAN}/mcp${C_RESET}            - Dynamic On-Demand MCP Manager"
+echo -e "  ${C_CYAN}/effort${C_RESET}         - Model Reasoning Effort Override (low, mid, high, ultra)"
+echo -e "  ${C_CYAN}/plan${C_RESET}           - Structured Project Planning Mode"
+echo -e "  ${C_CYAN}/debug${C_RESET}          - Root-Cause Debugging & Investigation"
+echo -e "  ${C_CYAN}/test${C_RESET}           - AAA Test Generation & Verification"
+echo -e "  ${C_CYAN}/design-ui${C_RESET}       - Design Intelligence & Layouts"
+echo -e "  ${C_CYAN}/focus-adhd${C_RESET}     - Action-first, bounded cognitive output mode"
+echo -e "  ${C_CYAN}/humanize-text${C_RESET}  - Human voice preservation & AI slop removal"
+echo -e "  ${C_CYAN}/compress-tokens${C_RESET}- Token-compressed telegraphic communication"
 echo ""
 
 exit 0

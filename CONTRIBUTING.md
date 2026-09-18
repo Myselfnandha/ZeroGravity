@@ -12,14 +12,15 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
 │   ├── agents/                 # Specialist autonomous personas (OpenHuman, etc.)
 │   ├── rules/                  # Behavioral gates & coding standards
 │   ├── skills/                 # On-demand domain expertise modules
-│   ├── workflows/              # Slash command workflows (/openhuman, /skylos, etc.)
-│   ├── plugins/                # Bundled skill packages
+│   ├── workflows/              # Slash command workflows (/openhuman, /mcp, etc.)
+│   ├── plugins/                # Workspace plugins (e.g. ponytail)
 │   ├── memory/                 # Durable Memory Tree (decisions, gotchas, goals)
 │   ├── scripts/                # Verification, analysis, and caching utilities
 │   ├── mcp-registry/           # MCP server recipes & catalog
 │   └── mcp_config.json         # Workspace MCP configuration
 ├── pack.sh                     # Packaging engine (builds self-extracting install.sh)
 ├── install.sh                  # Portable self-extracting installer
+├── unpack-plugins.sh           # Offline plugins archive manager (unpack/remove)
 ├── Makefile                    # Developer commands
 └── .github/workflows/          # Automated CI pipeline
 ```
@@ -39,14 +40,16 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
    make check
    ```
 
-3. **Adding a New Skill**:
-   - Create directory `.agents/skills/<skill-name>/`
-   - Include `SKILL.md` with standard YAML frontmatter:
+3. **Adding a New Workflow**:
+   - Create `.agents/workflows/<workflow-name>.md`
+   - Include standard YAML frontmatter:
      ```markdown
      ---
-     name: <skill-name>
-     description: <concise summary of when to activate this skill>
+     description: <concise summary of workflow>
      ---
+
+     # /<command> - Title
+     $ARGUMENTS
      ```
 
 4. **Adding an MCP Server Recipe**:
@@ -70,4 +73,4 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
 
 - Follow AAA (Arrange, Act, Assert) pattern for testing.
 - Ensure all markdown files have valid YAML frontmatter delimiters.
-- Run `skylos` SAST analysis on all Python scripts before committing.
+- Keep codebase lean: test scripts with `make test` before committing.

@@ -21,6 +21,11 @@ mcp_results/
 *.tmp
 *.bak*
 scratch/
+task.md
+codebase_*.md
+node_modules/
+**/node_modules/
+coding-interview-university/
 
 # Large Distribution Binaries (generated on-demand via ./pack.sh)
 # Note: Keep install.sh and pack.sh tracked if desired, or ignore dist/
@@ -40,3 +45,4 @@ Thumbs.db
 .env.*.local
 *.pem
 *.key
+.agents/mcp_config.json

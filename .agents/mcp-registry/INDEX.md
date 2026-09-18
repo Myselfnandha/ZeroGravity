@@ -17,7 +17,6 @@ A curated index of production Model Context Protocol (MCP) servers integrated in
 | **chrome-devtools** | [chrome-devtools.md](./recipes/chrome-devtools.md) | `npx -y @chrome-devtools-mcp/server` | — | Performance & Web Debugging |
 | **serena** | [serena.md](./recipes/serena.md) | `uvx serena-mcp` | — | Semantic Code Intelligence |
 | **docker-gateway** | [docker-gateway.md](./recipes/docker-gateway.md) | `npx -y @docker/mcp-server` | Running Docker daemon | Containers & Infrastructure |
-| **skylos** | Core Tool | `~/.local/share/skylos/venv/bin/python -m skylos_mcp` | — | SAST, Dead Code & AI Trust |
 | **dart-mcp-server** | Core Tool | `dart mcp-server` | — | Flutter & Dart SDK Tooling |
 | **shadcn** | Core Tool | `npx shadcn@latest mcp` | — | Component Registry |
 | **magic** | Core Tool | `npx -y @21st-dev/magic@latest` | `API_KEY` | UI Design & Magic Components |

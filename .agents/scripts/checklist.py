@@ -59,9 +59,7 @@ def print_error(text: str):
 import os
 import shutil
 
-# Define priority-ordered checks
 CORE_CHECKS = [
-    ("Skylos SAST & Security Audit", "skylos", True),
     ("Python Syntax & Compilation", "syntax_check", True),
     ("Import & API Verification", "import_verify", True),
     ("Framework Unit Tests", "test_suite", True),
@@ -76,18 +74,6 @@ PERFORMANCE_CHECKS = [
     ("Lighthouse Audit", ".agent/skills/performance-profiling/scripts/lighthouse_audit.py", True),
     ("Playwright E2E", ".agent/skills/webapp-testing/scripts/playwright_runner.py", True),
 ]
-
-def find_skylos_bin() -> Optional[str]:
-    """Locate skylos binary from standard locations or PATH"""
-    candidates = [
-        str(Path.home() / ".local/bin/skylos"),
-        str(Path.home() / ".local/share/skylos/venv/bin/skylos"),
-        "skylos",
-    ]
-    for c in candidates:
-        if shutil.which(c) or (Path(c).exists() and os.access(c, os.X_OK)):
-            return c
-    return None
 
 def resolve_script_path(project_path: str, script_path_str: str) -> Optional[Path]:
     """Resolve script path supporting .agents, .agent, and plugins directory."""
@@ -269,24 +255,7 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
     """
     scripts_dir = Path(__file__).resolve().parent
 
-    if script_path_str == "skylos":
-        skylos_bin = find_skylos_bin()
-        if not skylos_bin:
-            print_warning(f"{name}: Skylos binary not found, skipping")
-            return {"name": name, "passed": True, "output": "", "skipped": True}
-        print_step(f"Running: {name} via {skylos_bin}")
-        cmd = [
-            skylos_bin,
-            project_path,
-            "--exclude", ".agents",
-            "--exclude", ".agent",
-            "--exclude", "venv",
-            "--exclude", "dist",
-            "--exclude", "install.sh",
-            "--severity", "error",
-            "--format", "concise"
-        ]
-    elif script_path_str == "syntax_check":
+    if script_path_str == "syntax_check":
         print_step(f"Running: {name}")
         py_files = [str(p) for p in scripts_dir.glob("*.py")]
         cmd = [sys.executable, "-m", "py_compile"] + py_files
@@ -325,9 +294,7 @@ def run_script(name: str, script_path_str: str, project_path: str, url: Optional
             print_success(f"{name}: PASSED")
         else:
             print_error(f"{name}: FAILED")
-            if result.stdout and script_path_str == "skylos":
-                print(f"{Colors.YELLOW}  Findings preview:\n" + "\n".join("    " + line for line in result.stdout.strip().splitlines()[:10]) + f"{Colors.ENDC}")
-            elif result.stderr:
+            if result.stderr:
                 print(f"  Error: {result.stderr[:200]}")
         
         return {

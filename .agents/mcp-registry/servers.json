@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "context7": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@upstash/context7-mcp",
@@ -8,13 +9,16 @@
         "${UPSTASH_CONTEXT7_API_KEY}"
       ],
       "env": {
+        "UPSTASH_CONTEXT7_API_KEY": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get key at https://upstash.com",
       "description": "Real-time library documentation resolver (Upstash Context7)",
       "category": "documentation"
     },
     "shadcn": {
+      "tier": "zero-config",
       "command": "mcp-npx",
       "args": [
         "shadcn@latest",
@@ -28,44 +32,37 @@
       "category": "frontend"
     },
     "magic": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@21st-dev/magic@latest"
       ],
       "env": {
-        "API_KEY": "${MAGIC_API_KEY}",
+        "MAGIC_API_KEY": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get free key at https://21st.dev",
       "description": "21st.dev Magic UI design inspiration, component search & generation",
       "category": "frontend"
     },
-    "skylos": {
-      "command": "/home/nandha/.local/share/skylos/venv/bin/python",
-      "args": [
-        "-m",
-        "skylos_mcp"
-      ],
-      "env": {
-        "SKYLOS_MCP_RESULTS_DIR": "/home/nandha/.skylos/mcp_results"
-      },
-      "description": "Local-first static analysis, SAST security scans & AI hallucination checks",
-      "category": "security"
-    },
     "github": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@modelcontextprotocol/server-github"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_TOKEN": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get PAT at https://github.com/settings/tokens",
       "description": "GitHub issues, pull requests, repository search & automation",
       "category": "vcs"
     },
     "playwright": {
+      "tier": "zero-config",
       "command": "mcp-npx",
       "args": [
         "@playwright/mcp"
@@ -78,20 +75,23 @@
       "category": "testing"
     },
     "supabase": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@supabase/mcp-server-supabase"
       ],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}",
-        "SUPABASE_PROJECT_REF": "${SUPABASE_PROJECT_REF}",
+        "SUPABASE_ACCESS_TOKEN": "",
+        "SUPABASE_PROJECT_REF": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get tokens at https://supabase.com/dashboard/account/tokens",
       "description": "Supabase project management, database migrations & SQL execution",
       "category": "database"
     },
     "sentry": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@sentry/mcp-server",
@@ -99,29 +99,32 @@
         "${SENTRY_AUTH_TOKEN}"
       ],
       "env": {
-        "SENTRY_ACCESS_TOKEN": "${SENTRY_AUTH_TOKEN}",
-        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
-        "SENTRY_ORG": "${SENTRY_ORG}",
+        "SENTRY_AUTH_TOKEN": "",
+        "SENTRY_ORG": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get auth token at https://sentry.io/settings/account/api/auth-tokens/",
       "description": "Sentry error telemetry, performance traces & crash diagnostic queries",
       "category": "observability"
     },
     "neon": {
+      "tier": "bring-your-key",
       "command": "mcp-npx",
       "args": [
         "@neondatabase/mcp-server-neon"
       ],
       "env": {
-        "NEON_API_KEY": "${NEON_API_KEY}",
+        "NEON_API_KEY": "",
         "NO_COLOR": "1",
         "npm_config_loglevel": "silent"
       },
+      "setup_hint": "Get API key at https://console.neon.tech/app/settings/api-keys",
       "description": "Neon serverless Postgres branching, SQL queries & connection pooling",
       "category": "database"
     },
     "chrome-devtools": {
+      "tier": "zero-config",
       "command": "mcp-npx",
       "args": [
         "chrome-devtools-mcp"
@@ -134,6 +137,7 @@
       "category": "browser"
     },
     "serena": {
+      "tier": "zero-config",
       "command": "uvx",
       "args": [
         "--from",
@@ -147,6 +151,7 @@
       "category": "code-intelligence"
     },
     "docker-gateway": {
+      "tier": "zero-config",
       "command": "docker",
       "args": [
         "run",
@@ -158,6 +163,21 @@
       ],
       "description": "Docker container lifecycle, sandbox builds & image inspection",
       "category": "containers"
+    },
+    "ponytail": {
+      "tier": "zero-config",
+      "command": "node",
+      "args": [
+        "${AGENT_DIR}/plugins/ponytail/ponytail-mcp/index.js"
+      ],
+      "description": "Lazy senior dev instructions, prompts & tools (lite, full, ultra)",
+      "category": "productivity"
+    },
+    "reui": {
+      "tier": "zero-config",
+      "serverUrl": "https://mcp.reui.io",
+      "description": "ReUI 1,105+ React components, UI blocks & shadcn registry",
+      "category": "frontend"
     }
   }
 }

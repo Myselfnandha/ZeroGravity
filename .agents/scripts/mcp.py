@@ -94,6 +94,17 @@ def cmd_list(args):
     print("  Reset   : python .agents/scripts/mcp.py reset (zero-default)\n")
 
 
+def resolve_placeholders(obj):
+    if isinstance(obj, str):
+        home = os.path.expanduser("~")
+        return obj.replace("${HOME}", home).replace("${AGENT_DIR}", AGENT_DIR).replace("${WORKSPACE_ROOT}", WORKSPACE_ROOT)
+    elif isinstance(obj, list):
+        return [resolve_placeholders(x) for x in obj]
+    elif isinstance(obj, dict):
+        return {k: resolve_placeholders(v) for k, v in obj.items()}
+    return obj
+
+
 def cmd_enable(args):
     registry = load_json(REGISTRY_FILE, {"mcpServers": {}}).get("mcpServers", {})
     target_paths = get_target_configs(args.target)
@@ -103,7 +114,7 @@ def cmd_enable(args):
             print(f"❌ Error: MCP server '{name}' not found in registry (.agents/mcp-registry/servers.json).", file=sys.stderr)
             continue
 
-        server_def = {k: v for k, v in registry[name].items() if k not in ("description", "category")}
+        server_def = {k: resolve_placeholders(v) for k, v in registry[name].items() if k not in ("description", "category")}
 
         for cfg_path in target_paths:
             cfg = load_json(cfg_path, {"mcpServers": {}})

@@ -1,0 +1,25 @@
+# Development files & scripts
+Makefile
+pack.sh
+install.sh
+tests/
+.github/
+.agents/tools/scripts/tests/
+
+# Build & temporary outputs
+dist/
+scratch/
+*.log
+*.tmp
+*.bak*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Caches
+.agents/cache/
+__pycache__/
+*.py[cod]

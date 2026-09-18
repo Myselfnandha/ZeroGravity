@@ -1,0 +1,49 @@
+{
+  "name": "zerogravity",
+  "version": "1.1.0",
+  "description": "Ultra-compact autonomous supercoder OS framework installer for Google Antigravity",
+  "main": "bin/cli.js",
+  "bin": {
+    "zerogravity": "./bin/cli.js",
+    "zg": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    ".agents/",
+    "unpack-plugins.sh",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node bin/cli.js --help",
+    "pack:dry": "npm pack --dry-run",
+    "prepublishOnly": "python3 -m unittest discover tests -v && node bin/cli.js --dry-run"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "antigravity",
+    "zerogravity",
+    "ai-agent",
+    "supercoder",
+    "mcp",
+    "workflows",
+    "openhuman",
+    "developer-tools"
+  ],
+  "author": "Nandha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Myselfnandha/ZeroGravity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Myselfnandha/ZeroGravity/issues"
+  },
+  "homepage": "https://github.com/Myselfnandha/ZeroGravity#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

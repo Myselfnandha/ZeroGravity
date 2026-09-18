@@ -26,6 +26,24 @@ install-local: ## Install only to the local workspace (.agents/)
 install-global: ## Install only to global Antigravity config (~/.gemini/config/)
 	@./install.sh --global -y
 
+npm-link: ## Link zerogravity CLI globally (npx zerogravity / zg)
+	@npm link
+
+npm-pack: ## Dry-run preview of npm package contents and size
+	@npm run pack:dry
+
+npm-publish: ## Publish zerogravity package to public npm registry
+	@npm publish --access public
+
+plugins-unpack: ## Unpack extended offline plugins from archive
+	@./unpack-plugins.sh unpack
+
+plugins-remove: ## Remove unpacked offline plugins to keep workspace lean
+	@./unpack-plugins.sh remove
+
+plugins-status: ## Check plugin storage status (lean vs unpacked)
+	@./unpack-plugins.sh status
+
 dry-run: ## Simulate installation without modifying files
 	@./install.sh --dry-run --all
 
@@ -35,13 +53,9 @@ test: ## Run verification suite on scripts, rules, and MCP catalog
 
 check: verify lint learn-audit ## Run full verification, SAST, and learning matrix audit
 
-lint: ## Run Python syntax checks and Skylos SAST scan
+lint: ## Run Python syntax checks
 	@echo "🔍 Checking Python scripts..."
 	@$(PYTHON) -m py_compile .agents/scripts/*.py
-	@if command -v skylos >/dev/null 2>&1; then \
-		echo "🛡️ Running Skylos SAST analysis..."; \
-		skylos .agents/scripts/ --exclude .agents -a --format concise || true; \
-	fi
 
 verify: ## Check MCP catalog status
 	@$(PYTHON) .agents/scripts/mcp.py list

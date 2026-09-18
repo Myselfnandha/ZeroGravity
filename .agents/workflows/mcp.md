@@ -1,55 +1,57 @@
 ---
-description: Dynamic On-Demand MCP Server Manager. List catalog servers, enable on-demand, disable, or reset to zero-default profile.
+description: Dynamic On-Demand MCP Server Manager. List catalog servers, enable on-demand, disable, or sync to IDEs.
 ---
 
 # /mcp - On-Demand MCP Server Manager
 
-Manage and toggle the 12 verified production Model Context Protocol (MCP) servers with zero background overhead.
+Manage and toggle the 13 verified production Model Context Protocol (MCP) servers with zero background overhead.
 
 ---
 
 ## Quick Commands
 
 ```bash
-# List all cataloged servers and their active status
-python .agents/scripts/mcp.py list
+# List all cataloged servers, grouped by tier (zero-config vs bring-your-key)
+npx zerogravity mcp list
 
-# Enable server(s) on demand
-python .agents/scripts/mcp.py enable <name> [name2...]
+# Enable server(s) on demand (prompts for API keys if needed)
+npx zerogravity mcp enable <name> [name2...]
 
-# Disable / auto-close server(s) to free resources
-python .agents/scripts/mcp.py disable <name> [name2...]
+# Disable server(s)
+npx zerogravity mcp disable <name> [name2...]
 
-# Reset to clean zero-default profile (0 active background servers)
-python .agents/scripts/mcp.py reset
+# Show currently enabled servers
+npx zerogravity mcp status
 
-# Run an ephemeral task with auto-shutdown
-python .agents/scripts/mcp.py run <name> -- <command>
+# Force-sync enabled servers to IDE configurations (Antigravity, VS Code, Cursor)
+npx zerogravity mcp sync
 ```
 
 ---
 
-## 12 Verified Production Servers
+## 13 Verified Production Servers
 
-| Name | Category | Description |
+| Name | Category | Tier |
 |:---|:---|:---|
-| `context7` | Documentation | Real-time library documentation resolver (Upstash) |
-| `shadcn` | Frontend | Direct Shadcn UI registry component discovery |
-| `magic` | Frontend | 21st.dev Magic UI design inspiration & generator |
-| `skylos` | Security | Local-first static analysis, SAST scan & hallucination gate |
-| `github` | VCS | GitHub issues, pull requests, repository search |
-| `playwright` | Testing | Headless browser automation, visual snapshots, E2E |
-| `supabase` | Database | Supabase database migrations, table inspection & SQL |
-| `neon` | Database | Neon serverless Postgres branching & queries |
-| `sentry` | Observability | Sentry error telemetry & crash traces |
-| `chrome-devtools` | Browser | Live Chrome DOM inspection, Lighthouse audits |
-| `serena` | Code Intelligence | AST symbol navigation & deep refactoring |
-| `docker-gateway` | Containers | Docker container lifecycle & sandbox builds |
+| `context7` | Documentation | Bring-Your-Key |
+| `shadcn` | Frontend | Zero-Config |
+| `magic` | Frontend | Bring-Your-Key |
+| `github` | VCS | Bring-Your-Key |
+| `playwright` | Testing | Zero-Config |
+| `supabase` | Database | Bring-Your-Key |
+| `sentry` | Observability | Bring-Your-Key |
+| `neon` | Database | Bring-Your-Key |
+| `chrome-devtools` | Browser | Zero-Config |
+| `serena` | Code Intelligence | Zero-Config |
+| `docker-gateway` | Containers | Zero-Config |
+| `ponytail` | Productivity | Zero-Config |
+| `reui` | Frontend | Zero-Config |
 
 ---
 
 ## Agent Operating Standard
 When an MCP tool is needed during a task, the agent will:
-1. Run `python .agents/scripts/mcp.py enable <name>` before the tool call.
-2. Execute the tool call.
-3. Run `python .agents/scripts/mcp.py disable <name>` upon task completion to cleanly shut down background processes.
+1. Scan for required tools and matching MCP servers in the catalog.
+2. Ask the user for permission to enable the required servers using `npx zerogravity mcp enable <name>`.
+3. If the server is in the `bring-your-key` tier, the agent will assist the user in providing the necessary configuration.
+4. Execute the tool calls as needed.

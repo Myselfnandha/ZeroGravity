@@ -28,6 +28,7 @@ GOTCHAS_MD = MEMORY_DIR / "gotchas.md"
 DECISIONS_MD = MEMORY_DIR / "decisions.md"
 BUILD_FLOWS_JSON = MEMORY_DIR / "build_flows.json"
 SYNC_HISTORY_JSON = MEMORY_DIR / "sync_history.json"
+STRATEGIES_JSON = MEMORY_DIR / "learned_strategies.json"
 
 CENTRAL_REPO = "Myselfnandha/ZeroGravity"
 CENTRAL_GIT_URL = f"https://github.com/{CENTRAL_REPO}.git"
@@ -54,7 +55,7 @@ ECOSYSTEM_KEYWORDS = {
     "python": ["python", "pip", "pep", "venv", "pytest", "fastapi", "flask", "django", "pydantic", "poetry", "uv", "asyncio"],
     "docker": ["docker", "container", "dockerfile", "compose", "podman", "k8s", "kubernetes", "image", "entrypoint"],
     "mobile": ["react-native", "flutter", "ios", "android", "swift", "kotlin", "expo", "pod"],
-    "general": ["git", "security", "skylos", "sast", "architecture", "cli", "bash", "shell", "invariant", "memory", "testing"]
+    "general": ["git", "security", "sast", "architecture", "cli", "bash", "shell", "invariant", "memory", "testing"]
 }
 
 
@@ -144,7 +145,7 @@ def record_build_flow(name: str, stack: str, commands: list, notes: str = "", ta
 
 
 def package_knowledge_payload():
-    """Package all locally recorded strategies, gotchas, decisions, and flows."""
+    """Package all locally recorded strategies, gotchas, decisions, flows, and auto-evolved knowledge."""
     # 1. Anti-patterns
     anti_patterns = []
     if ANTI_PATTERNS_JSON.exists():
@@ -170,13 +171,24 @@ def package_knowledge_payload():
         except Exception:
             pass
 
+    # 4. Auto-evolved strategies
+    learned_strategies = []
+    if STRATEGIES_JSON.exists():
+        try:
+            with open(STRATEGIES_JSON, "r", encoding="utf-8") as f:
+                strat_data = json.load(f)
+                learned_strategies = strat_data.get("strategies", [])
+        except Exception:
+            pass
+
     payload = {
-        "generator": "ZeroGravity-KnowledgeSync-v1.0.0",
+        "generator": "ZeroGravity-KnowledgeSync-v1.1.0",
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "central_target": CENTRAL_REPO,
         "anti_patterns": anti_patterns,
         "build_flows": flows,
-        "decisions": decisions
+        "decisions": decisions,
+        "learned_strategies": learned_strategies,
     }
 
     # Scrub all fields

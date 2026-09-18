@@ -57,6 +57,7 @@ function print_help() {
     echo -e "  ${YELLOW}learn <action>${RESET}       2-Way mistake immunization (list, add, check, audit)"
     echo -e "  ${YELLOW}sync [args]${RESET}          Auto-sync learned strategies & build flows to GitHub"
     echo -e "  ${YELLOW}flow <record|list>${RESET}   Record or list verified build methods & workflows"
+    echo -e "  ${YELLOW}evolve <action>${RESET}     Auto-evolve knowledge (capture, list, stats, sync)"
     echo -e "  ${YELLOW}memory${RESET}               Display decisions, gotchas, and goal evolution"
     echo ""
 }
@@ -78,7 +79,6 @@ case "$CMD" in
         echo -e "  • Node.js: $(node --version 2>/dev/null || echo 'Not found')"
         echo -e "  • Python:  $(python3 --version 2>/dev/null || echo 'Not found')"
         echo -e "  • mcp-npx: $(which mcp-npx 2>/dev/null || echo 'Not in PATH')"
-        echo -e "  • skylos:  $(which skylos 2>/dev/null || echo 'Not in PATH')"
         echo ""
         python3 "$SCRIPT_DIR/mcp.py" list
         echo ""
@@ -126,6 +126,9 @@ case "$CMD" in
         ;;
     openhuman)
         python3 "$SCRIPT_DIR/analyze.py" "$WORKSPACE_ROOT" --check --auto-heal
+        ;;
+    evolve)
+        python3 "$SCRIPT_DIR/auto_evolve.py" "$@"
         ;;
     memory)
         echo -e "${BOLD}🧠 Decisions Invariants:${RESET}"

@@ -5,7 +5,6 @@ model: auto
 color: purple
 skills:
   - openhuman
-  - skylos
   - codebase-design
   - domain-modeling
 ---
@@ -43,9 +42,8 @@ flowchart LR
 - Write self-documenting code with comprehensive error handling.
 - Eliminate dead code, unused imports, and mock placeholders.
 
-### Stage 4: AAA Testing & Skylos SAST Gate
+### Stage 4: AAA Testing & Verification Gate
 - Write unit/integration tests following the **Arrange-Act-Assert (AAA)** pattern.
-- Run `skylos verify` on edited files to prevent AI hallucinations, phantom functions, and dangerous dataflows.
 - Verify that changes compile and pass pre-flight verification before declaring complete.
 
 ### Stage 5: Memory Tree Sync

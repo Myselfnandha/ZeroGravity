@@ -1,140 +1,211 @@
 <div align="center">
 
 # 🌌 ZeroGravity OS
-### *Ultra-Compact Autonomous Supercoder OS • Zero-Default On-Demand MCPs • 5-Stage OpenHuman Engine*
+### *Autonomous Supercoder OS • Zero-Default MCPs • 28 Workflows*
 
-[![CI Quality Gate](https://github.com/nandha/agent/actions/workflows/ci.yml/badge.svg)](https://github.com/nandha/agent/actions)
-[![Package Size](https://img.shields.io/badge/Package%20Size-1.3%20MB-brightgreen.svg)](https://github.com/nandha/agent)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![MCP Servers](https://img.shields.io/badge/MCP%20Servers-12%20On--Demand-blueviolet.svg)](https://modelcontextprotocol.io/)
-[![Security](https://img.shields.io/badge/Security-Skylos%20Gate-emerald.svg)](https://github.com/duriantaco/skylos)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Package Size](https://img.shields.io/badge/Size-1.3%20MB-brightgreen.svg)]()
+[![MCP Servers](https://img.shields.io/badge/MCPs-13%20On--Demand-blueviolet.svg)](https://modelcontextprotocol.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 <p align="center">
-  <b>A zero-weight, ultra-compact (1.3 MB) autonomous AI developer framework with zero-default background processes, dynamic on-demand tool lifecycle, and persistent memory evolution.</b>
+  <b>A universal, zero-weight (1.3 MB) AI developer framework.<br/>Zero background processes. Dynamic on-demand tools. Persistent memory.</b>
 </p>
 
-[Quick Start](#-quick-start) • [Install on New PC](#-install-on-a-new-pc-one-liner) • [Architecture](#-architecture) • [On-Demand MCPs](#-zero-default-on-demand-mcp-manager) • [Slash Commands](#-slash-commands--workflows) • [Makefile](#-developer-tooling)
+[Install](#-install) • [Workflows](#-workflows) • [MCPs](#-mcp-servers) • [Memory](#-memory-tree) • [Developer](#-developer-tooling)
 
 </div>
 
 ---
 
-## 🌟 Highlights
+## ⚡ Install
 
-- 🚀 **Ultra-Compact Production Installer (`install.sh`)**: High-efficiency self-extracting XZ executable compressed to **~1.3 MB** (down from 86MB). Installs and configures everything in seconds.
-- ⚡ **Zero-Default On-Demand MCP Architecture**: 0 background processes at startup. Servers are cataloged in `.agents/mcp-registry/servers.json`, dynamically activated when needed (`/mcp enable <name>` or `mcp.py`), and **automatically shut down** upon task completion.
-- 🤖 **OpenHuman Supercoder Engine (`@[openhuman]`)**: 5-stage automated engineering pipeline (Context Sweep $\rightarrow$ Architecture Blueprint $\rightarrow$ CodeCrusher $\rightarrow$ AAA Testing & Skylos Gate $\rightarrow$ Memory Tree Sync).
-- 🧠 **Persistent Memory Tree**: Invariant architecture decisions (`decisions.md`), platform gotchas (`gotchas.md`), and durable goal tracking (`goals.md`) that persist across agent sessions.
-- 🔌 **12 Verified Production MCP Servers**: GitHub, Playwright, Supabase, Neon Postgres, Sentry, Chrome DevTools, Serena, Docker Gateway, Context7, Shadcn UI, Magic 21st.dev, and Skylos with pure STDIO stream isolation (`mcp-npx`).
-- 🛡️ **Deterministic SAST & Zero-Slop**: Integrated local-first static analysis (`skylos`) to catch AI hallucinations, plus ADHD action-first formatting and human voice filters (`/no-ai-slop`).
+```bash
+# Deploy into current workspace
+npx zerogravity
+
+# Deploy into a specific project
+npx zerogravity /path/to/my-project -y
+
+# Deploy everywhere (workspace + global config)
+npx zerogravity --all -y
+
+# Update existing workspace (preserves your memory & configs)
+npx zerogravity update
+
+# Or install globally
+npm install -g zerogravity
+```
+
+**What it does:** Copies the `.agents/` framework into your project root. That's it — no daemons, no config files to manage, no build steps.
+
+<details>
+<summary><b>Alternative install methods</b></summary>
+
+#### Direct copy
+```bash
+cp -r .agents /path/to/any/project/
+```
+
+#### Self-extracting installer
+```bash
+./install.sh --local -y    # Workspace only
+./install.sh --global -y   # Global (~/.gemini/config/)
+./install.sh --all -y      # Both
+```
+
+#### Restore offline plugins
+```bash
+./unpack-plugins.sh
+```
+
+</details>
 
 ---
 
-## ⚡ Install on a New PC (One-Liner)
+## 💬 Workflows
 
-Run this single command in your terminal on any new Linux/macOS machine to download, unpack, and configure **ZeroGravity OS**:
+28 slash commands organized by what you're doing:
 
-### 🎯 Interactive Setup Menu
-```bash
-curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh && rm -f /tmp/install.sh
-```
+### 🔨 Build
 
-### ⚡ Non-Interactive Automated Deployment (Local & Global)
-```bash
-curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh --all -y && rm -f /tmp/install.sh
-```
+| Command | What it does |
+|:---|:---|
+| `/build-feature` | 5-stage supercoding pipeline: Context Sweep → Blueprint → CodeCrush → AAA Test → Sync |
+| `/create` | Scaffold a new application from scratch |
+| `/enhance` | Add or update features in an existing app |
+| `/spec-driven-dev` | Full spec-driven cycle: specify → plan → tasks → implement with review gates |
+| `/prd-workflow` | Matt Pocock workflow: Triage → PRD → Issues → Implementation → Handoff |
 
-### 📦 Deploy into a Specific Target Workspace
-```bash
-curl -fsSL https://raw.githubusercontent.com/<OWNER>/<REPO>/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh --target /path/to/project -y && rm -f /tmp/install.sh
-```
+### 🧠 Think
+
+| Command | What it does |
+|:---|:---|
+| `/brainstorm` | Structured multi-option brainstorming before implementation |
+| `/plan` | Generate a project plan (no code — plan only) |
+| `/codebase-design` | Deep module design: interfaces, seams, testability |
+| `/domain-model` | Build domain terminology and ubiquitous language |
+| `/orchestrate` | Coordinate multiple agents for complex multi-perspective tasks |
+
+### 🐛 Verify
+
+| Command | What it does |
+|:---|:---|
+| `/debug` | Systematic root-cause investigation |
+| `/test` | Generate and run tests (unit, integration, E2E) |
+| `/deploy` | Pre-flight checks + deployment execution |
+| `/audit-agent` | Independent iFixAi safety and alignment audit |
+
+### 🎨 Design
+
+| Command | What it does |
+|:---|:---|
+| `/design-ui` | Plan and implement UI with modern design patterns |
+| `/react-components` | Search and install 1,105+ ReUI/shadcn components |
+
+### ⚙️ Control
+
+| Command | What it does |
+|:---|:---|
+| `/effort` | Set reasoning depth (routes to low/mid/high/ultra) |
+| `/effort-low` | Fire & forget — act immediately, skip plans |
+| `/effort-mid` | Balanced default — research enough, then act |
+| `/effort-high` | Thorough — full context sweep, verify everything |
+| `/effort-ultra` | Leave nothing unchecked — exhaustive analysis |
+| `/mcp` | Enable/disable/list MCP servers on demand |
+| `/skill` | Search and activate specialized skills from 1,450+ library |
+
+### 📝 Communication
+
+| Command | What it does |
+|:---|:---|
+| `/focus` | Action-first output: numbered steps, no tangents, time estimates |
+| `/humanize-text` | Strip AI slop patterns, preserve human voice |
+| `/compress-tokens` | Ultra-compressed mode — ~75% fewer tokens |
+| `/teach-concept` | Deep technical concept explanations |
+| `/yagni-simplify` | Lazy senior dev mode — eliminate over-engineering |
 
 ---
 
-## 🔌 Zero-Default On-Demand MCP Manager
+## 🔌 MCP Servers
 
-All 12 MCP servers start in a clean dormant state (`{}`). Activate them dynamically when needed and auto-close when done:
+13 servers, zero running at startup. Enable what you need:
 
 ```bash
-# List catalog & status
-python .agents/scripts/mcp.py list
-
-# Enable server(s) on demand
-python .agents/scripts/mcp.py enable neon sentry
-
-# Disable server(s) (kills background processes)
-python .agents/scripts/mcp.py disable neon sentry
-
-# Reset to zero-default clean profile
-python .agents/scripts/mcp.py reset
-
-# Run an ephemeral task with auto-shutdown
-python .agents/scripts/mcp.py run neon -- python my_script.py
+npx zerogravity mcp list              # Browse catalog
+npx zerogravity mcp enable <name>     # Activate a server
+npx zerogravity mcp disable <name>    # Deactivate
 ```
 
-### Catalog of 12 Production Servers
+Or via slash command in chat: `/mcp enable filesystem`
 
-| MCP Server | Category | Description |
+### ⚡ Zero-Config (enable instantly)
+
+| Server | Category | Description |
 |:---|:---|:---|
-| **`context7`** | Documentation | Real-time library documentation resolver (Upstash Context7) |
-| **`shadcn`** | Frontend | Direct Shadcn UI registry component discovery and addition |
-| **`magic`** | Frontend | 21st.dev Magic UI design inspiration, component search & generation |
-| **`skylos`** | Security | Local-first static analysis, SAST security scans & AI hallucination checks |
-| **`github`** | VCS | GitHub issues, pull requests, repository search & automation |
-| **`playwright`** | Testing | Headless browser automation, visual snapshots & E2E web testing |
-| **`supabase`** | Database | Supabase project management, database migrations & SQL execution |
-| **`neon`** | Database | Neon serverless Postgres branching, SQL queries & connection pooling |
-| **`sentry`** | Observability | Sentry error telemetry, performance traces & crash diagnostic queries |
-| **`chrome-devtools`** | Browser | Live Chrome DOM inspection, Lighthouse audits & performance traces |
-| **`serena`** | Code Intelligence | Semantic AST symbol navigation, project memory & deep refactoring |
-| **`docker-gateway`** | Containers | Docker container lifecycle, sandbox builds & image inspection |
+| `playwright` | Testing | Headless browser automation, visual snapshots & E2E testing |
+| `chrome-devtools` | Browser | Live Chrome DOM inspection, Lighthouse audits |
+| `serena` | Code Intel | Semantic AST navigation, project memory & refactoring |
+| `docker-gateway` | Containers | Docker container lifecycle, sandbox builds |
+| `context7` | Docs | Real-time library documentation resolver |
+| `shadcn` | Frontend | Shadcn UI registry component discovery and installation |
+| `magic` | Frontend | 21st.dev Magic UI design inspiration & generation |
+| `reui` | Frontend | ReUI 1,105+ React components, blocks, and motion icons |
+| `ponytail` | Productivity | YAGNI enforcement & minimal diffs |
+
+### 🔑 Bring-Your-Key
+
+| Server | Category | Description | Setup |
+|:---|:---|:---|:---|
+| `github` | VCS | Issues, PRs, repository search & automation | `GITHUB_TOKEN` |
+| `supabase` | Database | Project management, migrations & SQL | Supabase access token |
+| `neon` | Database | Serverless Postgres branching & SQL | Neon API key |
+| `sentry` | Observability | Error telemetry, performance traces | Sentry auth token |
 
 ---
 
-## 💬 Slash Commands & Workflows
+## 🧠 Memory Tree
 
-| Slash Command | File Location | Description |
-|:---|:---|:---|
-| **`/openhuman`** | [`.agents/workflows/openhuman.md`](.agents/workflows/openhuman.md) | Executes the 5-stage OpenHuman supercoding pipeline |
-| **`/mcp`** | [`.agents/workflows/mcp.md`](.agents/workflows/mcp.md) | Dynamic on-demand MCP manager (enable, disable, list, auto-close) |
-| **`/skylos`** | [`.agents/workflows/skylos.md`](.agents/workflows/skylos.md) | Runs local static analysis, security scan, or AI change verification |
-| **`/i-have-adhd`** | [`.agents/workflows/i-have-adhd.md`](.agents/workflows/i-have-adhd.md) | Activates action-first, numbered steps and bounded cognitive output |
-| **`/no-ai-slop`** | [`.agents/workflows/no-ai-slop.md`](.agents/workflows/no-ai-slop.md) | Strips 20+ patterns of AI slop while preserving human voice |
-| **`/caveman`** | [`.agents/workflows/caveman.md`](.agents/workflows/caveman.md) | Cuts token usage by ~70% using telegraphic technical phrasing |
-| **`/skill`** | [`.agents/workflows/skill.md`](.agents/workflows/skill.md) | Searches and loads instructions dynamically on demand |
+Persistent knowledge lives in `.agents/memory/` and survives across sessions and updates:
 
----
-
-## 🗂️ Persistent Memory Tree
-
-Located in `.agents/memory/`:
-
-```text
+```
 .agents/memory/
-├── decisions.md       # Architectural decisions, invariants, design patterns
-├── gotchas.md         # Framework quirks, known bugs, workarounds
-└── goals.md           # Active milestones, sprint deliverables, completed goals
+├── decisions.md        # Architecture decisions and design patterns
+├── gotchas.md          # Framework quirks, known bugs, workarounds
+├── goals.md            # Active milestones and deliverables
+└── anti_patterns.json  # Failed approaches to never repeat
 ```
+
+Learning is automatic — on every correction, error recovery, or success, the agent distills lessons into memory without manual intervention.
 
 ---
 
 ## 🛠️ Developer Tooling
 
 ```bash
-make help             # View all available developer targets
-make pack             # Bundle .agents/ into ultra-compact 1.3 MB install.sh
-make install          # Install Local & Global suites
-make check            # Run verification suite + Skylos SAST analysis
-make test             # Validate MCP catalog, rules, and scripts
-make mcp-list         # View on-demand MCP status
-make mcp-enable s=... # Enable specific MCP server
-make mcp-disable s=.. # Disable specific MCP server
-make clean            # Remove caches, temporary logs, and build artifacts
+make help         # View all commands
+make pack         # Bundle into 1.3 MB install.sh
+make test         # Run test suite
+make lint         # Python syntax validation
+make clean        # Remove caches and build artifacts
+```
+
+---
+
+## 📁 Structure
+
+```
+.agents/
+├── workflows/      # 28 slash command workflows
+├── rules/          # Core behavioral rules
+├── memory/         # Persistent decisions, gotchas, goals
+├── scripts/        # CLI tools and automation
+├── skills/         # Specialized instruction sets
+├── plugins/        # Extensible plugin bundles
+└── mcp-registry/   # 13 MCP server catalog
 ```
 
 ---
 
 ## 📄 License
 
-Distributed under the [MIT License](LICENSE). Built for high-velocity software engineering with Google Antigravity.
+[MIT](LICENSE)

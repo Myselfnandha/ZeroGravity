@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ponytail": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/.agents/plugins/ponytail/ponytail-mcp/index.js"
+      ],
+      "description": "Ponytail lazy senior dev instructions and prompt tools",
+      "category": "productivity"
+    }
+  }
+}
