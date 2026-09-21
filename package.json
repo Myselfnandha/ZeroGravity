@@ -1,6 +1,6 @@
 {
   "name": "zerogravity",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Ultra-compact autonomous supercoder OS framework installer for Google Antigravity",
   "main": "bin/cli.js",
   "bin": {
@@ -12,13 +12,14 @@
     ".agents/",
     "unpack-plugins.sh",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "AGENTS.md"
   ],
   "scripts": {
     "start": "node bin/cli.js",
     "test": "node bin/cli.js --help",
     "pack:dry": "npm pack --dry-run",
-    "prepublishOnly": "python3 -m unittest discover tests -v && node bin/cli.js --dry-run"
+    "prepublishOnly": "python3 -m unittest discover tests -v && node bin/cli.js --dry-run -y"
   },
   "publishConfig": {
     "access": "public"

@@ -199,7 +199,7 @@ function copyDirSync(src, dest) {
 }
 
 // Smart update preserving user memory and configs
-function updateAgentsDir(sourceDir, targetAgentsDir, dryRun) {
+function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   const updatedItems = [];
   const preservedItems = [];
 
@@ -215,6 +215,28 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun) {
         copyDirSync(srcFolder, destFolder);
       }
       updatedItems.push(`${folder}/`);
+    }
+  }
+
+  // Handle AGENTS.md update for workspace
+  if (!dryRun && targetDir) {
+    const pkgRoot = path.resolve(__dirname, '..');
+    const agentsMdSrc = path.join(pkgRoot, 'AGENTS.md');
+    const targetAgentsMd = path.join(targetDir, 'AGENTS.md');
+    
+    if (fs.existsSync(agentsMdSrc)) {
+      let shouldCopy = true;
+      if (fs.existsSync(targetAgentsMd)) {
+         const srcContent = fs.readFileSync(agentsMdSrc, 'utf8');
+         const destContent = fs.readFileSync(targetAgentsMd, 'utf8');
+         if (srcContent === destContent) {
+            shouldCopy = false; // Already up to date
+         }
+      }
+      if (shouldCopy) {
+        fs.copyFileSync(agentsMdSrc, targetAgentsMd);
+        updatedItems.push('AGENTS.md');
+      }
     }
   }
 
@@ -514,7 +536,7 @@ async function main() {
         copyDirSync(localAgentsDest, backupPath);
 
         console.log(`${C.bold}🔄 Updating .agents/ components...${C.reset}`);
-        const { updatedItems, preservedItems } = updateAgentsDir(sourceDir, localAgentsDest, false);
+        const { updatedItems, preservedItems } = updateAgentsDir(sourceDir, localAgentsDest, false, targetDir);
 
         // Permissions
         if (process.platform !== 'win32') {
@@ -603,12 +625,24 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
           execSync(`chmod -R +x "${path.join(localAgentsDest, 'scripts')}" 2>/dev/null || true`);
         } catch (_) {}
       }
+
+      // Copy AGENTS.md to the target workspace root
+      const pkgRoot = path.resolve(__dirname, '..');
+      const agentsMdSrc = path.join(pkgRoot, 'AGENTS.md');
+      const targetAgentsMd = path.join(targetDir, 'AGENTS.md');
+      if (fs.existsSync(agentsMdSrc)) {
+        if (!fs.existsSync(targetAgentsMd) || args.force || args.yes || (await askQuestion(`${C.yellow}⚠ AGENTS.md exists in target workspace. Overwrite? (y/N): ${C.reset}`)).toLowerCase().startsWith('y')) {
+          fs.copyFileSync(agentsMdSrc, targetAgentsMd);
+          console.log(`  ${C.green}✔ Copied AGENTS.md to workspace root.${C.reset}`);
+        }
+      }
     }
 
     if (args.mode === 'global' || args.mode === 'all') {
       console.log(`\n${C.bold}🌐 Installing Global Configuration...${C.reset}`);
       fs.mkdirSync(path.join(globalDest, 'rules'), { recursive: true });
       fs.mkdirSync(path.join(globalDest, 'skills'), { recursive: true });
+      fs.mkdirSync(path.join(globalDest, 'workflows'), { recursive: true });
 
       const rulesSrc = path.join(sourceDir, 'rules');
       if (fs.existsSync(rulesSrc)) {
@@ -618,6 +652,11 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       const skillsSrc = path.join(sourceDir, 'skills');
       if (fs.existsSync(skillsSrc)) {
         copyDirSync(skillsSrc, path.join(globalDest, 'skills'));
+      }
+      
+      const workflowsSrc = path.join(sourceDir, 'workflows');
+      if (fs.existsSync(workflowsSrc)) {
+        copyDirSync(workflowsSrc, path.join(globalDest, 'workflows'));
       }
 
       const mcpConfigDest = path.join(globalDest, 'mcp_config.json');
