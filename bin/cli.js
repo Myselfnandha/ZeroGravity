@@ -530,12 +530,7 @@ async function main() {
 
     try {
       if (args.mode === 'local' || args.mode === 'all') {
-        // Create backup
-        const backupPath = `${localAgentsDest}.bak.${Date.now()}`;
-        console.log(`\n${C.bold}📦 Creating backup at:${C.reset} ${backupPath}`);
-        copyDirSync(localAgentsDest, backupPath);
-
-        console.log(`${C.bold}🔄 Updating .agents/ components...${C.reset}`);
+        console.log(`\n${C.bold}🔄 Updating .agents/ components...${C.reset}`);
         const { updatedItems, preservedItems } = updateAgentsDir(sourceDir, localAgentsDest, false, targetDir);
 
         // Permissions
