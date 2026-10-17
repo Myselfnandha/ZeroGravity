@@ -1,6 +1,6 @@
 {
   "name": "@nandhaalagesan/zerogravity",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Ultra-compact autonomous supercoder OS framework installer for Google Antigravity",
   "main": "bin/cli.js",
   "bin": {
@@ -16,8 +16,9 @@
   "scripts": {
     "start": "node bin/cli.js",
     "test": "node bin/cli.js --help",
-    "pack:dry": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null; npm pack --dry-run",
-    "prepublishOnly": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover tests -v && node bin/cli.js --dry-run -y"
+    "prepack": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null; rm -rf .agents/cache/* 2>/dev/null",
+    "pack:dry": "npm run prepack && npm pack --dry-run",
+    "prepublishOnly": "npm run prepack && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover tests -v && npm run prepack && node bin/cli.js --dry-run -y"
   },
   "publishConfig": {
     "access": "public"
