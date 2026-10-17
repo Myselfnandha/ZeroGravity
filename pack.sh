@@ -289,9 +289,7 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         echo -e "${C_YELLOW}[DRY-RUN] Would install to: $LOCAL_DEST${C_RESET}"
     else
         if [ -d "$LOCAL_DEST" ]; then
-            BACKUP_LOCAL="${LOCAL_DEST}.bak.${TIMESTAMP}"
-            echo -e "  ${C_YELLOW}⚠ Existing .agents directory detected. Creating backup at:${C_RESET} $BACKUP_LOCAL"
-            cp -r "$LOCAL_DEST" "$BACKUP_LOCAL"
+            rm -rf "$LOCAL_DEST"
         fi
 
         mkdir -p "$LOCAL_DEST"

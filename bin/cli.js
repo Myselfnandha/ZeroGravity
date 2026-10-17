@@ -498,7 +498,7 @@ async function main() {
 
     if (args.dryRun) {
       console.log(`${C.yellow}[DRY-RUN] Simulation mode. No files will be modified.${C.reset}`);
-      console.log(`[DRY-RUN] Would backup and update .agents/ in: ${localAgentsDest}`);
+      console.log(`[DRY-RUN] Would update .agents/ in: ${localAgentsDest}`);
       console.log(`[DRY-RUN] Would preserve memory/ and custom configurations.`);
       console.log(`\n${C.green}✔ Dry-run completed successfully.${C.reset}`);
       process.exit(0);
@@ -585,9 +585,7 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       fs.mkdirSync(targetDir, { recursive: true });
 
       if (fs.existsSync(localAgentsDest)) {
-        const backupPath = `${localAgentsDest}.bak.${Date.now()}`;
-        console.log(`  ${C.yellow}Creating backup at:${C.reset} ${backupPath}`);
-        fs.renameSync(localAgentsDest, backupPath);
+        fs.rmSync(localAgentsDest, { recursive: true, force: true });
       }
 
       copyDirSync(sourceDir, localAgentsDest);
