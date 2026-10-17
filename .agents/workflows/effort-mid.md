@@ -1,8 +1,8 @@
 ---
-description: "Effort: Mid — Balanced default. Research enough to be right, then act."
+description: "Effort: Mid — Balanced. Research enough to be right, then act."
 ---
 
-# /effort mid — Balanced (Default)
+# /effort-mid — Balanced
 
 > Research enough to be right, then act. Don't over-analyze.
 

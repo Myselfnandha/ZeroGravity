@@ -21,5 +21,10 @@ Thumbs.db
 
 # Caches
 .agents/cache/
-__pycache__/
-*.py[cod]
+__pycache__
+**/__pycache__/**
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.agents/**/__pycache__
+.agents/**/*.pyc

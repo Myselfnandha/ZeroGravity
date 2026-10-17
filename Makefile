@@ -26,7 +26,7 @@ install-local: ## Install only to the local workspace (.agents/)
 install-global: ## Install only to global Antigravity config (~/.gemini/config/)
 	@./install.sh --global -y
 
-npm-link: ## Link zerogravity CLI globally (npx zerogravity / zg)
+npm-link: ## Link zerogravity CLI globally (npx @nandhaalagesan/zerogravity / zg)
 	@npm link
 
 npm-pack: ## Dry-run preview of npm package contents and size
@@ -34,15 +34,6 @@ npm-pack: ## Dry-run preview of npm package contents and size
 
 npm-publish: ## Publish zerogravity package to public npm registry
 	@npm publish --access public
-
-plugins-unpack: ## Unpack extended offline plugins from archive
-	@./unpack-plugins.sh unpack
-
-plugins-remove: ## Remove unpacked offline plugins to keep workspace lean
-	@./unpack-plugins.sh remove
-
-plugins-status: ## Check plugin storage status (lean vs unpacked)
-	@./unpack-plugins.sh status
 
 dry-run: ## Simulate installation without modifying files
 	@./install.sh --dry-run --all
@@ -77,10 +68,6 @@ learn-list: ## List all learned anti-patterns and prevention strategies
 
 learn-audit: ## Audit the learning matrix integrity
 	@$(PYTHON) .agents/scripts/learn.py audit
-
-openhands-config: ## Export OpenHands configuration to target (default: ./)
-	@cp .agents/templates/openhands_config.toml $(DEST)/config.toml 2>/dev/null || cp .agents/templates/openhands_config.toml ./openhands_config.toml
-	@echo "✔ OpenHands configuration generated."
 
 clean: ## Clean cache, temp files, and test directories
 	@rm -rf /tmp/agy-* dist/*.tar.gz .agents/cache/*.db

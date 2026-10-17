@@ -51,6 +51,6 @@ ReUI is a design-forward, shadcn/ui-compatible component and block registry prov
 
 ## Reference
 
-- Official Skill: [SKILL.md](../skills/reui/SKILL.md)
-- Rules & Composition: [rules/components.md](../skills/reui/rules/components.md)
-- Registry & Licensing: [rules/registry.md](../skills/reui/rules/registry.md)
+- Official Skill: [SKILL.md](../skills/react-components/SKILL.md)
+- Rules & Composition: [rules/components.md](../skills/react-components/rules/components.md)
+- Registry & Licensing: [rules/registry.md](../skills/react-components/rules/registry.md)

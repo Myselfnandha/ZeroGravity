@@ -51,7 +51,7 @@ When `/caveman` is active:
 ## Caveman Compress
 
 To optimize project memory, run:
-`python .agents/skills/caveman-compress/scripts/cli.py <filepath>`
+`python .agents/skills/compress-tokens/scripts/cli.py <filepath>`
 
 This will:
 1. Create a backup `<file>.original.md`.

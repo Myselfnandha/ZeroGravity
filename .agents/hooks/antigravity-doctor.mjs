@@ -173,7 +173,6 @@ function checkOrchestration(root, report, contract) {
   const cfg = contract?.phases?.orchestration ?? {};
   const groups = [
     ['workflow', cfg.workflows ?? [], name => path.join(root, '.agents', 'workflows', `${name}.md`)],
-    ['agent', cfg.agents ?? [], name => path.join(root, '.agents', 'agent', `${name}.md`)],
     ['skill', cfg.skills ?? [], name => path.join(root, '.agents', 'skills', name, 'SKILL.md')]
   ];
   for (const [kind, names, resolve] of groups) {
@@ -197,31 +196,25 @@ function checkPlugin(root, report) {
 
 function checkValidation(root, report) {
   const requiredFiles = [
-    '.agents/hooks/tests/antigravity.test.mjs',
-    'MIGRATION.md',
-    'SECURITY.md'
+    '.agents/hooks/tests/antigravity.test.mjs'
   ];
   for (const file of requiredFiles) {
-    if (!fs.existsSync(path.join(root, file))) add(report, 'error', 'validation', 'validation.file_missing', file, 'Production validation or operator documentation is missing.');
+    if (!fs.existsSync(path.join(root, file))) add(report, 'error', 'validation', 'validation.file_missing', file, 'Production validation test suite is missing.');
   }
 
-  const versionFiles = [
+  const versionCandidates = [
     ['.agents/VERSION', value => value.trim()],
-    ['package.json', value => JSON.parse(value).version],
-    ['cli/package.json', value => JSON.parse(value).version],
-    ['web/package.json', value => JSON.parse(value).version]
+    ['package.json', value => JSON.parse(value).version]
   ];
   const versions = [];
-  for (const [file, parse] of versionFiles) {
+  for (const [file, parse] of versionCandidates) {
     const target = path.join(root, file);
-    if (!fs.existsSync(target)) {
-      add(report, 'error', 'validation', 'validation.version_missing', file, 'Version source is missing.');
-      continue;
-    }
-    try {
-      versions.push([file, parse(fs.readFileSync(target, 'utf8'))]);
-    } catch (error) {
-      add(report, 'error', 'validation', 'validation.version_invalid', file, error.message);
+    if (fs.existsSync(target)) {
+      try {
+        versions.push([file, parse(fs.readFileSync(target, 'utf8'))]);
+      } catch (error) {
+        add(report, 'error', 'validation', 'validation.version_invalid', file, error.message);
+      }
     }
   }
   const unique = new Set(versions.map(([, value]) => value));

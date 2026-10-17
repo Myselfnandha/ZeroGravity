@@ -2,7 +2,7 @@
 description: "Effort: Low — Fire & Forget mode. Act immediately, conclusion-only, skip plans, trust edits."
 ---
 
-# /effort low — Fire & Forget
+# /effort-low — Fire & Forget
 
 > Act immediately. Don't overthink. Ship fast.
 

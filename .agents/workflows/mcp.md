@@ -4,7 +4,7 @@ description: Dynamic On-Demand MCP Server Manager. List catalog servers, enable 
 
 # /mcp - On-Demand MCP Server Manager
 
-Manage and toggle the 13 verified production Model Context Protocol (MCP) servers with zero background overhead.
+Manage and toggle the 12 verified production Model Context Protocol (MCP) servers with zero background overhead, or search the extended 2,600+ server ecosystem catalog.
 
 ---
 
@@ -12,24 +12,24 @@ Manage and toggle the 13 verified production Model Context Protocol (MCP) server
 
 ```bash
 # List all cataloged servers, grouped by tier (zero-config vs bring-your-key)
-npx zerogravity mcp list
+zg mcp list
 
 # Enable server(s) on demand (prompts for API keys if needed)
-npx zerogravity mcp enable <name> [name2...]
+zg mcp enable <name> [name2...]
 
 # Disable server(s)
-npx zerogravity mcp disable <name> [name2...]
+zg mcp disable <name> [name2...]
 
 # Show currently enabled servers
-npx zerogravity mcp status
+zg mcp status
 
-# Force-sync enabled servers to IDE configurations (Antigravity, VS Code, Cursor)
-npx zerogravity mcp sync
+# Search extended 2,600+ catalog
+grep -i "<service>" .agents/skills/mcp/data/mcp_catalog.json
 ```
 
 ---
 
-## 13 Verified Production Servers
+## 12 Verified Production Servers
 
 | Name | Category | Tier |
 |:---|:---|:---|
@@ -44,14 +44,23 @@ npx zerogravity mcp sync
 | `chrome-devtools` | Browser | Zero-Config |
 | `serena` | Code Intelligence | Zero-Config |
 | `docker-gateway` | Containers | Zero-Config |
-| `ponytail` | Productivity | Zero-Config |
 | `reui` | Frontend | Zero-Config |
+
+---
+
+## Extended 2,600+ Server Catalog
+
+When a task requires a specialized server outside the 12 verified core:
+- Catalog dataset: [mcp_catalog.json](../skills/mcp/data/mcp_catalog.json)
+- Catalog guide: [INDEX.md](../skills/mcp/data/INDEX.md)
+- Search: `grep -i "<name>" .agents/skills/mcp/data/mcp_catalog.json`
+- Ephemeral execution: `python .agents/scripts/mcp.py run <name> -- <task-cmd>`
 
 ---
 
 ## Agent Operating Standard
 When an MCP tool is needed during a task, the agent will:
-1. Scan for required tools and matching MCP servers in the catalog.
-2. Ask the user for permission to enable the required servers using `npx zerogravity mcp enable <name>`.
+1. Scan for required tools and matching MCP servers in the 12 core servers or extended catalog.
+2. Ask the user for permission to enable the required servers using `zg mcp enable <name>`.
 3. If the server is in the `bring-your-key` tier, the agent will assist the user in providing the necessary configuration.
 4. Execute the tool calls as needed.

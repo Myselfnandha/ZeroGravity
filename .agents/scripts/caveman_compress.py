@@ -1,1 +1,0 @@
-../skills/caveman-compress/scripts/cli.py

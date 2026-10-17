@@ -53,7 +53,7 @@ function print_help() {
     echo -e "  ${CYAN}mcp run <name> -- <cmd>${RESET} Run a command with temporary MCP server, auto-stop after"
     echo ""
     echo -e "${BOLD}Autonomous Engine & Learning:${RESET}"
-    echo -e "  ${YELLOW}openhuman${RESET}            Run OpenHuman 5-Stage Supercoder pipeline on current folder"
+    echo -e "  ${YELLOW}build-feature${RESET}        Run 5-Stage Supercoder pipeline on current folder"
     echo -e "  ${YELLOW}learn <action>${RESET}       2-Way mistake immunization (list, add, check, audit)"
     echo -e "  ${YELLOW}sync [args]${RESET}          Auto-sync learned strategies & build flows to GitHub"
     echo -e "  ${YELLOW}flow <record|list>${RESET}   Record or list verified build methods & workflows"
@@ -124,7 +124,7 @@ case "$CMD" in
     impact)
         python3 "$SCRIPT_DIR/impact_check.py" "$@"
         ;;
-    openhuman)
+    build-feature|openhuman)
         python3 "$SCRIPT_DIR/analyze.py" "$WORKSPACE_ROOT" --check --auto-heal
         ;;
     evolve)

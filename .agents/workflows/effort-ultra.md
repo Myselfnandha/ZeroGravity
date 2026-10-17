@@ -2,7 +2,7 @@
 description: "Effort: Ultra — Leave nothing unchecked. Exhaustive analysis, full documentation, zero blind spots."
 ---
 
-# /effort ultra — Leave Nothing Unchecked
+# /effort-ultra — Leave Nothing Unchecked
 
 > Exhaustive analysis. Document everything. Zero blind spots.
 

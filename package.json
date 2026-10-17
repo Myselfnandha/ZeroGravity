@@ -1,25 +1,23 @@
 {
-  "name": "zerogravity",
-  "version": "1.1.2",
+  "name": "@nandhaalagesan/zerogravity",
+  "version": "1.1.5",
   "description": "Ultra-compact autonomous supercoder OS framework installer for Google Antigravity",
   "main": "bin/cli.js",
   "bin": {
-    "zerogravity": "./bin/cli.js",
-    "zg": "./bin/cli.js"
+    "zerogravity": "bin/cli.js",
+    "zg": "bin/cli.js"
   },
   "files": [
     "bin/",
     ".agents/",
-    "unpack-plugins.sh",
     "README.md",
-    "LICENSE",
-    "AGENTS.md"
+    "LICENSE"
   ],
   "scripts": {
     "start": "node bin/cli.js",
     "test": "node bin/cli.js --help",
-    "pack:dry": "npm pack --dry-run",
-    "prepublishOnly": "python3 -m unittest discover tests -v && node bin/cli.js --dry-run -y"
+    "pack:dry": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null; npm pack --dry-run",
+    "prepublishOnly": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover tests -v && node bin/cli.js --dry-run -y"
   },
   "publishConfig": {
     "access": "public"
@@ -31,7 +29,6 @@
     "supercoder",
     "mcp",
     "workflows",
-    "openhuman",
     "developer-tools"
   ],
   "author": "Nandha",

@@ -402,5 +402,50 @@ class TestScriptHasMain(unittest.TestCase):
             )
 
 
+class TestAnalyzeOutputLocation(unittest.TestCase):
+    """
+    Ensure codebase_summary, codebase_index, and codebase_patch are stored
+    strictly inside the .agent or .agents folder and not in the project root.
+    """
+
+    def test_analyze_outputs_to_agent_folder_only(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_dir = Path(tmpdir) / "test_project"
+            project_dir.mkdir()
+            agent_dir = project_dir / ".agents"
+            agent_dir.mkdir()
+
+            # Create sample source file
+            (project_dir / "index.js").write_text("console.log('hello');", encoding="utf-8")
+
+            # Create dummy legacy root files
+            legacy_summary = project_dir / "codebase_summary.md"
+            legacy_index = project_dir / "codebase_index.md"
+            legacy_patch = project_dir / "codebase_patch.md"
+            legacy_summary.write_text("old", encoding="utf-8")
+            legacy_index.write_text("old", encoding="utf-8")
+            legacy_patch.write_text("old", encoding="utf-8")
+
+            # Run analyze.py
+            analyze_script = SCRIPTS_DIR / "analyze.py"
+            result = subprocess.run(
+                [sys.executable, str(analyze_script), str(project_dir), "-y"],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, f"analyze.py failed:\n{result.stderr}")
+
+            # Verify files exist in .agents/
+            self.assertTrue((agent_dir / "codebase_summary.md").is_file())
+            self.assertTrue((agent_dir / "codebase_index.md").is_file())
+            self.assertTrue((agent_dir / "codebase_patch.md").is_file())
+
+            # Verify legacy files were cleaned from root
+            self.assertFalse(legacy_summary.exists(), "codebase_summary.md should not exist in root")
+            self.assertFalse(legacy_index.exists(), "codebase_index.md should not exist in root")
+            self.assertFalse(legacy_patch.exists(), "codebase_patch.md should not exist in root")
+
+
 if __name__ == "__main__":
     unittest.main()
+

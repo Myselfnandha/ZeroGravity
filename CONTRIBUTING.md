@@ -9,10 +9,10 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
 ```
 .
 ├── .agents/                    # Core Agent System Assets
-│   ├── agents/                 # Specialist autonomous personas (OpenHuman, etc.)
+│   ├── agents/                 # Specialist autonomous personas (orchestrator, etc.)
 │   ├── rules/                  # Behavioral gates & coding standards
 │   ├── skills/                 # On-demand domain expertise modules
-│   ├── workflows/              # Slash command workflows (/openhuman, /mcp, etc.)
+│   ├── workflows/              # Slash command workflows (/build-feature, /mcp, etc.)
 │   ├── plugins/                # Workspace plugins (e.g. ponytail)
 │   ├── memory/                 # Durable Memory Tree (decisions, gotchas, goals)
 │   ├── scripts/                # Verification, analysis, and caching utilities
@@ -20,7 +20,6 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
 │   └── mcp_config.json         # Workspace MCP configuration
 ├── pack.sh                     # Packaging engine (builds self-extracting install.sh)
 ├── install.sh                  # Portable self-extracting installer
-├── unpack-plugins.sh           # Offline plugins archive manager (unpack/remove)
 ├── Makefile                    # Developer commands
 └── .github/workflows/          # Automated CI pipeline
 ```
@@ -52,10 +51,10 @@ Thank you for contributing to the Antigravity autonomous agent ecosystem!
      $ARGUMENTS
      ```
 
-4. **Adding an MCP Server Recipe**:
-   - Add recipe markdown to `.agents/mcp-registry/recipes/<server-name>.md`
+4. **Adding an MCP Server**:
+   - Register the server in `.agents/mcp-registry/servers.json`
    - Update `.agents/mcp-registry/INDEX.md`
-   - Register STDIO runner in `.agents/mcp_config.json`
+   - Register runner in `.agents/mcp_config.json`
 
 5. **Re-Packing the Distribution**:
    ```bash

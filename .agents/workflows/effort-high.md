@@ -1,8 +1,8 @@
 ---
-description: "Effort: High — Thorough mode. Full context sweep, show reasoning, verify everything."
+description: "Effort: High — Thorough default mode. Full context sweep, show reasoning, verify everything."
 ---
 
-# /effort high — Thorough
+# /effort-high — Thorough (Default)
 
 > Understand deeply before acting. Show your reasoning. Verify everything.
 

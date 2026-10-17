@@ -21,19 +21,19 @@
 
 ```bash
 # Deploy into current workspace
-npx zerogravity
+npx @nandhaalagesan/zerogravity
 
 # Deploy into a specific project
-npx zerogravity /path/to/my-project -y
+npx @nandhaalagesan/zerogravity /path/to/my-project -y
 
 # Deploy everywhere (workspace + global config)
-npx zerogravity --all -y
+npx @nandhaalagesan/zerogravity --all -y
 
 # Update existing workspace (preserves your memory & configs)
-npx zerogravity update
+npx @nandhaalagesan/zerogravity update
 
 # Or install globally
-npm install -g zerogravity
+npm install -g @nandhaalagesan/zerogravity
 ```
 
 **What it does:** Copies the `.agents/` framework into your project root. That's it — no daemons, no config files to manage, no build steps.
@@ -52,10 +52,6 @@ cp -r .agents /path/to/any/project/
 ./install.sh --global -y   # Global (~/.gemini/config/)
 ./install.sh --all -y      # Both
 ```
-
-#### Restore offline plugins
-```bash
-./unpack-plugins.sh
 ```
 
 </details>
@@ -64,7 +60,7 @@ cp -r .agents /path/to/any/project/
 
 ## 💬 Workflows
 
-28 slash commands organized by what you're doing:
+20 specialized slash commands organized by developer intent:
 
 ### 🔨 Build
 
@@ -73,18 +69,15 @@ cp -r .agents /path/to/any/project/
 | `/build-feature` | 5-stage supercoding pipeline: Context Sweep → Blueprint → CodeCrush → AAA Test → Sync |
 | `/create` | Scaffold a new application from scratch |
 | `/enhance` | Add or update features in an existing app |
-| `/spec-driven-dev` | Full spec-driven cycle: specify → plan → tasks → implement with review gates |
-| `/prd-workflow` | Matt Pocock workflow: Triage → PRD → Issues → Implementation → Handoff |
 
 ### 🧠 Think
 
 | Command | What it does |
 |:---|:---|
 | `/brainstorm` | Structured multi-option brainstorming before implementation |
-| `/plan` | Generate a project plan (no code — plan only) |
 | `/codebase-design` | Deep module design: interfaces, seams, testability |
 | `/domain-model` | Build domain terminology and ubiquitous language |
-| `/orchestrate` | Coordinate multiple agents for complex multi-perspective tasks |
+| `/orchestrate` | Coordinate multiple perspectives for complex architectural tasks |
 
 ### 🐛 Verify
 
@@ -93,7 +86,7 @@ cp -r .agents /path/to/any/project/
 | `/debug` | Systematic root-cause investigation |
 | `/test` | Generate and run tests (unit, integration, E2E) |
 | `/deploy` | Pre-flight checks + deployment execution |
-| `/audit-agent` | Independent iFixAi safety and alignment audit |
+| `/audit-agent` | Independent iFixAi safety, alignment, and accuracy audit |
 
 ### 🎨 Design
 
@@ -106,7 +99,6 @@ cp -r .agents /path/to/any/project/
 
 | Command | What it does |
 |:---|:---|
-| `/effort` | Set reasoning depth (routes to low/mid/high/ultra) |
 | `/effort-low` | Fire & forget — act immediately, skip plans |
 | `/effort-mid` | Balanced default — research enough, then act |
 | `/effort-high` | Thorough — full context sweep, verify everything |
@@ -114,29 +106,30 @@ cp -r .agents /path/to/any/project/
 | `/mcp` | Enable/disable/list MCP servers on demand |
 | `/skill` | Search and activate specialized skills from 1,450+ library |
 
-### 📝 Communication
+### 📝 Communication & Pragmatism
 
 | Command | What it does |
 |:---|:---|
 | `/focus` | Action-first output: numbered steps, no tangents, time estimates |
 | `/humanize-text` | Strip AI slop patterns, preserve human voice |
 | `/compress-tokens` | Ultra-compressed mode — ~75% fewer tokens |
-| `/teach-concept` | Deep technical concept explanations |
 | `/yagni-simplify` | Lazy senior dev mode — eliminate over-engineering |
+
+> **Native Antigravity Built-ins**: `/plan` (interactive planning), `/goal` (autonomous run-until-done), `/grill-me` (Socratic plan alignment), `/schedule`, `/learn`.
 
 ---
 
 ## 🔌 MCP Servers
 
-13 servers, zero running at startup. Enable what you need:
+12 verified servers, zero running at startup. Enable what you need:
 
 ```bash
-npx zerogravity mcp list              # Browse catalog
-npx zerogravity mcp enable <name>     # Activate a server
-npx zerogravity mcp disable <name>    # Deactivate
+npx @nandhaalagesan/zerogravity mcp list              # Browse catalog (or 'zg mcp list')
+npx @nandhaalagesan/zerogravity mcp enable <name>     # Activate a server
+npx @nandhaalagesan/zerogravity mcp disable <name>    # Deactivate
 ```
 
-Or via slash command in chat: `/mcp enable filesystem`
+Or via slash command in chat: `/mcp enable playwright`
 
 ### ⚡ Zero-Config (enable instantly)
 
@@ -146,16 +139,15 @@ Or via slash command in chat: `/mcp enable filesystem`
 | `chrome-devtools` | Browser | Live Chrome DOM inspection, Lighthouse audits |
 | `serena` | Code Intel | Semantic AST navigation, project memory & refactoring |
 | `docker-gateway` | Containers | Docker container lifecycle, sandbox builds |
-| `context7` | Docs | Real-time library documentation resolver |
 | `shadcn` | Frontend | Shadcn UI registry component discovery and installation |
-| `magic` | Frontend | 21st.dev Magic UI design inspiration & generation |
 | `reui` | Frontend | ReUI 1,105+ React components, blocks, and motion icons |
-| `ponytail` | Productivity | YAGNI enforcement & minimal diffs |
 
 ### 🔑 Bring-Your-Key
 
 | Server | Category | Description | Setup |
 |:---|:---|:---|:---|
+| `context7` | Docs | Real-time library documentation resolver | Upstash Context7 API key |
+| `magic` | Frontend | 21st.dev Magic UI design inspiration & generation | Free 21st.dev API key |
 | `github` | VCS | Issues, PRs, repository search & automation | `GITHUB_TOKEN` |
 | `supabase` | Database | Project management, migrations & SQL | Supabase access token |
 | `neon` | Database | Serverless Postgres branching & SQL | Neon API key |
@@ -183,7 +175,7 @@ Learning is automatic — on every correction, error recovery, or success, the a
 
 ```bash
 make help         # View all commands
-make pack         # Bundle into 1.3 MB install.sh
+make pack         # Bundle into standalone install.sh
 make test         # Run test suite
 make lint         # Python syntax validation
 make clean        # Remove caches and build artifacts
@@ -195,13 +187,13 @@ make clean        # Remove caches and build artifacts
 
 ```
 .agents/
-├── workflows/      # 28 slash command workflows
+├── workflows/      # 20 slash command workflows
 ├── rules/          # Core behavioral rules
 ├── memory/         # Persistent decisions, gotchas, goals
 ├── scripts/        # CLI tools and automation
 ├── skills/         # Specialized instruction sets
-├── plugins/        # Extensible plugin bundles
-└── mcp-registry/   # 13 MCP server catalog
+├── plugins/        # Extensible plugin bundles (ponytail)
+└── mcp-registry/   # 12 verified MCP servers + catalog
 ```
 
 ---

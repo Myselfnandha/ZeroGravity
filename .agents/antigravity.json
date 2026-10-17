@@ -1,5 +1,4 @@
 {
-  "$schema": "hooks/antigravity-contract.schema.json",
   "schemaVersion": "1.0.0",
   "runtime": "antigravity",
   "requiredCliCommands": [
@@ -23,9 +22,8 @@
       "policy": ".agents/hooks/validate-tool-call.mjs"
     },
     "orchestration": {
-      "workflows": ["coordinate", "orchestrate"],
-      "agents": ["orchestrator", "project-planner", "security-auditor", "test-engineer"],
-      "skills": ["coordinator-mode", "parallel-agents", "intelligent-routing", "verify-changes"]
+      "workflows": ["orchestrate", "build-feature"],
+      "skills": ["audit-agent", "compress-tokens", "humanize-text", "react-components", "skill-router"]
     },
     "plugin": {
       "builder": ".agents/hooks/build-plugin.mjs",

@@ -203,8 +203,8 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   const updatedItems = [];
   const preservedItems = [];
 
-  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'tools', 'docs', 'schemas', 'agent', 'agents', 'skills'];
-  const syncFiles = ['skills_index.json', 'antigravity.json', 'manifest.json', 'manifest.lock.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'DEPENDENCY_GRAPH.md'];
+  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'plugins', 'skills', 'knowledge', 'hooks'];
+  const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
 
   for (const folder of syncFolders) {
     const srcFolder = path.join(sourceDir, folder);
@@ -215,28 +215,6 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
         copyDirSync(srcFolder, destFolder);
       }
       updatedItems.push(`${folder}/`);
-    }
-  }
-
-  // Handle AGENTS.md update for workspace
-  if (!dryRun && targetDir) {
-    const pkgRoot = path.resolve(__dirname, '..');
-    const agentsMdSrc = path.join(pkgRoot, 'AGENTS.md');
-    const targetAgentsMd = path.join(targetDir, 'AGENTS.md');
-    
-    if (fs.existsSync(agentsMdSrc)) {
-      let shouldCopy = true;
-      if (fs.existsSync(targetAgentsMd)) {
-         const srcContent = fs.readFileSync(agentsMdSrc, 'utf8');
-         const destContent = fs.readFileSync(targetAgentsMd, 'utf8');
-         if (srcContent === destContent) {
-            shouldCopy = false; // Already up to date
-         }
-      }
-      if (shouldCopy) {
-        fs.copyFileSync(agentsMdSrc, targetAgentsMd);
-        updatedItems.push('AGENTS.md');
-      }
     }
   }
 
@@ -619,17 +597,6 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
         try {
           execSync(`chmod -R +x "${path.join(localAgentsDest, 'scripts')}" 2>/dev/null || true`);
         } catch (_) {}
-      }
-
-      // Copy AGENTS.md to the target workspace root
-      const pkgRoot = path.resolve(__dirname, '..');
-      const agentsMdSrc = path.join(pkgRoot, 'AGENTS.md');
-      const targetAgentsMd = path.join(targetDir, 'AGENTS.md');
-      if (fs.existsSync(agentsMdSrc)) {
-        if (!fs.existsSync(targetAgentsMd) || args.force || args.yes || (await askQuestion(`${C.yellow}⚠ AGENTS.md exists in target workspace. Overwrite? (y/N): ${C.reset}`)).toLowerCase().startsWith('y')) {
-          fs.copyFileSync(agentsMdSrc, targetAgentsMd);
-          console.log(`  ${C.green}✔ Copied AGENTS.md to workspace root.${C.reset}`);
-        }
       }
     }
 

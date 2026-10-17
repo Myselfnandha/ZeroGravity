@@ -56,9 +56,18 @@ test('runtime contract uses documented CLI capabilities instead of an invented v
 });
 
 test('MCP sync detects placeholders and plans without writing', () => {
-  const plan = planSync({root, target: 'suite', force: false});
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-sync-test-'));
+  const tempConfig = path.join(tempDir, '.agents', 'mcp_config.json');
+  fs.mkdirSync(path.dirname(tempConfig), {recursive: true});
+  fs.writeFileSync(tempConfig, JSON.stringify({
+    mcpServers: {
+      demo: { command: 'node', args: ['server.js'], env: { API_KEY: 'YOUR_API_KEY' } }
+    }
+  }));
+  const plan = planSync({root: tempDir, target: 'suite', force: false});
   assert.equal(plan.placeholders, true);
   assert.ok(Object.keys(plan.workspace.mcpServers).length > 0);
+  fs.rmSync(tempDir, {recursive: true, force: true});
 });
 
 test('plugin builder creates manifest, commands, skills, and hook', () => {

@@ -1,16 +1,16 @@
 ---
-name: openhuman
-description: 'The OpenHuman Supercoding Engine: 5-stage automated coding pipeline, Memory Tree (decisions, gotchas, goals) management, CodeCrusher implementation patterns, and Skylos verification gate. Invoke with /openhuman.'
+name: build-feature
+description: 'Autonomous 5-stage feature building pipeline: Memory Sweep → Blueprint → CodeCrush → AAA Test → Sync. Invoke with /build-feature.'
 disable-model-invocation: false
 license: MIT
 metadata:
-  tags: "Supercoding, Architecture, Memory Tree, OpenHuman, CodeCrusher, Quality Gate"
+  tags: "Supercoding, Architecture, Memory Tree, CodeCrusher, Quality Gate"
   category: "supercoding"
 ---
 
-# OpenHuman Supercoding Engine
+# Autonomous 5-Stage Feature Pipeline
 
-The OpenHuman Supercoding skill provides an end-to-end framework for autonomous, high-velocity, high-reliability software engineering.
+The Feature Pipeline provides an end-to-end framework for autonomous, high-velocity, high-reliability software engineering.
 
 ---
 
@@ -28,7 +28,7 @@ Before modifying or creating files:
 - Identify and isolate external dependencies (I/O, database, network) behind testable seams.
 
 ### 3. CodeCrushing Implementation
-- Write clean, idiomatically typed code across any target stack (Dart/Flutter, TypeScript, Python, Rust, Go, SQL).
+- Write clean, idiomatically typed code across any target stack (TypeScript, Python, Rust, Go, Dart/Flutter, SQL).
 - Avoid premature abstractions while strictly adhering to DRY where repetition causes maintenance debt.
 - Handle error edge cases explicitly with typed errors or result types.
 
@@ -51,8 +51,8 @@ Before modifying or creating files:
 
 | Command | Action |
 |:---|:---|
-| `/openhuman <task>` | Execute full 5-stage supercoding pipeline for the requested task. |
-| `/openhuman architect <feature>` | Produce architectural blueprint and interface definitions only. |
-| `/openhuman code <plan>` | High-velocity CodeCrusher implementation of an existing plan. |
-| `/openhuman test <target>` | Generate AAA test suite and run verification gates. |
-| `/openhuman sync-memory` | Sweep codebase and synchronize active state into `.agents/memory/`. |
+| `/build-feature <task>` | Execute full 5-stage engineering pipeline for the requested task. |
+| `/build-feature architect <feature>` | Produce architectural blueprint and interface definitions only. |
+| `/build-feature code <plan>` | High-velocity implementation of an existing plan. |
+| `/build-feature test <target>` | Generate AAA test suite and run verification gates. |
+| `/build-feature sync-memory` | Sweep codebase and synchronize active state into `.agents/memory/`. |

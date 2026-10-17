@@ -96,7 +96,7 @@ export function buildPlugin(root, output) {
 
   const counts = {
     skills: copyTree(path.join(root, '.agents', 'skills'), path.join(output, 'skills')),
-    agents: copyTree(path.join(root, '.agents', 'agent'), path.join(output, 'agents')),
+    agents: copyTree(path.join(root, '.agents', 'agents'), path.join(output, 'agents')),
     rules: copyTree(path.join(root, '.agents', 'rules'), path.join(output, 'rules')),
     workflows: convertWorkflows(root, output)
   };

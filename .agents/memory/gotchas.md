@@ -1,6 +1,6 @@
 # 🛡️ ZeroGravity OS: Anti-Patterns Matrix & Known Gotchas
 
-This document serves as the **Persistent Anti-Patterns Matrix** for OpenHuman and ZeroGravity OS.
+This document serves as the **Persistent Anti-Patterns Matrix** for ZeroGravity OS.
 Before taking any architectural, coding, or tooling action, the agent must sweep this matrix (Stage 1) to immunize itself against known failure modes.
 
 ---
@@ -18,6 +18,11 @@ Before taking any architectural, coding, or tooling action, the agent must sweep
 | **AP-007** | **Claiming success without running verification commands** | Token-pressure or speed bias leads agent to skip test runs and pattern-match 'this looks right' or use speculative language. | Evidence Gate: Always run tests or re-read files, report actual terminal output, never say 'should work'. |
 | **AP-008** | **Editing files based on stale cached memory instead of current on-disk state** | Files read early in long sessions get modified externally or by background tasks while agent remembers old lines. | Freshness Gate: Re-read target file if >5 tool calls since last read; run git status before multi-file edits. |
 | **AP-009** | **Using invented library functions that don't exist in installed packages** | LLM hallucination on fast-moving libraries or niche frameworks where training memory contains plausible APIs. | Hallucination Guard: Verify every unfamiliar API symbol via tool inspection, REPL check, or docs before using. |
+| **AP-010** | **Polling in loops or setting redundant timers while waiting for background tasks or command completion** | Failing to utilize the system's reactive wakeup event loop, resulting in busy-wait loops and unnecessary timers | Always use "Waiting for a task notification" with live status. Avoid unnecessary timers; do not poll; await direct completion signal |
+| **AP-011** | **Reading a single file in multiple sliced chunks or piecemeal line ranges when analyzing it** | Unnecessary line range slicing on single-file analysis resulting in fragmented context and multiple redundant tool calls | When a single file needs to be analyzed, read the entire file in one call (single view_file without slicing) |
+| **AP-012** | **Suboptimal or haphazard tool selection resulting in latency, token waste, or context bloat** | Executing operations reflexively using shell commands or piecemeal calls without pre-flight tool evaluation | Evaluate and select the most direct, token-efficient tool (grep_search, full view_file, multi_replace, reactive async) before execution |
+
+
 
 ---
 

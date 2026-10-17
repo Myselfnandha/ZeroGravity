@@ -361,16 +361,24 @@ def build_ascii_tree(dir_path, matcher, custom_excludes=None, prefix="", root_di
     return lines
 
 
-def get_cache_db_path(target_dir, output_path):
-    """Determine the optimal storage path for the SQLite cache database."""
+def get_agent_dir(target_dir):
+    """
+    Determine the agent folder (.agents or .agent) inside target_dir.
+    Prioritizes an existing agent folder; defaults to .agent if neither exists.
+    """
     for dirname in ('.agents', '.agent'):
-        agent_dir = os.path.join(target_dir, dirname)
-        if os.path.isdir(agent_dir):
-            cache_dir = os.path.join(agent_dir, 'cache')
-            os.makedirs(cache_dir, exist_ok=True)
-            return os.path.join(cache_dir, 'codebase.db')
-    out_dir = os.path.dirname(os.path.abspath(output_path))
-    return os.path.join(out_dir, '.codebase.db')
+        candidate = os.path.join(target_dir, dirname)
+        if os.path.isdir(candidate):
+            return candidate
+    return os.path.join(target_dir, '.agent')
+
+
+def get_cache_db_path(target_dir, output_path=None):
+    """Determine the optimal storage path for the SQLite cache database."""
+    agent_dir = get_agent_dir(target_dir)
+    cache_dir = os.path.join(agent_dir, 'cache')
+    os.makedirs(cache_dir, exist_ok=True)
+    return os.path.join(cache_dir, 'codebase.db')
 
 
 def _write_patch_log(patch_path, project_name, changed_files, scan_date):
@@ -413,7 +421,7 @@ def main():
         description="Analyze a folder end-to-end and generate a single Markdown summary for LLM context windows."
     )
     parser.add_argument("target_dir", nargs="?", default=".", help="Target directory to scan (default: .)")
-    parser.add_argument("-o", "--output", default="codebase_summary.md", help="Markdown summary path (default: codebase_summary.md)")
+    parser.add_argument("-o", "--output", default=None, help="Markdown summary path (default: <agent_dir>/codebase_summary.md)")
     parser.add_argument("-e", "--exclude", help="Comma-separated additional exclude glob patterns (e.g. '*.log,tests/').")
     parser.add_argument("-t", "--token-limit", type=int, default=300000, help="Warning token limit threshold (default: 300,000)")
     parser.add_argument("--no-defaults", action="store_true", help="Disable default system ignores")
@@ -426,12 +434,36 @@ def main():
     args = parser.parse_args()
 
     target_dir = os.path.abspath(args.target_dir)
-    output_path = os.path.abspath(args.output)
-    custom_excludes = [p.strip() for p in args.exclude.split(',')] if args.exclude else []
 
     if not os.path.isdir(target_dir):
         print(f"Error: Target directory '{target_dir}' does not exist.", file=sys.stderr)
         sys.exit(1)
+
+    agent_dir = get_agent_dir(target_dir)
+    os.makedirs(agent_dir, exist_ok=True)
+
+    # codebase_summary, codebase_index, and codebase_patch MUST live in the .agent folder only
+    if (not args.output or
+        args.output in ("codebase_summary.md", "./codebase_summary.md") or
+        os.path.normpath(os.path.abspath(args.output)) == os.path.normpath(os.path.join(target_dir, "codebase_summary.md"))):
+        output_path = os.path.join(agent_dir, "codebase_summary.md")
+    else:
+        output_path = os.path.abspath(args.output)
+
+    index_path = os.path.join(agent_dir, 'codebase_index.md')
+    patch_path = os.path.join(agent_dir, 'codebase_patch.md')
+
+    # Clean up legacy root files if they exist to keep project root clean
+    for legacy_name in ('codebase_summary.md', 'codebase_index.md', 'codebase_patch.md'):
+        legacy_file = os.path.join(target_dir, legacy_name)
+        if os.path.isfile(legacy_file) and os.path.normpath(legacy_file) != os.path.normpath(output_path):
+            try:
+                os.remove(legacy_file)
+                print(f"Cleaned up legacy root file: {legacy_file}")
+            except Exception:
+                pass
+
+    custom_excludes = [p.strip() for p in args.exclude.split(',')] if args.exclude else []
 
     # Initialize SQLite Cache DB
     db_path = get_cache_db_path(target_dir, output_path)
@@ -767,8 +799,6 @@ def main():
     # =========================================================================
     # Write codebase_index.md
     # =========================================================================
-    output_dir = os.path.dirname(output_path) or '.'
-    index_path = os.path.join(output_dir, 'codebase_index.md')
     print(f"Writing codebase index to: {index_path}")
 
     try:
@@ -812,7 +842,6 @@ def main():
     # =========================================================================
     # Write / Update codebase_patch.md
     # =========================================================================
-    patch_path = os.path.join(output_dir, 'codebase_patch.md')
     if changed_files:
         print(f"Writing patch log ({len(changed_files)} changes) to: {patch_path}")
         try:

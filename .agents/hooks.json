@@ -1,5 +1,4 @@
 {
-  "$schema": "hooks/antigravity-hooks.schema.json",
   "enabled": true,
   "PreToolUse": [
     {

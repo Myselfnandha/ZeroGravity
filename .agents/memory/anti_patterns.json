@@ -73,6 +73,30 @@
       "root_cause": "LLM hallucination on fast-moving libraries or niche frameworks where training memory contains plausible APIs.",
       "strategy": "Hallucination Guard: Verify every unfamiliar API symbol via tool inspection, REPL check, or docs before using.",
       "invariant_rule": "Verify all library APIs and methods via tools before writing code; pass Import Verification Gate."
+    },
+    {
+      "id": "AP-010",
+      "category": "agent_behavior",
+      "mistake": "Polling in loops or setting redundant timers while waiting for background tasks or command completion",
+      "root_cause": "Failing to utilize the system's reactive wakeup and task notification event loop, resulting in busy-wait polling and wasted timer wakeups",
+      "strategy": "Always use 'Waiting for a task notification' with live status. Avoid unnecessary timers; do not poll; stop calling tools and await direct completion signal",
+      "invariant_rule": "NEVER poll or loop on task status; rely on reactive task completion notifications with live status and avoid unneeded timers."
+    },
+    {
+      "id": "AP-011",
+      "category": "agent_behavior",
+      "mistake": "Reading a single file in multiple sliced chunks or piecemeal line ranges when analyzing it",
+      "root_cause": "Unnecessary line range slicing on single-file analysis resulting in fragmented context and multiple redundant tool calls",
+      "strategy": "When a single file needs to be analyzed, read the entire file in one call (single view_file without line slicing)",
+      "invariant_rule": "Always read a target file in its entirety in a single call when analyzing that file."
+    },
+    {
+      "id": "AP-012",
+      "category": "tooling",
+      "mistake": "Suboptimal or haphazard tool selection resulting in excessive latency, token waste, or context bloat",
+      "root_cause": "Executing operations reflexively using generic shell commands or piecemeal calls without pre-evaluating the optimal specialized tool",
+      "strategy": "Pre-Flight Tool Evaluation: Consciously select the most direct tool (grep_search over shell search, view_file over cat, multi_replace over fragmented edits, reactive async task over polling) before initiating execution",
+      "invariant_rule": "Always determine and select the optimal tool for time, context, and execution efficiency before starting execution."
     }
   ]
 }

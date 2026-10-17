@@ -14,26 +14,23 @@ This command starts a new application creation process.
 
 ### Steps:
 
-1. **Request Analysis**
-   - Understand what the user wants
-   - If information is missing, use `conversation-manager` skill to ask
+1. **Request Analysis & Socratic Clarification**
+   - Understand the target application requirements and user expectations
+   - Clarify any ambiguous architecture or tech stack choices with the user upfront
 
-2. **Project Planning**
-   - Use `project-planner` agent for task breakdown
-   - Determine tech stack
-   - Plan file structure
-   - Create plan file and proceed to building
+2. **Architecture & File Planning**
+   - Determine tech stack (stdlib/minimal dependencies first per YAGNI)
+   - Outline directory structure, models, and core API endpoints
+   - Present concise implementation plan for user alignment
 
-3. **Application Building (After Approval)**
-   - Orchestrate with `app-builder` skill
-   - Coordinate expert agents:
-     - `database-architect` → Schema
-     - `backend-specialist` → API
-     - `frontend-specialist` → UI
+3. **Autonomous Implementation**
+   - Build models, backend, and responsive frontend
+   - Apply curated design aesthetics (Inter/Outfit fonts, modern dark/light slate palette)
+   - Verify functionality empirically with tests and linters
 
-4. **Preview**
-   - Start with `auto_preview.py` when complete
-   - Present URL to user
+4. **Live Verification & Preview**
+   - Launch preview server with `python .agents/scripts/auto_preview.py` or native dev command
+   - Present local URL to user
 
 ---
 

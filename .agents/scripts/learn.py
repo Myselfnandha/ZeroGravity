@@ -44,7 +44,7 @@ def save_anti_patterns(data):
 def sync_to_gotchas_markdown(data):
     lines = [
         "# 🛡️ ZeroGravity OS: Anti-Patterns Matrix & Known Gotchas\n",
-        "This document serves as the **Persistent Anti-Patterns Matrix** for OpenHuman and ZeroGravity OS.",
+        "This document serves as the **Persistent Anti-Patterns Matrix** for ZeroGravity OS.",
         "Before taking any architectural, coding, or tooling action, the agent must sweep this matrix (Stage 1) to immunize itself against known failure modes.\n",
         "---",
         "",

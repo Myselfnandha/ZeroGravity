@@ -164,15 +164,6 @@
       "description": "Docker container lifecycle, sandbox builds & image inspection",
       "category": "containers"
     },
-    "ponytail": {
-      "tier": "zero-config",
-      "command": "node",
-      "args": [
-        "${AGENT_DIR}/plugins/ponytail/ponytail-mcp/index.js"
-      ],
-      "description": "Lazy senior dev instructions, prompts & tools (lite, full, ultra)",
-      "category": "productivity"
-    },
     "reui": {
       "tier": "zero-config",
       "serverUrl": "https://mcp.reui.io",

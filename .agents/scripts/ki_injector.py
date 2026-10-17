@@ -99,6 +99,7 @@ def inject_ki(project_name, project_path, index_content, patch_content=None):
 
 def _create_metadata(project_name, project_path, now):
     """Create a new metadata.json structure."""
+    agent_dir_name = '.agents' if os.path.isdir(os.path.join(project_path, '.agents')) else '.agent'
     return {
         'summary': f"Codebase context for {project_name}",
         'created_at': now,
@@ -106,11 +107,11 @@ def _create_metadata(project_name, project_path, now):
         'references': [
             {
                 'type': 'file',
-                'path': os.path.join(project_path, 'codebase_summary.md')
+                'path': os.path.join(project_path, agent_dir_name, 'codebase_summary.md')
             },
             {
                 'type': 'file',
-                'path': os.path.join(project_path, 'codebase_index.md')
+                'path': os.path.join(project_path, agent_dir_name, 'codebase_index.md')
             }
         ]
     }
@@ -124,18 +125,15 @@ def ensure_workspace_rule(workspace_root):
         workspace_root: Absolute path to workspace root
     """
     if os.path.isdir(os.path.join(workspace_root, '.agents')):
-        rules_dir = os.path.join(workspace_root, '.agents', 'rules')
+        agent_dir_name = '.agents'
     else:
-        rules_dir = os.path.join(workspace_root, '.agent', 'rules')
+        agent_dir_name = '.agent'
+    rules_dir = os.path.join(workspace_root, agent_dir_name, 'rules')
     rule_path = os.path.join(rules_dir, 'codebase_context.md')
-
-    if os.path.exists(rule_path):
-        print(f"Workspace rule already exists: {rule_path}")
-        return rule_path
 
     os.makedirs(rules_dir, exist_ok=True)
 
-    rule_content = """---
+    rule_content = f"""---
 trigger: always_on
 ---
 
@@ -146,7 +144,7 @@ When starting a new conversation in this workspace:
 1. A Knowledge Item (KI) named `codebase-context-*` contains the compact codebase index and recent patches
 2. This context is automatically injected at conversation start via the KI system
 3. Use this context to understand the codebase before asking the user or reading files
-4. For deeper analysis, read the full `codebase_summary.md` in the project root
+4. For deeper analysis, read the full `codebase_summary.md` in `{agent_dir_name}/codebase_summary.md`
 
 ## Auto-Regeneration
 
@@ -169,11 +167,6 @@ def ensure_global_rule():
     Create or verify the global rule for auto-context in all .agent/ or .agents/ workspaces.
     """
     rule_path = os.path.join(GLOBAL_RULES_DIR, 'auto_codebase_context.md')
-
-    if os.path.exists(rule_path):
-        print(f"Global rule already exists: {rule_path}")
-        return rule_path
-
     os.makedirs(GLOBAL_RULES_DIR, exist_ok=True)
 
     rule_content = """---
@@ -186,7 +179,7 @@ For any workspace containing a `.agent/` or `.agents/` directory:
 
 1. **On conversation start**, silently check codebase freshness and auto-heal:
    ```
-   python .agents/scripts/analyze.py . -o ./codebase_summary.md --check --auto-heal --inject-ki 2>/dev/null || python .agent/scripts/analyze.py . -o ./codebase_summary.md --check --auto-heal --inject-ki
+   python .agents/scripts/analyze.py . --check --auto-heal --inject-ki 2>/dev/null || python .agent/scripts/analyze.py . --check --auto-heal --inject-ki
    ```
 
 2. **Result**: Every new conversation starts with fresh codebase knowledge in persistent memory.

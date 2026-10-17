@@ -8,7 +8,7 @@ Tracks active durable goals, sprint objectives, and completed engineering milest
 
 - [x] **Setup Production MCP Suite**: Configured 9 production MCP servers (`github`, `playwright`, `supabase`, `sentry`, `context7`, `neon`, `chrome-devtools`, `serena`, `docker-gateway`).
 - [x] **Install Developer Experience Tools**: Configured `i-have-adhd` output optimization and `no-ai-slop` voice preservation.
-- [x] **Establish OpenHuman Supercoder Engine**: Unified `@[openhuman]` agent persona, 5-stage supercoding pipeline, `/openhuman` workflow, and persistent Memory Tree.
+- [x] **Establish Autonomous Supercoding Engine**: 5-stage feature pipeline (`/build-feature`), verification quality gates, and persistent Memory Tree.
 
 ---
 

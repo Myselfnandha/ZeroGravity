@@ -1,4 +1,30 @@
-# AG Kit Toolkit Changelog
+# ZeroGravity OS Changelog
+
+## 1.1.5 (2026-10-17)
+
+### Highlights & Reasoning Effort Optimization
+- **Default High Reasoning**: Set baseline model reasoning effort to `high` (Claude-style deep reasoning) in `rules/core.md` (§10) and `rules/effort.md`.
+- **Restored Granular Effort Workflows**: Retained dedicated `/effort-low`, `/effort-mid`, `/effort-high` (default), and `/effort-ultra` workflows.
+- **Removed Redundant Effort Entrypoint**: Pruned `.agents/workflows/effort.md` in favor of direct granular slash commands.
+
+## 1.1.4 (2026-10-17)
+
+### Highlights & Slim Optimization
+- **File Count Reduced**: Down to 115 total package files (from 229+) and 516 KB installer.
+- **Workflow & Rules Consolidation**: Merged all effort levels into unified `workflows/effort.md` and `rules/core.md` (§10).
+- **Purged Obsolete Workflows & Manifests**: Deleted legacy `prd-workflow.md`, `teach-concept.md`, `spec-driven-dev.md`, and stale `manifest.json`.
+- **Ecosystem & Redundancy Pruning**: Removed dead `DEPENDENCY_GRAPH.md`, unused ecosystem templates, and session scratch files.
+- **MCP Catalog Isolated in Skill Data**: Moved 1.27 MB community catalog dataset into `skills/mcp/data/` leaving core `mcp-registry/servers.json` lean (5 KB, 12 verified servers).
+
+## 1.1.3 (2026-10-15)
+
+### Highlights & Major Optimization
+- **Portability & Zero-Dependency Installation**: Bundled authoritative `AGENTS.md` directly into `.agents/` ensuring complete standalone functionality when copying `.agents/` to any new workspace.
+- **Complete OpenHuman Purge**: Removed all legacy OpenHuman references across workflows, agents, scripts, templates, and memory; established pure 5-stage feature pipeline (`/build-feature`).
+- **2,648+ MCP Server Catalog**: Deleted bloated `servers/` sources and compiled a lightweight, structured `mcp_catalog.json` indexing 2,648 MCP servers with runtime commands and zero background bloat.
+- **Skills Renamed & Standardized**: Renamed skills to match slash workflows (`compress-tokens`, `humanize-text`, `audit-agent`, `react-components`); all skills verified with valid `SKILL.md` frontmatters.
+- **Time & Context Economy Rules**: Strengthened `rules/core.md` with strict pre-flight tool selection (§0), whole-file analysis invariant (§1), and reactive async waiting with live status (§9).
+- **Scripts & Schemas Pruned**: Removed obsolete Chinese documentation validators and non-mandatory schemas; enhanced `checklist.py` with multi-project fallback.
 
 ## 2026.8.31
 
