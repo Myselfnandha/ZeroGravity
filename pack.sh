@@ -297,6 +297,14 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         chmod +x "$LOCAL_DEST/scripts/"*.py 2>/dev/null || true
         chmod +x "$LOCAL_DEST/scripts/"*.sh 2>/dev/null || true
         echo -e "  ${C_GREEN}✔ Installed rules, skills, workflows, scripts, and MCP catalog to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
+
+        # Synchronize core rules and workflows to global config
+        GLOBAL_CONFIG="$HOME/.gemini/config"
+        mkdir -p "$GLOBAL_CONFIG/rules" "$GLOBAL_CONFIG/workflows"
+        cp "$TEMP_EXTRACT/.agents/rules/core.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
+        cp "$TEMP_EXTRACT/.agents/rules/effort.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
+        cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_CONFIG/workflows/" 2>/dev/null || true
+        echo -e "  ${C_GREEN}✔ Core rules & workflows active globally in:${C_RESET} ${C_BOLD}$GLOBAL_CONFIG${C_RESET}"
     fi
 fi
 
@@ -308,20 +316,17 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
     if [ "$DRY_RUN" = true ]; then
         echo -e "${C_YELLOW}[DRY-RUN] Would install to: $GLOBAL_DEST${C_RESET}"
     else
-        if [ -d "$GLOBAL_DEST" ]; then
-            BACKUP_GLOBAL="${GLOBAL_DEST}.bak.${TIMESTAMP}"
-            echo -e "  ${C_YELLOW}⚠ Existing global config detected. Creating backup at:${C_RESET} $BACKUP_GLOBAL"
-            cp -r "$GLOBAL_DEST" "$BACKUP_GLOBAL"
-        fi
+        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills" "$GLOBAL_DEST/workflows"
 
-        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills"
-
-        # Copy global rules and skills
+        # Copy global rules, skills, and workflows
         if [ -d "$TEMP_EXTRACT/.agents/rules" ]; then
             cp -a "$TEMP_EXTRACT/.agents/rules/." "$GLOBAL_DEST/rules/" 2>/dev/null || true
         fi
         if [ -d "$TEMP_EXTRACT/.agents/skills" ]; then
             cp -a "$TEMP_EXTRACT/.agents/skills/." "$GLOBAL_DEST/skills/" 2>/dev/null || true
+        fi
+        if [ -d "$TEMP_EXTRACT/.agents/workflows" ]; then
+            cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_DEST/workflows/" 2>/dev/null || true
         fi
 
         # Ensure zero-default clean profile

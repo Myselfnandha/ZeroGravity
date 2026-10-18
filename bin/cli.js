@@ -524,13 +524,35 @@ async function main() {
         }
       }
 
+      // Always synchronize global core rules and workflows to ~/.gemini/config
+      try {
+        const globalRulesDir = path.join(globalDest, 'rules');
+        fs.mkdirSync(globalRulesDir, { recursive: true });
+        const rulesSrc = path.join(sourceDir, 'rules');
+        if (fs.existsSync(rulesSrc)) {
+          ['core.md', 'effort.md'].forEach(ruleFile => {
+            const srcFile = path.join(rulesSrc, ruleFile);
+            if (fs.existsSync(srcFile)) {
+              fs.copyFileSync(srcFile, path.join(globalRulesDir, ruleFile));
+            }
+          });
+        }
+        const globalWorkflowsDir = path.join(globalDest, 'workflows');
+        fs.mkdirSync(globalWorkflowsDir, { recursive: true });
+        const workflowsSrc = path.join(sourceDir, 'workflows');
+        if (fs.existsSync(workflowsSrc)) {
+          copyDirSync(workflowsSrc, globalWorkflowsDir);
+        }
+        console.log(`  ${C.green}✔ Global rules & workflows active in:${C.reset} ${globalDest}`);
+      } catch (_) {}
+
       if (args.mode === 'global' || args.mode === 'all') {
-        console.log(`\n${C.bold}🌐 Updating Global Configuration...${C.reset}`);
+        console.log(`\n${C.bold}🌐 Updating Full Global Configuration...${C.reset}`);
         const rulesSrc = path.join(sourceDir, 'rules');
         if (fs.existsSync(rulesSrc)) {
           copyDirSync(rulesSrc, path.join(globalDest, 'rules'));
         }
-        console.log(`  ${C.green}✔ Global rules synchronized.${C.reset}`);
+        console.log(`  ${C.green}✔ All global rules synchronized.${C.reset}`);
       }
 
       console.log(`
@@ -598,8 +620,30 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       }
     }
 
+    // Always synchronize global core rules and workflows to ~/.gemini/config
+    try {
+      const globalRulesDir = path.join(globalDest, 'rules');
+      fs.mkdirSync(globalRulesDir, { recursive: true });
+      const rulesSrc = path.join(sourceDir, 'rules');
+      if (fs.existsSync(rulesSrc)) {
+        ['core.md', 'effort.md'].forEach(ruleFile => {
+          const srcFile = path.join(rulesSrc, ruleFile);
+          if (fs.existsSync(srcFile)) {
+            fs.copyFileSync(srcFile, path.join(globalRulesDir, ruleFile));
+          }
+        });
+      }
+      const globalWorkflowsDir = path.join(globalDest, 'workflows');
+      fs.mkdirSync(globalWorkflowsDir, { recursive: true });
+      const workflowsSrc = path.join(sourceDir, 'workflows');
+      if (fs.existsSync(workflowsSrc)) {
+        copyDirSync(workflowsSrc, globalWorkflowsDir);
+      }
+      console.log(`  ${C.green}✔ Global rules & workflows active in:${C.reset} ${globalDest}`);
+    } catch (_) {}
+
     if (args.mode === 'global' || args.mode === 'all') {
-      console.log(`\n${C.bold}🌐 Installing Global Configuration...${C.reset}`);
+      console.log(`\n${C.bold}🌐 Installing Full Global Configuration...${C.reset}`);
       fs.mkdirSync(path.join(globalDest, 'rules'), { recursive: true });
       fs.mkdirSync(path.join(globalDest, 'skills'), { recursive: true });
       fs.mkdirSync(path.join(globalDest, 'workflows'), { recursive: true });

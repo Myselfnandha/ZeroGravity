@@ -1,5 +1,11 @@
 # ZeroGravity OS Changelog
 
+## 1.1.8 (2026-10-18)
+
+### Enhancements & Global Rules Auto-Sync
+- **Universal Global Rules Sync**: Updated CLI (`bin/cli.js`) and installer (`pack.sh`) to always synchronize core rules (`core.md`, `effort.md`) and all 23 slash workflows directly into `~/.gemini/config/` on any install or update. This guarantees baseline reasoning invariants apply across all workspaces (e.g. Pocket, new projects).
+- **Clean Global Overwrites**: Removed legacy `.bak` directory creation during global installation.
+
 ## 1.1.7 (2026-10-17)
 
 ### Fixes & Clean Overwrite
