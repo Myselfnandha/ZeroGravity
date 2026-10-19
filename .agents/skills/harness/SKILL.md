@@ -1,6 +1,6 @@
 ---
 name: harness
-description: Recursively self-optimize agent harness components (c1..c8: prompts, rules, memory, tools, subagents, skills, scripts, hooks) using Propose-Probe-Compose recursion and experience ledgers.
+description: Recursive agent self-harnessing (c1..c8) via Propose-Probe-Compose and experience ledgers.
 ---
 
 # Harness²: Recursive Agent Harnessing

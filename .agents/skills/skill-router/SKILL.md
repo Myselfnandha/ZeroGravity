@@ -1,6 +1,6 @@
 ---
 name: skill-router
-description: Dynamic on-demand skill discovery router. Automatically searches and loads specialized instructions from the 1,450+ offline skills library for any language, framework, database, tool, or architecture pattern.
+description: Dynamic router: discover and load instructions from the 1,450+ offline skills library.
 ---
 
 # Skill Router (Dynamic On-Demand Skill Loader)

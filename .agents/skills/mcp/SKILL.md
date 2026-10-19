@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Search, evaluate, and enable on-demand MCP servers from the 12 verified registry and 2,600+ extended ecosystem catalog.
+description: Search, enable, or disable on-demand MCP servers from 12 verified and 2,600+ catalog.
 ---
 
 # Dynamic On-Demand MCP Manager & Ecosystem Catalog

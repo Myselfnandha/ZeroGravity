@@ -1,6 +1,6 @@
 ---
 name: coding-interview
-description: "Interactive Computer Science & DSA Study Tutor based on Coding Interview University. Explains complex algorithms from first principles with diagrams and Big-O proofs, guides problem-solving drills step-by-step (naive to optimal), conducts rapid technical quizzes, reviews code for complexity and bugs, and tracks curriculum progress. No mock interviews or roleplaying."
+description: Interactive DSA tutor: algorithmic proofs, step-by-step problem solving, and quizzes.
 ---
 
 # Coding Interview & CS Tutor

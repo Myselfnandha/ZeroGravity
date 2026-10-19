@@ -1,6 +1,6 @@
 ---
 name: agy-lead
-description: Orchestrate an ongoing task with AGY while the current agent owns key decisions, review, and delivery. Use when the user invokes /skill:agy-lead or asks you to coordinate a task using AGY.
+description: Orchestrate multi-step tasks with Antigravity CLI while retaining final review and delivery.
 argument-hint: '[task]'
 ---
 

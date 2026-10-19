@@ -1,6 +1,6 @@
 ---
 name: agy-ask
-description: Ask Google's Antigravity CLI (agy staffer, fast Gemini) a cheap one-shot question - the fast zero-tool mode and the post-install smoke test. Use when the user says /skill:agy-ask, "ask agy", "quick second opinion from agy", or right after installing to verify the plugin works.
+description: Ask Google Antigravity CLI (fast Gemini) a quick one-shot question without tools.
 argument-hint: '[--continue] [--model <id>|--effort low|medium|high] [--timeout <dur>] "question"'
 allowed-tools: Bash(node:*)
 ---

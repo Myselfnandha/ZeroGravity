@@ -779,18 +779,14 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       }
     }
 
-    // Always synchronize global core rules and workflows to ~/.gemini/config
+    // Synchronize auto_codebase_context hook to ~/.gemini/config/rules
     try {
       const globalRulesDir = path.join(globalDest, 'rules');
       fs.mkdirSync(globalRulesDir, { recursive: true });
-      const rulesSrc = path.join(sourceDir, 'rules');
-      if (fs.existsSync(rulesSrc)) {
-        ['core.md', 'effort.md'].forEach(ruleFile => {
-          const srcFile = path.join(rulesSrc, ruleFile);
-          if (fs.existsSync(srcFile)) {
-            fs.copyFileSync(srcFile, path.join(globalRulesDir, ruleFile));
-          }
-        });
+      // Only copy global auto-context rule; avoid duplicating core.md/effort.md which are loaded from local .agents/rules/
+      const autoContextSrc = path.join(sourceDir, 'scripts', 'auto_codebase_context.md');
+      if (fs.existsSync(autoContextSrc)) {
+        fs.copyFileSync(autoContextSrc, path.join(globalRulesDir, 'auto_codebase_context.md'));
       }
       const globalWorkflowsDir = path.join(globalDest, 'workflows');
       fs.mkdirSync(globalWorkflowsDir, { recursive: true });

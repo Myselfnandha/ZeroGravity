@@ -69,6 +69,18 @@ def inject_ki(project_name, project_path, index_content, patch_content=None):
     else:
         metadata = _create_metadata(project_name, project_path, now)
 
+    agent_dir_name = '.agents' if os.path.isdir(os.path.join(project_path, '.agents')) else '.agent'
+    metadata['references'] = [
+        {
+            'type': 'file',
+            'path': os.path.join(project_path, agent_dir_name, 'codebase_summary.md')
+        },
+        {
+            'type': 'file',
+            'path': os.path.join(project_path, agent_dir_name, 'codebase_index.md')
+        }
+    ]
+
     # Count files from index content
     file_count = index_content.count('\n- `')
     metadata['summary'] = (

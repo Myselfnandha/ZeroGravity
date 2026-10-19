@@ -1,6 +1,6 @@
 ---
 name: compress-tokens
-description: Ultra-compressed token communication mode and markdown memory compression utility. Cuts token usage ~75% while keeping technical accuracy. Use when the user requests /compress-tokens, /caveman, or file compression.
+description: Ultra-compressed caveman communication mode; reduces token usage ~75%.
 ---
 
 # Compress Tokens (Caveman Mode & Context Compressor)

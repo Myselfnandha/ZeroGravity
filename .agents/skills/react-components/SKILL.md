@@ -1,6 +1,6 @@
 ---
 name: react-components
-description: Search, inspect, and add 1,105+ React components, dashboard blocks, and motion icons from the ReUI shadcn registry. Use when the user requests /react-components, React UI blocks, kanban, data-grid, or ReUI elements.
+description: Search, inspect, and add 1,105+ ReUI/shadcn React blocks, charts, and motion icons.
 allowed-tools: Bash(npx shadcn@latest *), Bash(pnpm dlx shadcn@latest *), Bash(bunx --bun shadcn@latest *)
 ---
 

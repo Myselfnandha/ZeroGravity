@@ -1,6 +1,6 @@
 ---
 name: humanize-text
-description: Edit drafts into sharper, more human writing while preserving personal voice, removing 20+ patterns of AI slop. Use when the user invokes /humanize-text or requests sharper, less AI-sounding prose. (Formerly no-ai-slop).
+description: Remove 20+ AI slop patterns and sharpen prose while preserving natural human voice.
 ---
 
 # No AI slop

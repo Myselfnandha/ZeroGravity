@@ -1,6 +1,6 @@
 ---
 name: agent-reach
-description: Universal internet capability router for AI Agents. Search, read, and extract content across 16 platforms (Twitter/X, Reddit, Facebook, Instagram, YouTube, GitHub, Bilibili, XiaoHongShu, LinkedIn, Boss直聘, V2EX, Xueqiu, RSS, Exa web search, Jina Reader). Use when the user wants to search, browse, research, or inspect any web URL or social media platform.
+description: Universal internet research router across 16 platforms (Twitter, Reddit, YouTube, GitHub, Exa, Jina).
 ---
 
 # Agent Reach — Universal Internet Capability Router

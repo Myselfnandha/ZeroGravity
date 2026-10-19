@@ -1,6 +1,6 @@
 ---
 name: audit-agent
-description: Guide the user through an independent agent safety, alignment, and functional accuracy audit. Use when the user requests /audit-agent, asks to audit an agent, or runs iFixAi inspections.
+description: Run safety, alignment, and functional accuracy audits on agents and tools.
 ---
 
 # iFixAi: audit your own agent, on any model

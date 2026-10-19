@@ -1,5 +1,25 @@
 # ZeroGravity OS Changelog
 
+## 1.2.3 (2026-10-19)
+
+### Performance & Token Economy Overhaul (~80% Prompt Token Reduction)
+- **Eliminated Scratch Artifact Bloat (-9,520 tokens/turn)**:
+  - Purged 224 accumulated temporary git clones from the brain scratch directory.
+  - Reduced conversation artifact registry headers from 224 down to 0 scratch files.
+- **Rule Deduplication & Deconfliction (-1,698 tokens/turn)**:
+  - Deconflicted global rules (`~/.gemini/config/rules/`) with workspace rules (`.agents/rules/`).
+  - Removed duplicate copies of `core.md`, `effort.md`, and `codebase_context.md` from global rules.
+  - Preserved only universal `auto_codebase_context.md` globally, allowing Antigravity to inject workspace rules exactly once per turn.
+- **Plugin Skill Restructuring (-3,638 tokens/turn)**:
+  - Migrated 31 plugin skills from `.agents/plugins/*/skills/` directly into `.agents/skills/`.
+  - Completely eliminated Antigravity's redundant `<plugins>` double-advertising block while preserving full skill functionality.
+- **Progressive Disclosure Frontmatter Compaction (-2,535 tokens/turn)**:
+  - Compacted `description:` across all 47 skills to high-signal 1-sentence triggers (60-100 characters).
+  - Reduced `<skills>` block from 21,402 chars to 11,263 chars.
+- **Knowledge Item (KI) Pruning (-600 tokens/turn)**:
+  - Pruned stale, non-existent workspace KIs from `~/.gemini/antigravity-ide/knowledge/`.
+  - Fixed relative metadata file references in `ki_injector.py` to target `.agents/codebase_summary.md`.
+
 ## 1.2.2 (2026-10-19)
 
 ### Features & Google Research Harness² Integration

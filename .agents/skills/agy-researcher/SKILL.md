@@ -1,6 +1,6 @@
 ---
 name: agy-researcher
-description: Delegate a deep research or survey task to Google's Antigravity CLI (agy staffer, fast Gemini). Use when the user says /skill:agy-researcher, "ask agy to research", "have the agy staffer survey X", or wants a second, independent deep-dive on a topic or codebase without spending the host model's quota.
+description: Delegate deep research, surveys, or code exploration to Antigravity CLI.
 argument-hint: '[--continue] [--model <id>|--effort low|medium|high] [--restricted|--unrestricted] [--prompt-file <path>|--stdin] "what to research"'
 allowed-tools: Read, Glob, Grep, Bash(node:*), Bash(git:*), Bash(gh:*)
 ---
