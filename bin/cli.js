@@ -47,6 +47,7 @@ ${C.bold}Commands:${C.reset}
   install (default)       Install ZeroGravity (.agents/) into target workspace
   update, upgrade         Update existing .agents/ to latest (preserves memory)
   mcp                     Manage on-demand MCP servers (list, enable, disable, status, sync)
+  harness                 Recursive Agent Harnessing (status, inspect, validate, propose, ledger)
 
 ${C.bold}Arguments:${C.reset}
   target-directory        Workspace path to install/update (default: current directory)
@@ -135,6 +136,11 @@ function parseArgs(argv) {
       }
       args.mcpArgs = [...positional];
       positional.length = 0;
+    } else if (first === 'harness') {
+      args.command = 'harness';
+      positional.shift();
+      args.harnessArgs = [...positional];
+      positional.length = 0;
     }
   }
 
@@ -210,7 +216,7 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
     return { updatedItems: ['(source repository up to date)'], preservedItems: [] };
   }
 
-  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'skills', 'knowledge', 'hooks'];
+  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'skills', 'plugins', 'knowledge', 'hooks'];
   const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
 
   for (const folder of syncFolders) {
@@ -557,6 +563,21 @@ async function handleMcpCommand(args, agentsDir) {
   }
 }
 
+async function handleHarnessCommand(args, agentsDir) {
+  const harnessScript = path.join(agentsDir, 'scripts', 'harness.py');
+  if (!fs.existsSync(harnessScript)) {
+    console.error(`${C.red}❌ Error: harness.py not found in ${path.join(agentsDir, 'scripts')}.${C.reset}`);
+    process.exit(1);
+  }
+  const subArgs = (args.harnessArgs || []).map(a => a.includes(' ') ? `"${a}"` : a).join(' ');
+  const cmd = `python3 "${harnessScript}" ${subArgs}`;
+  try {
+    execSync(cmd, { stdio: 'inherit' });
+  } catch (err) {
+    process.exit(err.status || 1);
+  }
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   printBanner();
@@ -575,6 +596,14 @@ async function main() {
     console.log(`${C.blue}Global Path:${C.reset}  ${C.bold}${globalDest}${C.reset}`);
   }
   console.log('');
+
+  // -------------------------------------------------------------
+  // HARNESS COMMAND
+  // -------------------------------------------------------------
+  if (args.command === 'harness') {
+    await handleHarnessCommand(args, localAgentsDest);
+    return;
+  }
 
   // -------------------------------------------------------------
   // MCP COMMAND

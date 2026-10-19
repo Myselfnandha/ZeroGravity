@@ -53,6 +53,7 @@ function print_help() {
     echo -e "  ${CYAN}mcp run <name> -- <cmd>${RESET} Run a command with temporary MCP server, auto-stop after"
     echo ""
     echo -e "${BOLD}Autonomous Engine & Learning:${RESET}"
+    echo -e "  ${YELLOW}harness <action>${RESET}     Recursive Agent Harnessing (status, inspect, validate, propose, ledger)"
     echo -e "  ${YELLOW}build-feature${RESET}        Run 5-Stage Supercoder pipeline on current folder"
     echo -e "  ${YELLOW}learn <action>${RESET}       2-Way mistake immunization (list, add, check, audit)"
     echo -e "  ${YELLOW}sync [args]${RESET}          Auto-sync learned strategies & build flows to GitHub"
@@ -83,6 +84,9 @@ case "$CMD" in
         python3 "$SCRIPT_DIR/mcp.py" list
         echo ""
         python3 "$SCRIPT_DIR/learn.py" audit
+        ;;
+    harness)
+        python3 "$SCRIPT_DIR/harness.py" "$@"
         ;;
     mcp)
         python3 "$SCRIPT_DIR/mcp.py" "$@"

@@ -1,5 +1,35 @@
 # ZeroGravity OS Changelog
 
+## 1.2.2 (2026-10-19)
+
+### Features & Google Research Harness² Integration
+- **Harness² Recursive Agent Harnessing (arXiv:2610.14224)**:
+  - Full integration of Google Research's Harness² framework ("Recursive Agent Harnessing for an Open World").
+  - Formally defined and instrumented the **8 editable harness components (`c1..c8`)** for Antigravity & ZeroGravity OS:
+    - `c1` System Prompt (`AGENTS.md`)
+    - `c2` Guardrails & Rules (`.agents/rules/`)
+    - `c3` Memory (`.agents/memory/`)
+    - `c4` Tool Guidance (`.agents/mcp_config.json`, `mcp-registry/`)
+    - `c5` Subagents (`.agents/plugins/agent-skills/agents/`)
+    - `c6` Skills (`.agents/skills/`, `.agents/plugins/*/skills/`)
+    - `c7` Scripts (`.agents/scripts/`)
+    - `c8` Plugins & Hooks (`.agents/hooks/`, `hooks.json`, `.agents/plugins/`)
+- **Propose-Probe-Compose (PPC) Engine (`.agents/scripts/harness.py`)**:
+  - Implements contrastive candidate harness proposals across Invariant (`INV`) and Domain (`DOM`) dimensions.
+  - Generates behavioral contrast without requiring external ground-truth feedback.
+  - Automatically synthesizes non-conflicting winning edits with omitted-is-inherited diff semantics.
+- **Experience Ledger (`.agents/memory/harness_ledger.json`)**:
+  - Tracks task-level rollouts, proposal counts, adopted harnesses, and lessons learned.
+  - Connects task-level recursion with persistent harnessing-level meta-reflection.
+- **CLI & Workflow Integration**:
+  - Added `/harness` slash command workflow (`.agents/workflows/harness.md`).
+  - Added dedicated Harness² skill (`.agents/skills/harness/SKILL.md`).
+  - Integrated `zg harness` and `npx @nandhaalagesan/zerogravity harness` commands (`status`, `inspect`, `validate`, `propose`, `ledger`).
+  - Updated `bin/cli.js` syncFolders to include `plugins/` across multi-workspace sync.
+- **Surface Validation & Census**:
+  - Added surface invariants validation and component budget checks.
+  - Added unit test coverage in `tests/test_all.py` (CLI help, schema validation, smoke tests).
+
 ## 1.2.1 (2026-10-19)
 
 ### Features & Multi-Workspace Background Auto-Sync

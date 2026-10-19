@@ -45,6 +45,7 @@ CLI_SCRIPTS = {
     "mcp.py",
     "checklist.py",
     "analyze.py",
+    "harness.py",
 }
 
 # JSON data files and their required top-level keys
@@ -60,6 +61,10 @@ JSON_SCHEMAS: Dict[str, Dict[str, type]] = {
     "learned_strategies.json": {
         "version": str,
         "strategies": list,
+    },
+    "harness_ledger.json": {
+        "version": str,
+        "runs": list,
     },
 }
 
@@ -83,6 +88,12 @@ SMOKE_FUNCTIONS: Dict[str, List[tuple]] = {
     ],
     "impact_check": [
         ("is_binary_file", [Path("/dev/null")], {}, bool),
+    ],
+    "harness": [
+        ("get_harness_census", [], {}, dict),
+        ("load_ledger", [], {}, dict),
+        ("validate_surface", [], {}, list),
+        ("propose_refinements", ["test task"], {}, list),
     ],
 }
 

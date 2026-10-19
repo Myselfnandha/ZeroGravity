@@ -67,6 +67,7 @@ cp -r .agents /path/to/any/project/
 | Command | What it does |
 |:---|:---|
 | `/build-feature` | 5-stage supercoding pipeline: Context Sweep → Blueprint → CodeCrush → AAA Test → Sync |
+| `/harness` | Harness² Recursive Agent Harnessing: optimize c1..c8 via Propose-Probe-Compose recursion |
 | `/spec` | Spec before code: requirements interrogation, PRD, and testable interfaces |
 | `/create` | Scaffold a new application from scratch |
 | `/enhance` | Add or update features in an existing app |
@@ -121,6 +122,41 @@ cp -r .agents /path/to/any/project/
 | `/yagni-simplify` | Lazy senior dev mode — eliminate over-engineering |
 
 > **Native Antigravity Built-ins**: `/plan` (interactive planning), `/goal` (autonomous run-until-done), `/grill-me` (Socratic plan alignment), `/schedule`, `/learn`.
+
+---
+
+## 🔬 Harness² Recursive Agent Harnessing
+
+Built on Google Research's *Harness²: Recursive Agent Harnessing for an Open World* ([arXiv:2610.14224](https://arxiv.org/abs/2610.14224)), ZeroGravity OS exposes and recursively optimizes the **8 editable harness components** around the model:
+
+| Component | Identifier | Location | Levers |
+|---|---|---|---|
+| **c1** | System Prompt | `AGENTS.md` | Root agent definition and high-level execution directives |
+| **c2** | Guardrails | `.agents/rules/` | Behavioral fences, effort levels (`core.md`, `effort.md`) |
+| **c3** | Memory | `.agents/memory/` | Durable invariants, gotchas, anti-patterns, learned strategies |
+| **c4** | Tool Guidance | `.agents/mcp_config.json` | MCP server registry, parameter contracts, tool routing |
+| **c5** | Subagents | `.agents/plugins/agent-skills/agents/` | Persona specialists running in isolated sub-contexts |
+| **c6** | Skills | `.agents/skills/` | On-demand procedural workflows and domain playbooks |
+| **c7** | Scripts | `.agents/scripts/` | Deterministic CLI tools (`harness.py`, `analyze.py`, `learn.py`) |
+| **c8** | Plugins & Hooks | `.agents/hooks/` + `.agents/plugins/` | Runtime lifecycle interceptors and middleware bundles |
+
+### 🔄 Propose–Probe–Compose (PPC) Loop
+When facing hard tasks or failure loops, the agent recursively mutates its harness:
+1. **Propose**: Generate paired Invariant (`INV`) and Domain (`DOM`) candidate mutations.
+2. **Probe**: Execute candidate configurations to establish behavioral contrast (zero ground truth needed).
+3. **Compose**: Synthesize winning modifications into the live `.agents/` environment.
+4. **Reflect**: Record adopted configurations and lessons into the persistent **Experience Ledger** (`.agents/memory/harness_ledger.json`).
+
+```bash
+# Check 8-component status and character budget
+zg harness status
+
+# Generate contrastive PPC proposals for a task
+zg harness propose --task "Refactor auth middleware to use OAuth2" --record
+
+# Inspect Experience Ledger history
+zg harness ledger summary
+```
 
 ---
 
