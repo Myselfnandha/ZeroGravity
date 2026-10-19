@@ -97,6 +97,14 @@
       "root_cause": "Executing operations reflexively using generic shell commands or piecemeal calls without pre-evaluating the optimal specialized tool",
       "strategy": "Pre-Flight Tool Evaluation: Consciously select the most direct tool (grep_search over shell search, view_file over cat, multi_replace over fragmented edits, reactive async task over polling) before initiating execution",
       "invariant_rule": "Always determine and select the optimal tool for time, context, and execution efficiency before starting execution."
+    },
+    {
+      "id": "AP-013",
+      "category": "workflow",
+      "mistake": "Adding extraneous YAML frontmatter keys (disable-model-invocation, metadata, license) or mismatched name fields to workflows, or syncing global workflows only to ~/.gemini/config/workflows/",
+      "root_cause": "Antigravity IDE expects strict description-only frontmatter matching the filename stem, and native global workflow discovery watches ~/.gemini/antigravity-ide/global_workflows/",
+      "strategy": "Workflows must strictly contain description-only YAML frontmatter matching their file stems, and global workflows must dual-sync to ~/.gemini/antigravity-ide/global_workflows/ and ~/.gemini/config/workflows/",
+      "invariant_rule": "Maintain strict description-only frontmatter in all workflows and dual-sync global workflows to ~/.gemini/antigravity-ide/global_workflows/."
     }
   ]
 }

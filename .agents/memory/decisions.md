@@ -29,5 +29,10 @@ This document records durable architectural decisions, system invariants, and in
 - **Decision**: Prior to triggering any action, assess the action against available tools to choose the most token-efficient, fast, and direct execution path.
 - **Rationale**: Using the best-fit tool (dedicated search/edit/read/async primitives over shell commands or fragmented multi-step calls) preserves context window, eliminates round-trip latency, and prevents hallucination.
 
+### 7. Workflow Frontmatter Contract & Dual Global Path
+- **Decision**: Workflows must strictly contain `description:`-only in YAML frontmatter matching their filename stem (`<stem>.md` -> `/<stem>`). Global workflows must be dual-synced to `~/.gemini/antigravity-ide/global_workflows/` and `~/.gemini/config/workflows/`.
+- **Rationale**: Extraneous keys (`disable-model-invocation`, `metadata`) suppress Antigravity IDE's slash autocomplete popup. Antigravity IDE specifically monitors `~/.gemini/antigravity-ide/global_workflows/` for global discovery.
 
-
+### 8. Auto-Learn & Post-Execution Socratic Alignment
+- **Decision**: Upon completion of any major execution (multi-file feature build, architectural overhaul, `/build-feature`, or complex pipeline), the agent automatically runs `/learn` distillation to persistent memory and concludes with a quick `/grill-me` via `ask_question`.
+- **Rationale**: Ensures continuous, automated capture of failure modes and conventions while verifying alignment with user intent.

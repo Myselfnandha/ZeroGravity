@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated_at": "2026-09-17T05:37:08.603684+00:00",
+  "updated_at": "2026-10-19T16:36:08.891695+00:00",
   "strategies": [
     {
       "id": "STR-0001",
@@ -14,6 +14,26 @@
       "project": "agent",
       "hash": "7102f16b7c3f991e",
       "captured_at": "2026-09-17T05:37:08.603526+00:00",
+      "synced": false
+    },
+    {
+      "id": "STR-0002",
+      "type": "tool_preference",
+      "type_label": "Tool Preferences & Workflows",
+      "title": "Antigravity Workflow Frontmatter Contract & Global Discovery",
+      "content": "All Antigravity workflows must contain description-only YAML frontmatter matching their file stems without disable-model-invocation or metadata tags. Global workflows must be synchronized to ~/.gemini/antigravity-ide/global_workflows/. Major executions must auto-run /learn and finish with a quick /grill-me.",
+      "ecosystem": "general",
+      "tags": [
+        "workflows",
+        "antigravity",
+        "frontmatter",
+        "learning",
+        "grill-me"
+      ],
+      "source": "agent",
+      "project": "agent",
+      "hash": "45d1e490e93e5085",
+      "captured_at": "2026-10-19T16:36:08.891481+00:00",
       "synced": false
     }
   ]

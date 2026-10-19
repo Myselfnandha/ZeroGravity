@@ -33,11 +33,13 @@ Before modifying or creating files:
   - **Assert**: Verify outputs, state mutations, and mock invocations.
 - Run project test suites and linters to verify behavior and type safety.
 
-### 5. Memory Tree Synchronization
-- At the conclusion of non-trivial tasks, record learnings into `.agents/memory/`:
+### 5. Memory Tree Synchronization & Auto-Learn / Quick Grill-Me
+- **Auto-run `/learn`**: Record durable learnings and invariants into `.agents/memory/`:
   - New invariants $\rightarrow$ `decisions.md`
-  - Fixed quirks/workarounds $\rightarrow$ `gotchas.md`
+  - Fixed quirks/workarounds $\rightarrow$ `gotchas.md` (and `anti_patterns.json`)
   - Completed milestones $\rightarrow$ `goals.md`
+  - Captured strategies $\rightarrow$ run `python3 .agents/scripts/auto_evolve.py capture`
+- **Quick Grill-Me**: Conclude the execution with a quick `/grill-me` via `ask_question` (1-2 targeted Socratic questions) to verify alignment, confirm architectural choices, and lock in user conventions.
 
 ---
 

@@ -37,3 +37,8 @@ Output the final scorecard:
 - **Procedure**: [Git revert command or deployment command]
 - **Target RTO**: [< 5 minutes]
 ```
+
+### PHASE D: AUTO-LEARN & POST-LAUNCH GRILL-ME
+- **Auto-run `/learn`**: Distill deployment/release learnings, migration quirks, and gotchas into `.agents/memory/` (`decisions.md`, `gotchas.md`).
+- **Quick `/grill-me`**: Conclude with an `ask_question` prompt to confirm follow-up deployment tasks, telemetry monitoring, or canary rollout milestones.
+

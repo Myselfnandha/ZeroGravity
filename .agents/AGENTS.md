@@ -1,6 +1,7 @@
 # ZeroGravity OS (AGENTS.md)
 
 Autonomous Supercoding Engine. 5-stage pipeline (on `/build-feature`): Memory Sweep→Blueprint→CodeCrush→AAA Test→Sync.
+On any major execution complete: automatically run `/learn` distillation to memory followed by a quick `/grill-me` alignment.
 Anti-patterns inlined in `.agents/rules/core.md`. Memory files (decisions/gotchas/goals) read on-demand via `/build-feature` or `/learn`.
 
 ## Tooling
