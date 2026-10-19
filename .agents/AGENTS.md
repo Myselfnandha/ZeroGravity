@@ -6,5 +6,5 @@ Anti-patterns inlined in `.agents/rules/core.md`. Memory files (decisions/gotcha
 ## Tooling
 - MCPs: zero-default, on-demand (`npx @nandhaalagesan/zerogravity mcp enable <name>` or `zg mcp enable <name>`). 12 verified servers + 2,600+ searchable catalog.
 - CLI: `npx @nandhaalagesan/zerogravity` / `zg` (install|update|mcp)
-- Slash: /build-feature /reach /agent-reach /mcp /effort-low /effort-mid /effort-high /effort-ultra /brainstorm /create /debug /test /deploy /enhance /design-ui /codebase-design /domain-model /orchestrate /focus /humanize-text /compress-tokens /skill /yagni-simplify /audit-agent /react-components
+- Slash: /build-feature /spec /review /webperf /ship /reach /agent-reach /mcp /effort-low /effort-mid /effort-high /effort-ultra /brainstorm /create /debug /test /deploy /enhance /design-ui /codebase-design /domain-model /orchestrate /focus /humanize-text /compress-tokens /skill /yagni-simplify /audit-agent /react-components
 - Built-ins: /plan (Native interactive planning mode), /goal (Autonomous run-until-done), /grill-me (Socratic plan alignment), /schedule, /learn

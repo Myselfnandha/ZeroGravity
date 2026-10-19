@@ -203,7 +203,7 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   const updatedItems = [];
   const preservedItems = [];
 
-  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'plugins', 'skills', 'knowledge', 'hooks'];
+  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'skills', 'knowledge', 'hooks'];
   const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
 
   for (const folder of syncFolders) {
@@ -258,10 +258,31 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
     updatedItems.push('mcp_config.json (created default)');
   }
 
-  // Preserve plugins/
+  // Sync plugins (copy built-in plugins while preserving user-added plugins)
+  const srcPlugins = path.join(sourceDir, 'plugins');
   const destPlugins = path.join(targetAgentsDir, 'plugins');
+  if (fs.existsSync(srcPlugins)) {
+    if (!dryRun) fs.mkdirSync(destPlugins, { recursive: true });
+    const pluginList = fs.readdirSync(srcPlugins);
+    for (const p of pluginList) {
+      const srcPluginPath = path.join(srcPlugins, p);
+      const destPluginPath = path.join(destPlugins, p);
+      if (fs.statSync(srcPluginPath).isDirectory()) {
+        if (!dryRun) {
+          fs.rmSync(destPluginPath, { recursive: true, force: true });
+          copyDirSync(srcPluginPath, destPluginPath);
+        }
+        updatedItems.push(`plugins/${p}/`);
+      }
+    }
+  }
   if (fs.existsSync(destPlugins)) {
-    preservedItems.push('plugins/');
+    const userPlugins = fs.readdirSync(destPlugins);
+    for (const up of userPlugins) {
+      if (!fs.existsSync(path.join(srcPlugins, up))) {
+        preservedItems.push(`plugins/${up}/`);
+      }
+    }
   }
 
   return { updatedItems, preservedItems };
@@ -552,7 +573,15 @@ async function main() {
         if (fs.existsSync(rulesSrc)) {
           copyDirSync(rulesSrc, path.join(globalDest, 'rules'));
         }
-        console.log(`  ${C.green}✔ All global rules synchronized.${C.reset}`);
+        const skillsSrc = path.join(sourceDir, 'skills');
+        if (fs.existsSync(skillsSrc)) {
+          copyDirSync(skillsSrc, path.join(globalDest, 'skills'));
+        }
+        const pluginsSrc = path.join(sourceDir, 'plugins');
+        if (fs.existsSync(pluginsSrc)) {
+          copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
+        }
+        console.log(`  ${C.green}✔ All global rules, skills & plugins synchronized.${C.reset}`);
       }
 
       console.log(`
@@ -647,6 +676,7 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       fs.mkdirSync(path.join(globalDest, 'rules'), { recursive: true });
       fs.mkdirSync(path.join(globalDest, 'skills'), { recursive: true });
       fs.mkdirSync(path.join(globalDest, 'workflows'), { recursive: true });
+      fs.mkdirSync(path.join(globalDest, 'plugins'), { recursive: true });
 
       const rulesSrc = path.join(sourceDir, 'rules');
       if (fs.existsSync(rulesSrc)) {
@@ -661,6 +691,11 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       const workflowsSrc = path.join(sourceDir, 'workflows');
       if (fs.existsSync(workflowsSrc)) {
         copyDirSync(workflowsSrc, path.join(globalDest, 'workflows'));
+      }
+
+      const pluginsSrc = path.join(sourceDir, 'plugins');
+      if (fs.existsSync(pluginsSrc)) {
+        copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
       }
 
       const mcpConfigDest = path.join(globalDest, 'mcp_config.json');

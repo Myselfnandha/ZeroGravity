@@ -316,9 +316,9 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
     if [ "$DRY_RUN" = true ]; then
         echo -e "${C_YELLOW}[DRY-RUN] Would install to: $GLOBAL_DEST${C_RESET}"
     else
-        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills" "$GLOBAL_DEST/workflows"
+        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills" "$GLOBAL_DEST/workflows" "$GLOBAL_DEST/plugins"
 
-        # Copy global rules, skills, and workflows
+        # Copy global rules, skills, workflows, and plugins
         if [ -d "$TEMP_EXTRACT/.agents/rules" ]; then
             cp -a "$TEMP_EXTRACT/.agents/rules/." "$GLOBAL_DEST/rules/" 2>/dev/null || true
         fi
@@ -327,6 +327,9 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
         fi
         if [ -d "$TEMP_EXTRACT/.agents/workflows" ]; then
             cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_DEST/workflows/" 2>/dev/null || true
+        fi
+        if [ -d "$TEMP_EXTRACT/.agents/plugins" ]; then
+            cp -a "$TEMP_EXTRACT/.agents/plugins/." "$GLOBAL_DEST/plugins/" 2>/dev/null || true
         fi
 
         # Ensure zero-default clean profile

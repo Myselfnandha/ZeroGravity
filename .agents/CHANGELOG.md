@@ -1,5 +1,20 @@
 # ZeroGravity OS Changelog
 
+## 1.2.0 (2026-10-19)
+
+### Features & Addy Osmani Agent-Skills Integration
+- **Full Plugin Suite (`.agents/plugins/agent-skills/`)**: Integrated Addy Osmani's complete production-grade software engineering skill suite:
+  - **25 Specialized Skills**: `api-and-interface-design`, `browser-testing-with-devtools`, `ci-cd-and-automation`, `code-review-and-quality`, `code-simplification`, `constraint-driven-development`, `context-engineering`, `debugging-and-error-recovery`, `deprecation-and-migration`, `documentation-and-adrs`, `doubt-driven-development`, `frontend-ui-engineering`, `git-workflow-and-versioning`, `idea-refine`, `incremental-implementation`, `interview-me`, `observability-and-instrumentation`, `performance-optimization`, `planning-and-task-breakdown`, `security-and-hardening`, `shipping-and-launch`, `source-driven-development`, `spec-driven-development`, `test-driven-development`, `using-agent-skills`.
+  - **4 Subagent Roles**: `code-reviewer`, `security-auditor`, `test-engineer`, `web-performance-auditor`.
+  - **7 Reference Checklists**: Accessibility, Definition of Done, Observability, Orchestration Patterns, Performance, Security, and Testing Patterns.
+- **Dedicated Slash Workflows**:
+  - `/spec`: Requirements gathering, constraint identification, user stories, and acceptance criteria.
+  - `/review`: 5-axis code review across correctness, design, performance, security, and testability.
+  - `/webperf`: Web performance audit, Core Web Vitals (LCP/INP/CLS), bundle optimization, and rendering efficiency.
+  - `/ship`: Multi-specialist pre-launch review, smoke testing, migration verification, and Go/No-Go decision.
+- **CLI & Sync Automation**: Updated `bin/cli.js` with intelligent plugin synchronization preserving user custom plugins while updating built-in plugins (`agent-skills`, `ponytail`) locally and globally in `~/.gemini/config/plugins/`.
+- **Skills Registry Indexing**: Re-indexed registry to 46 total skills in `skills_index.json`.
+
 ## 1.1.9 (2026-10-19)
 
 ### Features & Agent-Reach Integration

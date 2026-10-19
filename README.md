@@ -62,13 +62,15 @@ cp -r .agents /path/to/any/project/
 
 20 specialized slash commands organized by developer intent:
 
-### 🔨 Build
+### 🔨 Build & Ship
 
 | Command | What it does |
 |:---|:---|
 | `/build-feature` | 5-stage supercoding pipeline: Context Sweep → Blueprint → CodeCrush → AAA Test → Sync |
+| `/spec` | Spec before code: requirements interrogation, PRD, and testable interfaces |
 | `/create` | Scaffold a new application from scratch |
 | `/enhance` | Add or update features in an existing app |
+| `/ship` | Pre-launch multi-specialist verification fan-out & Go/No-Go decision |
 
 ### 🧠 Think
 
@@ -80,10 +82,12 @@ cp -r .agents /path/to/any/project/
 | `/orchestrate` | Coordinate multiple perspectives for complex architectural tasks |
 | `/reach` | Universal internet router across 16 platforms (Twitter, Reddit, YouTube, Bilibili, GitHub, Exa, Jina) |
 
-### 🐛 Verify
+### 🐛 Verify & Review
 
 | Command | What it does |
 |:---|:---|
+| `/review` | 5-axis code review: correctness, readability, architecture, security, performance |
+| `/webperf` | Web performance and Core Web Vitals audit (Lighthouse/CrUX metrics) |
 | `/debug` | Systematic root-cause investigation |
 | `/test` | Generate and run tests (unit, integration, E2E) |
 | `/deploy` | Pre-flight checks + deployment execution |
