@@ -56,6 +56,7 @@ ${C.bold}Options:${C.reset}
   -l, --local             Target local workspace (.agents/) only (default)
   -g, --global            Target global Antigravity configuration (~/.gemini/config/)
   -a, --all               Target both local (.agents/) and global configuration
+  -A, --all-workspaces    Update all registered active workspaces on the system
   -f, --force             Overwrite without prompting
   -y, --yes               Non-interactive mode (auto-accept all prompts)
   --dry-run               Simulate execution without modifying any files
@@ -101,6 +102,8 @@ function parseArgs(argv) {
       args.mode = 'global';
     } else if (arg === '-a' || arg === '--all') {
       args.mode = 'all';
+    } else if (arg === '-A' || arg === '--all-workspaces') {
+      args.allWorkspaces = true;
     } else if (arg === '-f' || arg === '--force') {
       args.force = true;
     } else if (arg === '-y' || arg === '--yes') {
@@ -203,13 +206,17 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   const updatedItems = [];
   const preservedItems = [];
 
+  if (path.resolve(sourceDir) === path.resolve(targetAgentsDir)) {
+    return { updatedItems: ['(source repository up to date)'], preservedItems: [] };
+  }
+
   const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'skills', 'knowledge', 'hooks'];
   const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
 
   for (const folder of syncFolders) {
     const srcFolder = path.join(sourceDir, folder);
     const destFolder = path.join(targetAgentsDir, folder);
-    if (fs.existsSync(srcFolder)) {
+    if (fs.existsSync(srcFolder) && path.resolve(srcFolder) !== path.resolve(destFolder)) {
       if (!dryRun) {
         fs.rmSync(destFolder, { recursive: true, force: true });
         copyDirSync(srcFolder, destFolder);
@@ -221,7 +228,7 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   for (const file of syncFiles) {
     const srcFile = path.join(sourceDir, file);
     const destFile = path.join(targetAgentsDir, file);
-    if (fs.existsSync(srcFile)) {
+    if (fs.existsSync(srcFile) && path.resolve(srcFile) !== path.resolve(destFile)) {
       if (!dryRun) {
         fs.copyFileSync(srcFile, destFile);
       }
@@ -286,6 +293,86 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
   }
 
   return { updatedItems, preservedItems };
+}
+
+function getWorkspacesRegistryPath() {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  return path.join(homeDir, '.gemini', 'config', 'workspaces.json');
+}
+
+function loadRegisteredWorkspaces() {
+  const regPath = getWorkspacesRegistryPath();
+  const workspaces = new Set();
+  if (fs.existsSync(regPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(regPath, 'utf8'));
+      if (Array.isArray(data.workspaces)) {
+        data.workspaces.forEach(w => {
+          if (fs.existsSync(w) && (fs.existsSync(path.join(w, '.agents')) || fs.existsSync(path.join(w, '.agent')))) {
+            workspaces.add(path.resolve(w));
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
+  // Auto-discover from ~/.gemini/antigravity-ide/knowledge/
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const knowledgeDir = path.join(homeDir, '.gemini', 'antigravity-ide', 'knowledge');
+  if (fs.existsSync(knowledgeDir)) {
+    try {
+      const items = fs.readdirSync(knowledgeDir);
+      for (const item of items) {
+        const metaPath = path.join(knowledgeDir, item, 'metadata.json');
+        if (fs.existsSync(metaPath)) {
+          try {
+            const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+            if (Array.isArray(meta.references)) {
+              for (const ref of meta.references) {
+                if (typeof ref.path === 'string' && ref.path.includes('/.agents/')) {
+                  const ws = ref.path.split('/.agents/')[0];
+                  if (fs.existsSync(ws) && fs.existsSync(path.join(ws, '.agents'))) {
+                    workspaces.add(path.resolve(ws));
+                  }
+                }
+              }
+            }
+          } catch (_) {}
+        }
+      }
+    } catch (_) {}
+  }
+
+  return Array.from(workspaces);
+}
+
+function registerWorkspace(workspacePath) {
+  try {
+    const regPath = getWorkspacesRegistryPath();
+    const dir = path.dirname(regPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const existing = new Set(loadRegisteredWorkspaces());
+    existing.add(path.resolve(workspacePath));
+    fs.writeFileSync(regPath, JSON.stringify({ workspaces: Array.from(existing).sort() }, null, 2));
+  } catch (_) {}
+}
+
+function syncOtherWorkspaces(sourceDir, currentWorkspace, dryRun) {
+  const allWorkspaces = loadRegisteredWorkspaces();
+  const currentNorm = path.resolve(currentWorkspace);
+  const updated = [];
+
+  for (const ws of allWorkspaces) {
+    if (path.resolve(ws) === currentNorm) continue;
+    const wsAgents = path.join(ws, '.agents');
+    if (fs.existsSync(wsAgents)) {
+      try {
+        updateAgentsDir(sourceDir, wsAgents, dryRun, ws);
+        updated.push(ws);
+      } catch (_) {}
+    }
+  }
+  return updated;
 }
 
 async function resolveSourcePayload() {
@@ -501,6 +588,19 @@ async function main() {
   // UPDATE COMMAND
   // -------------------------------------------------------------
   if (args.command === 'update') {
+    if (args.dryRun) {
+      console.log(`${C.yellow}[DRY-RUN] Simulation mode. No files will be modified.${C.reset}`);
+      console.log(`[DRY-RUN] Would update .agents/ in: ${localAgentsDest}`);
+      console.log(`[DRY-RUN] Would preserve memory/ and custom configurations.`);
+      const registered = loadRegisteredWorkspaces().filter(w => path.resolve(w) !== path.resolve(targetDir));
+      if (registered.length > 0) {
+        console.log(`[DRY-RUN] Would background sync ${registered.length} other workspace(s):`);
+        registered.forEach(w => console.log(`    • ${w}`));
+      }
+      console.log(`\n${C.green}✔ Dry-run completed successfully.${C.reset}`);
+      process.exit(0);
+    }
+
     if (args.mode === 'local' || args.mode === 'all') {
       if (!fs.existsSync(localAgentsDest)) {
         console.error(`${C.red}❌ No existing .agents directory found in: ${targetDir}${C.reset}`);
@@ -515,14 +615,6 @@ async function main() {
           process.exit(0);
         }
       }
-    }
-
-    if (args.dryRun) {
-      console.log(`${C.yellow}[DRY-RUN] Simulation mode. No files will be modified.${C.reset}`);
-      console.log(`[DRY-RUN] Would update .agents/ in: ${localAgentsDest}`);
-      console.log(`[DRY-RUN] Would preserve memory/ and custom configurations.`);
-      console.log(`\n${C.green}✔ Dry-run completed successfully.${C.reset}`);
-      process.exit(0);
     }
 
     const { sourceDir, tempDirToClean } = await resolveSourcePayload();
@@ -545,33 +637,22 @@ async function main() {
         }
       }
 
-      // Always synchronize global core rules and workflows to ~/.gemini/config
+      // Register current workspace in central registry
+      registerWorkspace(targetDir);
+
+      // Always synchronize full global config to ~/.gemini/config
       try {
         const globalRulesDir = path.join(globalDest, 'rules');
         fs.mkdirSync(globalRulesDir, { recursive: true });
         const rulesSrc = path.join(sourceDir, 'rules');
         if (fs.existsSync(rulesSrc)) {
-          ['core.md', 'effort.md'].forEach(ruleFile => {
-            const srcFile = path.join(rulesSrc, ruleFile);
-            if (fs.existsSync(srcFile)) {
-              fs.copyFileSync(srcFile, path.join(globalRulesDir, ruleFile));
-            }
-          });
+          copyDirSync(rulesSrc, globalRulesDir);
         }
         const globalWorkflowsDir = path.join(globalDest, 'workflows');
         fs.mkdirSync(globalWorkflowsDir, { recursive: true });
         const workflowsSrc = path.join(sourceDir, 'workflows');
         if (fs.existsSync(workflowsSrc)) {
           copyDirSync(workflowsSrc, globalWorkflowsDir);
-        }
-        console.log(`  ${C.green}✔ Global rules & workflows active in:${C.reset} ${globalDest}`);
-      } catch (_) {}
-
-      if (args.mode === 'global' || args.mode === 'all') {
-        console.log(`\n${C.bold}🌐 Updating Full Global Configuration...${C.reset}`);
-        const rulesSrc = path.join(sourceDir, 'rules');
-        if (fs.existsSync(rulesSrc)) {
-          copyDirSync(rulesSrc, path.join(globalDest, 'rules'));
         }
         const skillsSrc = path.join(sourceDir, 'skills');
         if (fs.existsSync(skillsSrc)) {
@@ -581,7 +662,26 @@ async function main() {
         if (fs.existsSync(pluginsSrc)) {
           copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
         }
-        console.log(`  ${C.green}✔ All global rules, skills & plugins synchronized.${C.reset}`);
+        const scriptsSrc = path.join(sourceDir, 'scripts');
+        if (fs.existsSync(scriptsSrc)) {
+          copyDirSync(scriptsSrc, path.join(globalDest, 'scripts'));
+        }
+        const versionSrc = path.join(sourceDir, 'VERSION');
+        if (fs.existsSync(versionSrc)) {
+          fs.copyFileSync(versionSrc, path.join(globalDest, 'VERSION'));
+        }
+        const indexSrc = path.join(sourceDir, 'skills_index.json');
+        if (fs.existsSync(indexSrc)) {
+          fs.copyFileSync(indexSrc, path.join(globalDest, 'skills_index.json'));
+        }
+        console.log(`  ${C.green}✔ Global payload synchronized in:${C.reset} ${globalDest}`);
+      } catch (_) {}
+
+      // Automatically synchronize all other registered workspaces on the machine
+      const otherWorkspaces = syncOtherWorkspaces(sourceDir, targetDir, false);
+      if (otherWorkspaces.length > 0) {
+        console.log(`  ${C.green}✔ Background synced ${otherWorkspaces.length} other registered workspace(s):${C.reset}`);
+        otherWorkspaces.forEach(w => console.log(`    • ${C.cyan}${w}${C.reset}`));
       }
 
       console.log(`
@@ -641,6 +741,7 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
 
       copyDirSync(sourceDir, localAgentsDest);
       console.log(`  ${C.green}✔ Installed .agents/ to:${C.reset} ${C.bold}${localAgentsDest}${C.reset}`);
+      registerWorkspace(targetDir);
 
       if (process.platform !== 'win32') {
         try {

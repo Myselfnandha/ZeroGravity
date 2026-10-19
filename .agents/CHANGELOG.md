@@ -1,5 +1,21 @@
 # ZeroGravity OS Changelog
 
+## 1.2.1 (2026-10-19)
+
+### Features & Multi-Workspace Background Auto-Sync
+- **Central Workspaces Registry (`~/.gemini/config/workspaces.json`)**:
+  - Automatically records and tracks all active projects where ZeroGravity (`.agents/`) is installed across the system.
+  - Auto-discovers workspaces dynamically from Antigravity IDE knowledge context (`~/.gemini/antigravity-ide/knowledge/`) and filesystem scans.
+- **Push Mode Synchronization (`bin/cli.js`)**:
+  - Whenever `npx @nandhaalagesan/zerogravity update` or `zg update` runs, it automatically synchronizes the update across all other registered workspaces on the machine in the background.
+  - Supports explicit multi-project updates via `-A` / `--all-workspaces`.
+  - Always safely preserves each project's `.agents/memory/` (decisions, gotchas, goals) and `.agents/mcp_config.json`.
+  - Added self-overwrite protection preventing development repository from modifying itself during sync.
+- **Pull Mode & Silent Self-Healing (`scripts/analyze.py`)**:
+  - Automatically executes on conversation start via `auto_codebase_context.md`.
+  - Detects if the workspace's `.agents/` is older than `~/.gemini/config/VERSION` and silently self-syncs in ~20ms without blocking.
+  - Includes a non-blocking background npm freshness check (cached every 12h) to detect new releases and trigger background updates.
+
 ## 1.2.0 (2026-10-19)
 
 ### Features & Addy Osmani Agent-Skills Integration

@@ -416,6 +416,154 @@ def _write_patch_log(patch_path, project_name, changed_files, scan_date):
             f.write('\n\n')
 
 
+def auto_sync_framework(target_dir, agent_dir, silent=True):
+    """
+    Silently auto-updates workspace .agents/ from global ~/.gemini/config/
+    if the local workspace framework is older than the global installed version.
+    Registers the workspace path in ~/.gemini/config/workspaces.json.
+    """
+    try:
+        global_config = os.path.expanduser('~/.gemini/config')
+        if not os.path.isdir(global_config):
+            return
+
+        norm_target = os.path.abspath(target_dir)
+
+        # 1. Register workspace in ~/.gemini/config/workspaces.json
+        workspaces_file = os.path.join(global_config, 'workspaces.json')
+        try:
+            workspaces = set()
+            if os.path.exists(workspaces_file):
+                with open(workspaces_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data.get('workspaces'), list):
+                        workspaces = set(data['workspaces'])
+            if norm_target not in workspaces:
+                workspaces.add(norm_target)
+                os.makedirs(os.path.dirname(workspaces_file), exist_ok=True)
+                with open(workspaces_file, 'w', encoding='utf-8') as f:
+                    json.dump({'workspaces': sorted(list(workspaces))}, f, indent=2)
+        except Exception:
+            pass
+
+        # Protect development repository from self-overwrite
+        if os.path.exists(os.path.join(norm_target, 'pack.sh')) and os.path.exists(os.path.join(norm_target, 'bin', 'cli.js')):
+            return
+
+        # 2. Check version
+        global_version_file = os.path.join(global_config, 'VERSION')
+        if not os.path.exists(global_version_file):
+            return
+
+        with open(global_version_file, 'r', encoding='utf-8') as f:
+            global_ver = f.read().strip()
+
+        local_version_file = os.path.join(agent_dir, 'VERSION')
+        local_ver = '0.0.0'
+        if os.path.exists(local_version_file):
+            try:
+                with open(local_version_file, 'r', encoding='utf-8') as f:
+                    local_ver = f.read().strip()
+            except Exception:
+                pass
+
+        if local_ver == global_ver:
+            return
+
+        # 3. Synchronize framework components from global config
+        sync_dirs = ['rules', 'workflows', 'plugins', 'skills', 'scripts']
+        import shutil
+        for d in sync_dirs:
+            src_dir = os.path.join(global_config, d)
+            dest_dir = os.path.join(agent_dir, d)
+            if os.path.isdir(src_dir):
+                if d in ('plugins', 'skills'):
+                    os.makedirs(dest_dir, exist_ok=True)
+                    for p in os.listdir(src_dir):
+                        sp = os.path.join(src_dir, p)
+                        dp = os.path.join(dest_dir, p)
+                        if os.path.isdir(sp):
+                            if os.path.exists(dp):
+                                shutil.rmtree(dp)
+                            shutil.copytree(sp, dp)
+                else:
+                    if os.path.exists(dest_dir):
+                        shutil.rmtree(dest_dir)
+                    shutil.copytree(src_dir, dest_dir)
+
+        # Sync key metadata files
+        for f in ['skills_index.json']:
+            sf = os.path.join(global_config, f)
+            df = os.path.join(agent_dir, f)
+            if os.path.isfile(sf):
+                shutil.copy2(sf, df)
+
+        # Write new local VERSION
+        with open(local_version_file, 'w', encoding='utf-8') as f:
+            f.write(global_ver + '\n')
+
+        if not silent:
+            print(f"[ZeroGravity] Auto-synced {norm_target} from v{local_ver} to v{global_ver}")
+    except Exception:
+        pass
+
+
+def check_npm_update_background():
+    """
+    Periodically checks if a newer version exists on npm in the background.
+    Throttled to once every 12 hours via ~/.gemini/config/last_npm_check.json.
+    """
+    try:
+        import urllib.request, time, subprocess, threading
+        global_config = os.path.expanduser('~/.gemini/config')
+        stamp_file = os.path.join(global_config, 'last_npm_check.json')
+        now = time.time()
+        if os.path.exists(stamp_file):
+            try:
+                with open(stamp_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if now - data.get('timestamp', 0) < 43200:
+                        return
+            except Exception:
+                pass
+
+        try:
+            with open(stamp_file, 'w', encoding='utf-8') as f:
+                json.dump({'timestamp': now}, f)
+        except Exception:
+            pass
+
+        def _check():
+            try:
+                req = urllib.request.Request(
+                    'https://registry.npmjs.org/@nandhaalagesan/zerogravity/latest',
+                    headers={'User-Agent': 'ZeroGravity-AutoUpdater'}
+                )
+                with urllib.request.urlopen(req, timeout=2.0) as resp:
+                    npm_data = json.loads(resp.read().decode())
+                    npm_ver = npm_data.get('version')
+                if not npm_ver:
+                    return
+                global_ver_file = os.path.join(global_config, 'VERSION')
+                cur_ver = '0.0.0'
+                if os.path.exists(global_ver_file):
+                    cur_ver = open(global_ver_file).read().strip()
+                if npm_ver != cur_ver:
+                    subprocess.Popen(
+                        ['npx', '-y', '@nandhaalagesan/zerogravity', 'update', '--global', '-y'],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        start_new_session=True
+                    )
+            except Exception:
+                pass
+
+        t = threading.Thread(target=_check, daemon=True)
+        t.start()
+    except Exception:
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Analyze a folder end-to-end and generate a single Markdown summary for LLM context windows."
@@ -441,6 +589,10 @@ def main():
 
     agent_dir = get_agent_dir(target_dir)
     os.makedirs(agent_dir, exist_ok=True)
+
+    # Silent framework auto-sync from global configuration & background npm check
+    auto_sync_framework(target_dir, agent_dir, silent=True)
+    check_npm_update_background()
 
     # codebase_summary, codebase_index, and codebase_patch MUST live in the .agent folder only
     if (not args.output or
