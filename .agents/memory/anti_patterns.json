@@ -105,6 +105,14 @@
       "root_cause": "Antigravity IDE expects strict description-only frontmatter matching the filename stem, and native global workflow discovery watches ~/.gemini/antigravity-ide/global_workflows/",
       "strategy": "Workflows must strictly contain description-only YAML frontmatter matching their file stems, and global workflows must dual-sync to ~/.gemini/antigravity-ide/global_workflows/ and ~/.gemini/config/workflows/",
       "invariant_rule": "Maintain strict description-only frontmatter in all workflows and dual-sync global workflows to ~/.gemini/antigravity-ide/global_workflows/."
+    },
+    {
+      "id": "AP-014",
+      "category": "tooling",
+      "mistake": "Invoking generic shell commands, sliced reads, or polling loops instead of specialized tool primitives",
+      "root_cause": "Omitting pre-flight goal, task, and context analysis, leading to unbounded token blowouts, multi-turn latency, and broken shell quoting",
+      "strategy": "Pre-Execution Tool Optimization: Evaluate represented goal, task, and context to select the exact optimal primitive (grep_search for search, full view_file for inspection, multi_replace_file_content for batch edits, tuned run_command for sync execution, reactive wakeup for async tasks)",
+      "invariant_rule": "Always evaluate and dispatch the optimal, lowest-token, highest-velocity primitive before taking action."
     }
   ]
 }

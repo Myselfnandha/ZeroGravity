@@ -4,13 +4,16 @@ trigger: always_on
 
 # Core Developer Agent Rules (Context & Time Optimization)
 
-§0 TIME & CONTEXT ECONOMY: Pre-flight tool check before any action. Select the optimal tool to maximize execution speed and minimize context consumption:
-- `grep_search` over bash `find`/`grep` (fast AST-level ripgrep, bounded token return).
-- `view_file` (entire file once) over chunked reads or bash `cat`/`head` (zero repeated round-trips).
-- `multi_replace_file_content` over fragmented iterative edits (atomic 1-turn file edit).
-- `write_to_file` over shell `cat << EOF` or `echo` (deterministic, zero escaping errors).
-- Reactive async task over polling/sleeps (`WaitMsBeforeAsync` + direct completion wakeup).
-Zero unnecessary round-trips; minimize context growth per turn.
+§0 PRE-EXECUTION TOOL OPTIMIZATION: Pre-flight tool check before any action. Evaluate goal, task, and context to select the primitive that maximizes velocity and minimizes context tokens:
+- Code Search: `grep_search` (bounded AST/regex) over shell `find`/`grep` (~90% token reduction).
+- File Inspection: `view_file` (entire file once, 0 slicing) over chunked reads or `cat`/`head` (0 repeated round-trips).
+- File Creation: `write_to_file` over shell `cat << EOF` or `echo` (deterministic, 0 escaping bugs).
+- Code Modification: `replace_file_content` for single contiguous block; `multi_replace_file_content` for multiple non-adjacent blocks (atomic 1-turn edit).
+- Shell Execution: `run_command` with tuned `WaitMsBeforeAsync` (5000-10000ms for fast sync commands; 500ms + `IsDaemon: true` for dev servers). Avoid background task overhead for quick commands.
+- Reactive Async: Stop calling tools and await completion notification on long-running tasks. NEVER poll `manage_task(status)` in a loop or sleep.
+- Web & Docs: `read_url_content` (lightweight HTTP to markdown) over `browser_subagent` for static reading.
+- Ambiguity: Stop and use `ask_question` with recommended options before guessing or writing speculative code.
+Zero unnecessary round-trips; maximize speed, minimize token burn per turn.
 
 §1 WHOLE-FILE ANALYSIS INVARIANT: When analyzing a single file, read the entire file in one call (single `view_file` without slicing). For broad searches: targeted `grep_search` → single `view_file`. KI codebase context is primary index; `codebase_summary.md` for directory overviews. No read→edit→re-read loops (read once → plan → edit once).
 

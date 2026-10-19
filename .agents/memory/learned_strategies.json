@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated_at": "2026-10-19T16:40:59.150715+00:00",
+  "updated_at": "2026-10-19T16:51:58.187161+00:00",
   "strategies": [
     {
       "id": "STR-0001",
@@ -53,6 +53,26 @@
       "project": "agent",
       "hash": "4f49836e441a4288",
       "captured_at": "2026-10-19T16:40:59.150360+00:00",
+      "synced": false
+    },
+    {
+      "id": "STR-0004",
+      "type": "tool_preference",
+      "type_label": "Tool Preferences & Workflows",
+      "title": "Pre-Execution Tool Optimization Protocol & Decision Matrix",
+      "content": "Before taking any action, determine the optimal tool primitive that minimizes tokens and time (grep_search for search, full view_file for inspection, multi_replace_file_content for batch edits, sync run_command for test/build, reactive wakeup for async tasks).",
+      "ecosystem": "web",
+      "tags": [
+        "tool-optimization",
+        "token-economy",
+        "pre-flight",
+        "velocity",
+        "performance"
+      ],
+      "source": "agent",
+      "project": "agent",
+      "hash": "08ef10eee5b12693",
+      "captured_at": "2026-10-19T16:51:58.187080+00:00",
       "synced": false
     }
   ]

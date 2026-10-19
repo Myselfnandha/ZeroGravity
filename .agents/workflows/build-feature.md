@@ -15,6 +15,7 @@ Before modifying or creating files:
 1. Read `.agents/memory/decisions.md` to honor past architectural commitments and invariants.
 2. Read `.agents/memory/gotchas.md` to avoid known platform bugs, tricky edge cases, and circular dependencies.
 3. Check the active goal state in `.agents/memory/goals.md`.
+4. **Pre-Execution Tool Optimization**: Select optimal tools per goal/context (`grep_search`, whole-file `view_file`, `multi_replace_file_content`, tuned `run_command`) to maximize speed and minimize token burn.
 
 ### 2. Architecture & Seam Design
 - Design interface boundaries before writing implementation logic.

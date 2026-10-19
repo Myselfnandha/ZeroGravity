@@ -27,7 +27,16 @@ This document records durable architectural decisions, system invariants, and in
 
 ### 6. Pre-Execution Tool Optimization & Context Economy
 - **Decision**: Prior to triggering any action, assess the action against available tools to choose the most token-efficient, fast, and direct execution path.
-- **Rationale**: Using the best-fit tool (dedicated search/edit/read/async primitives over shell commands or fragmented multi-step calls) preserves context window, eliminates round-trip latency, and prevents hallucination.
+- **Contract Matrix**:
+  - `grep_search`: bounded symbol/regex search over shell `grep`/`find` (~90% token reduction).
+  - `view_file`: single whole-file read without line slicing over chunked calls or `cat`/`head`.
+  - `write_to_file`: deterministic file creation over shell `cat << EOF` or echo.
+  - `replace_file_content`: single contiguous block modification.
+  - `multi_replace_file_content`: atomic 1-turn multi-chunk modification over iterative sequential calls.
+  - `run_command`: tuned `WaitMsBeforeAsync` (5000-10000ms for fast commands, 500ms + `IsDaemon: true` for dev servers).
+  - `read_url_content`: lightweight HTTP text extraction over browser subagent for static docs.
+  - `ask_question`: Socratic alignment before writing speculative code when trade-offs exist.
+- **Rationale**: Using the best-fit primitive preserves context window, eliminates round-trip latency, and prevents hallucination.
 
 ### 7. Workflow Frontmatter Contract & Dual Global Path
 - **Decision**: Workflows must strictly contain `description:`-only in YAML frontmatter matching their filename stem (`<stem>.md` -> `/<stem>`). Global workflows must be dual-synced to `~/.gemini/antigravity-ide/global_workflows/` and `~/.gemini/config/workflows/`.
