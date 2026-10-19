@@ -35,4 +35,5 @@ This document records durable architectural decisions, system invariants, and in
 
 ### 8. Auto-Learn & Post-Execution Socratic Alignment
 - **Decision**: Upon completion of any major execution (multi-file feature build, architectural overhaul, `/build-feature`, or complex pipeline), the agent automatically runs `/learn` distillation to persistent memory and concludes with a quick `/grill-me` via `ask_question`.
+- **Trigger Scope**: High threshold — triggers exclusively on major executions (multi-file feature builds, architectural changes, `/build-feature`, `/ship`), omitting small single-turn queries to preserve workflow velocity.
 - **Rationale**: Ensures continuous, automated capture of failure modes and conventions while verifying alignment with user intent.
