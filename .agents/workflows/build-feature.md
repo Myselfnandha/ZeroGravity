@@ -15,7 +15,7 @@ Before modifying or creating files:
 1. Read `.agents/memory/decisions.md` to honor past architectural commitments and invariants.
 2. Read `.agents/memory/gotchas.md` to avoid known platform bugs, tricky edge cases, and circular dependencies.
 3. Check the active goal state in `.agents/memory/goals.md`.
-4. **Pre-Execution Tool Optimization**: Select optimal tools per goal/context (`grep_search`, whole-file `view_file`, `multi_replace_file_content`, tuned `run_command`) to maximize speed and minimize token burn.
+4. **Pre-Execution Tool Optimization**: Select integrated tools (`grep_search`, whole-file `view_file`, `multi_replace_file_content`, tuned `run_command`). Never spawn internal Python scripts.
 
 ### 2. Architecture & Seam Design
 - Design interface boundaries before writing implementation logic.
@@ -35,11 +35,11 @@ Before modifying or creating files:
 - Run project test suites and linters to verify behavior and type safety.
 
 ### 5. Memory Tree Synchronization & Auto-Learn / Quick Grill-Me
-- **Auto-run `/learn`**: Record durable learnings and invariants into `.agents/memory/`:
-  - New invariants $\rightarrow$ `decisions.md`
-  - Fixed quirks/workarounds $\rightarrow$ `gotchas.md` (and `anti_patterns.json`)
-  - Completed milestones $\rightarrow$ `goals.md`
-  - Captured strategies $\rightarrow$ run `python3 .agents/scripts/auto_evolve.py capture`
+- **Auto-run `/learn`**: Record durable learnings and invariants directly into `.agents/memory/` using integrated tools:
+  - New invariants $\rightarrow$ `decisions.md` (via `replace_file_content`)
+  - Fixed quirks/workarounds $\rightarrow$ `gotchas.md` and `anti_patterns.json` (via `replace_file_content`)
+  - Completed milestones $\rightarrow$ `goals.md` (via `replace_file_content`)
+  - Captured strategies $\rightarrow$ append directly to `learned_strategies.json` (via `replace_file_content`, no Python subprocesses)
 - **Quick Grill-Me**: Conclude the execution with a quick `/grill-me` via `ask_question` (1-2 targeted Socratic questions) to verify alignment, confirm architectural choices, and lock in user conventions.
 
 ---

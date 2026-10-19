@@ -7,8 +7,8 @@ This document records durable architectural decisions, system invariants, and in
 ## Active Invariants
 
 ### 1. Dual-Layer Codebase Analysis Engine
-- **Decision**: Codebase freshness is checked via `analyze.py --check --auto-heal --inject-ki` at the start of every session.
-- **Rationale**: Prevents stale context without blocking user conversations, storing SQLite cache in `.agents/cache/codebase.db`.
+- **Decision**: Codebase context is provided via automatically injected persistent Knowledge Items (KIs) and `.agents/codebase_summary.md`, accessed natively by the agent using integrated tools (`view_file`, `grep_search`). Standalone CLI script `analyze.py` remains available for offline index maintenance, but is never invoked internally by the agent during turns.
+- **Rationale**: Eliminates process startup latency and shell payload token overhead while maintaining instantaneous, up-to-date codebase context.
 
 ### 2. Multi-Tier Security & Verification Gates
 - **Decision**: All modified files and business logic must pass AAA unit test standards and Skylos SAST / AI hallucination verification.
@@ -51,3 +51,8 @@ This document records durable architectural decisions, system invariants, and in
 - **Decision**: When a task matches a specialized engineering domain (debugging, UI design, web performance, deep research, specification, code simplification, or production launch), the agent autonomously activates the corresponding ZeroGravity workflow without waiting for explicit slash invocations.
 - **Token Invariant**: Workflows are loaded strictly on-demand (single `view_file` call). Never dump entire workflow text into conversation context or preload unneeded workflows.
 - **Rationale**: Reuses battle-tested, structured procedures and checklists while keeping continuous context token consumption at zero.
+
+### 10. Native Integrated Tools Over Internal Subprocesses & Token Preservation
+- **Decision**: The agent MUST NEVER invoke internal Python scripts (`analyze.py`, `auto_evolve.py`, `checklist.py`, `harness.py`, `ki_injector.py`, `learn.py`, `mcp.py`, `session_manager.py`, `summarizer.py`, `sync_knowledge.py`) or subprocess wrappers for memory capture, context sweeps, checklist management, or configuration. All internal agent operations must be performed directly using native IDE tools (`view_file`, `write_to_file`, `replace_file_content`, `multi_replace_file_content`, `grep_search`, `ask_question`).
+- **Rationale**: Subprocess invocations consume 400–800 tokens per call in shell payloads, formatting, and stdout return, plus process launch latency and shell escape risks. Integrated tools operate natively within the IDE runtime with 0 process overhead, minimal token consumption, and atomic deterministic edits. Python scripts remain strictly for external user CLI usage and automated testing.
+

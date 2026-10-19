@@ -94,6 +94,26 @@
       "hash": "23a66c7f725ea5d7",
       "captured_at": "2026-10-19T17:05:00.286482+00:00",
       "synced": false
+    },
+    {
+      "id": "STR-0006",
+      "type": "tool_preference",
+      "type_label": "Tool Preferences & Workflows",
+      "title": "Native Integrated Tools Over Python Subprocesses",
+      "content": "Use native integrated tools (view_file, write_to_file, replace_file_content, multi_replace_file_content, grep_search, ask_question) for all internal agent memory, context, checklist, and configuration operations instead of executing internal Python scripts (analyze.py, auto_evolve.py, checklist.py, harness.py, ki_injector.py, learn.py, mcp.py, session_manager.py, summarizer.py, sync_knowledge.py). Conserves tokens, eliminates subprocess latency, and ensures atomic operations.",
+      "ecosystem": "general",
+      "tags": [
+        "integrated-tools",
+        "token-save",
+        "no-python-internal",
+        "velocity",
+        "memory"
+      ],
+      "source": "agent",
+      "project": "agent",
+      "hash": "8f3b14a9c02d6e71",
+      "captured_at": "2026-10-19T17:15:00.000000+00:00",
+      "synced": false
     }
   ]
 }

@@ -13,6 +13,7 @@ trigger: always_on
 - Reactive Async: Stop calling tools and await completion notification on long-running tasks. NEVER poll `manage_task(status)` in a loop or sleep.
 - Web & Docs: `read_url_content` (lightweight HTTP to markdown) over `browser_subagent` for static reading.
 - Ambiguity: Stop and use `ask_question` with recommended options before guessing or writing speculative code.
+- Integrated Tools Over Python: NEVER spawn python3 scripts (`analyze.py`, `auto_evolve.py`, `checklist.py`, `harness.py`, `ki_injector.py`, `learn.py`, `mcp.py`, `session_manager.py`, `summarizer.py`, `sync_knowledge.py`) for agent operations. Perform memory updates, checklist tracking, config edits, and search directly via integrated tools (`view_file`, `write_to_file`, `replace_file_content`, `grep_search`). Shell execution is strictly for compilation, test suites, git, and package managers.
 Zero unnecessary round-trips; maximize speed, minimize token burn per turn.
 
 §1 WHOLE-FILE ANALYSIS INVARIANT: When analyzing a single file, read the entire file in one call (single `view_file` without slicing). For broad searches: targeted `grep_search` → single `view_file`. KI codebase context is primary index; `codebase_summary.md` for directory overviews. No read→edit→re-read loops (read once → plan → edit once).
@@ -26,7 +27,7 @@ Zero unnecessary round-trips; maximize speed, minimize token burn per turn.
 §5 SOCRATIC CLARIFICATION: When requirements are underspecified or high-risk architectural trade-offs exist: STOP immediately and use `ask_question` with recommended options before writing code.
 
 §6 AUTO-LEARN & POST-EXECUTION GRILL-ME: On user correction, verified bugfix, or upon completing any major execution (multi-file feature build, architectural overhaul, `/build-feature`, `/ship`):
-- **Auto-Learn**: Distill lessons and architectural decisions into `.agents/memory/` (`decisions.md`, `gotchas.md`, `anti_patterns.json`) and run `python3 .agents/scripts/auto_evolve.py capture`.
+- **Auto-Learn**: Distill lessons and architectural decisions directly into `.agents/memory/` (`decisions.md`, `gotchas.md`, `anti_patterns.json`, `learned_strategies.json`) using integrated file tools (`replace_file_content`, `write_to_file`). Never spawn Python subprocesses for memory operations.
 - **Quick Grill-Me**: Conclude big executions with a quick `/grill-me` via `ask_question` (1-2 targeted Socratic questions) to confirm design trade-offs, lock in conventions, and align with user intent.
 
 §7 RICH DESIGN AESTHETICS: No purple gradients or generic plain colors. Use curated dark/light palettes (slate neutrals, vibrant emerald/cyan/amber accents). Modern fonts (Inter, Outfit, Plus Jakarta Sans). Minimum 48dp touch targets on mobile.

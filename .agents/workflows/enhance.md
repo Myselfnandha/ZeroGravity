@@ -15,7 +15,7 @@ This command adds features or makes updates to existing application.
 ### Steps:
 
 1. **Understand Current State**
-   - Load project state with `python .agents/scripts/session_manager.py info 2>/dev/null || python .agent/scripts/session_manager.py info`
+   - Read project state directly from `.agents/memory/goals.md` or `.agents/codebase_summary.md` using `view_file`
    - Understand existing features, tech stack
 
 2. **Plan Changes**

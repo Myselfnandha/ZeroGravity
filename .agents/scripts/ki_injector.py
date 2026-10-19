@@ -155,16 +155,9 @@ When starting a new conversation in this workspace:
 
 1. A Knowledge Item (KI) named `codebase-context-*` contains the compact codebase index and recent patches
 2. This context is automatically injected at conversation start via the KI system
-3. Use this context to understand the codebase before asking the user or reading files
-4. For deeper analysis, read the full `codebase_summary.md` in `{agent_dir_name}/codebase_summary.md`
-
-## Auto-Regeneration
-
-The codebase context is automatically kept fresh:
-- On conversation start, staleness is checked and auto-healed via:
-  `python .agents/scripts/analyze.py <folder> --check --auto-heal --inject-ki 2>/dev/null || python .agent/scripts/analyze.py <folder> --check --auto-heal --inject-ki`
-- If stale, it auto-regenerates and updates the KI with `--inject-ki` flag
-- Patch log tracks recent changes for incremental context
+3. Use integrated tools (`view_file`, `grep_search`) to inspect code and directory structures directly
+4. For deeper analysis, read the full `codebase_summary.md` in `{agent_dir_name}/codebase_summary.md` via `view_file`
+5. Do NOT spawn background Python analyzer scripts; use native integrated tools for instant, zero-overhead access
 """
 
     with open(rule_path, 'w', encoding='utf-8') as f:
@@ -189,15 +182,11 @@ trigger: always_on
 
 For any workspace containing a `.agent/` or `.agents/` directory:
 
-1. **On conversation start**, silently check codebase freshness and auto-heal:
-   ```
-   python .agents/scripts/analyze.py . --check --auto-heal --inject-ki 2>/dev/null || python .agent/scripts/analyze.py . --check --auto-heal --inject-ki
-   ```
+1. **On conversation start**, leverage the injected KI codebase context and `.agents/codebase_summary.md` directly via integrated tools (`view_file`, `grep_search`). Do NOT spawn background Python analyzer scripts.
 
-2. **Result**: Every new conversation starts with fresh codebase knowledge in persistent memory.
+2. **Result**: Zero process startup latency and zero token waste on conversation start.
 
-> This rule applies globally to ALL workspaces that have `.agent/scripts/analyze.py` or `.agents/scripts/analyze.py`.
-> The KI is stored per-project in `~/.gemini/antigravity-ide/knowledge/codebase-context-<project>/`.
+> The persistent KI is stored per-project in `~/.gemini/antigravity-ide/knowledge/codebase-context-<project>/`.
 """
 
     with open(rule_path, 'w', encoding='utf-8') as f:

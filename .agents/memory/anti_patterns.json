@@ -121,6 +121,14 @@
       "root_cause": "Failing to recognize task domain patterns, or loading workflows verbosely rather than reading and executing on-demand",
       "strategy": "Context-Driven Workflow Adaptation: Match the task domain to the specialized ZeroGravity workflow, read on-demand in a single view_file call, and execute its checklist directly without conversational preamble",
       "invariant_rule": "Always adopt specialized domain workflows when context warrants, loaded strictly on-demand without context bloat."
+    },
+    {
+      "id": "AP-016",
+      "category": "tooling",
+      "mistake": "Agent executing Python scripts (analyze.py, auto_evolve.py, checklist.py, harness.py, ki_injector.py, learn.py, mcp.py, session_manager.py, summarizer.py, sync_knowledge.py) for internal memory updates, context sweeps, or configuration tasks",
+      "root_cause": "Spawning subprocesses consumes 400-800 tokens per call, creates shell escape issues, adds process startup latency, and bypasses native IDE primitives",
+      "strategy": "Strictly use integrated IDE tools (view_file, write_to_file, replace_file_content, multi_replace_file_content, grep_search, ask_question) directly for all memory, configuration, checklist, and context operations",
+      "invariant_rule": "NEVER invoke internal Python scripts for agent memory, checklist, or context tasks; use native integrated file and search tools."
     }
   ]
 }

@@ -38,15 +38,11 @@ Leverage specialized personas and subagents when a problem benefits from separat
 
 ### PHASE 2: IMPLEMENTATION & VERIFICATION
 1. **Code Execution**: Apply changes using single atomic edits (`multi_replace_file_content` / `write_to_file`).
-2. **Empirical Verification**: Run tests (`npm test`, `pytest`, `cargo test`) and pre-flight check (`python .agents/scripts/checklist.py .`).
+2. **Empirical Verification**: Run tests (`npm test`, `pytest`, `cargo test`) and verify checklist natively using integrated tools.
 3. **Sync Memory**: Record any discovered gotchas or patterns into `.agents/memory/`.
 
 ---
 
 ## Verification & Completion
 
-Run the workspace verification:
-```bash
-python .agents/scripts/checklist.py .
-```
-Report actual terminal outputs and verified outcomes directly to the user.
+Run project test suites (`npm test`, `cargo test`, `pytest`) and inspect codebase status natively with integrated tools. Report actual terminal outputs and verified outcomes directly to the user.
