@@ -418,24 +418,24 @@ function syncGlobalPayload(sourceDir, dryRun) {
       }
     }
 
-    // 3. Ensure global auto-context rules
+    // 3. Ensure single canonical codebase_context rule and remove duplicate auto_codebase_context.md
     const autoContextPath = path.join(globalRulesDir, 'auto_codebase_context.md');
-    if (!fs.existsSync(autoContextPath)) {
-      fs.writeFileSync(autoContextPath, `---
+    if (fs.existsSync(autoContextPath)) {
+      try { fs.unlinkSync(autoContextPath); } catch (_) {}
+    }
+
+    const contextRulePath = path.join(globalRulesDir, 'codebase_context.md');
+    fs.writeFileSync(contextRulePath, `---
 trigger: always_on
 ---
 
-# Auto Codebase Context (Global)
+# Codebase Context Auto-Loader
 
 For any workspace containing a .agent/ or .agents/ directory:
-
-1. **On conversation start**, leverage the injected KI codebase context and .agents/codebase_summary.md directly via integrated tools (view_file, grep_search). Do NOT spawn background Python analyzer scripts.
-
-2. **Result**: Zero process startup latency and zero token waste on conversation start.
-
-> The persistent KI is stored per-project in ~/.gemini/antigravity-ide/knowledge/codebase-context-<project>/.
+1. Injected codebase-context-* KI provides the index and recent patches at conversation start.
+2. Inspect code and directory structures directly via view_file and grep_search. Read .agents/codebase_summary.md for directory overviews.
+3. NEVER spawn background Python analyzer scripts. Access persistent KI and summary natively with zero overhead.
 `, 'utf8');
-    }
 
     // 4. Skills, plugins, scripts, and metadata
     const skillsSrc = path.join(sourceDir, 'skills');

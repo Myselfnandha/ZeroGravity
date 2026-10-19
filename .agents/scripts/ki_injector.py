@@ -171,22 +171,25 @@ def ensure_global_rule():
     """
     Create or verify the global rule for auto-context in all .agent/ or .agents/ workspaces.
     """
-    rule_path = os.path.join(GLOBAL_RULES_DIR, 'auto_codebase_context.md')
     os.makedirs(GLOBAL_RULES_DIR, exist_ok=True)
+    legacy_path = os.path.join(GLOBAL_RULES_DIR, 'auto_codebase_context.md')
+    if os.path.exists(legacy_path):
+        try:
+            os.remove(legacy_path)
+        except OSError:
+            pass
 
+    rule_path = os.path.join(GLOBAL_RULES_DIR, 'codebase_context.md')
     rule_content = """---
 trigger: always_on
 ---
 
-# Auto Codebase Context (Global)
+# Codebase Context Auto-Loader
 
 For any workspace containing a `.agent/` or `.agents/` directory:
-
-1. **On conversation start**, leverage the injected KI codebase context and `.agents/codebase_summary.md` directly via integrated tools (`view_file`, `grep_search`). Do NOT spawn background Python analyzer scripts.
-
-2. **Result**: Zero process startup latency and zero token waste on conversation start.
-
-> The persistent KI is stored per-project in `~/.gemini/antigravity-ide/knowledge/codebase-context-<project>/`.
+1. Injected `codebase-context-*` KI provides the index and recent patches at conversation start.
+2. Inspect code and directory structures directly via `view_file` and `grep_search`. Read `.agents/codebase_summary.md` for directory overviews.
+3. NEVER spawn background Python analyzer scripts. Access persistent KI and summary natively with zero overhead.
 """
 
     with open(rule_path, 'w', encoding='utf-8') as f:
