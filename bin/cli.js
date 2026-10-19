@@ -679,9 +679,12 @@ async function main() {
         }
         const globalWorkflowsDir = path.join(globalDest, 'workflows');
         fs.mkdirSync(globalWorkflowsDir, { recursive: true });
+        const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
+        fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
         const workflowsSrc = path.join(sourceDir, 'workflows');
         if (fs.existsSync(workflowsSrc)) {
           copyDirSync(workflowsSrc, globalWorkflowsDir);
+          copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
         }
         const skillsSrc = path.join(sourceDir, 'skills');
         if (fs.existsSync(skillsSrc)) {
@@ -790,9 +793,12 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       }
       const globalWorkflowsDir = path.join(globalDest, 'workflows');
       fs.mkdirSync(globalWorkflowsDir, { recursive: true });
+      const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
+      fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
       const workflowsSrc = path.join(sourceDir, 'workflows');
       if (fs.existsSync(workflowsSrc)) {
         copyDirSync(workflowsSrc, globalWorkflowsDir);
+        copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
       }
       console.log(`  ${C.green}✔ Global rules & workflows active in:${C.reset} ${globalDest}`);
     } catch (_) {}
@@ -817,6 +823,9 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       const workflowsSrc = path.join(sourceDir, 'workflows');
       if (fs.existsSync(workflowsSrc)) {
         copyDirSync(workflowsSrc, path.join(globalDest, 'workflows'));
+        const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
+        fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
+        copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
       }
 
       const pluginsSrc = path.join(sourceDir, 'plugins');

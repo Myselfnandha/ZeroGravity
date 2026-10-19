@@ -1,11 +1,5 @@
 ---
-name: build-feature
-description: 'Autonomous 5-stage feature building pipeline: Memory Sweep → Blueprint → CodeCrush → AAA Test → Sync. Invoke with /build-feature.'
-disable-model-invocation: false
-license: MIT
-metadata:
-  tags: "Supercoding, Architecture, Memory Tree, CodeCrusher, Quality Gate"
-  category: "supercoding"
+description: Autonomous 5-stage feature building pipeline: Memory Sweep → Blueprint → CodeCrush → AAA Test → Sync. Invoke with /build-feature.
 ---
 
 # Autonomous 5-Stage Feature Pipeline

@@ -1,11 +1,5 @@
 ---
-name: focus
-description: 'Shape output for focused reading: lead with the next action, number multi-step tasks, restate state across turns, suppress tangents, give specific time estimates, make wins visible, and enforce clean engineering standards. Invoke with /focus; stays on until "stop focus mode".'
-disable-model-invocation: true
-license: MIT
-metadata:
-  tags: "ADHD, Output Style, Productivity, Formatting, Clean Code"
-  category: "productivity"
+description: Shape output for focused reading: lead with the next action, number multi-step tasks, restate state across turns, suppress tangents, give specific time estimates, make wins visible, and enforce clean engineering standards. Invoke with /focus; stays on until "stop focus mode".
 ---
 
 # /focus-adhd
