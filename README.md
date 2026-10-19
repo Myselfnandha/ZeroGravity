@@ -78,6 +78,7 @@ cp -r .agents /path/to/any/project/
 | `/codebase-design` | Deep module design: interfaces, seams, testability |
 | `/domain-model` | Build domain terminology and ubiquitous language |
 | `/orchestrate` | Coordinate multiple perspectives for complex architectural tasks |
+| `/reach` | Universal internet router across 16 platforms (Twitter, Reddit, YouTube, Bilibili, GitHub, Exa, Jina) |
 
 ### 🐛 Verify
 

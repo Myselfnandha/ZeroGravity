@@ -1,5 +1,13 @@
 # ZeroGravity OS Changelog
 
+## 1.1.9 (2026-10-19)
+
+### Features & Agent-Reach Integration
+- **Agent Reach Skill (`skills/agent-reach/`)**: Integrated universal internet capability router supporting 16 platforms (Twitter/X, Reddit, Facebook, Instagram, YouTube, GitHub, Bilibili, XiaoHongShu, LinkedIn, Boss直聘, V2EX, Xueqiu, RSS, Exa web search, Jina Reader).
+- **`/reach` & `/agent-reach` Slash Workflows**: Added dedicated workflows for autonomous internet search, transcript extraction, and cross-platform multi-source synthesis.
+- **Skills Registry Indexing**: Re-indexed 21 skills in `skills_index.json`.
+- **Global Synchronization**: Synchronized `agent-reach` skill and `/reach` workflows directly to `~/.gemini/config/` for universal access across all workspaces.
+
 ## 1.1.8 (2026-10-18)
 
 ### Enhancements & Global Rules Auto-Sync

@@ -1,5 +1,14 @@
 [
   {
+    "id": "agent-reach",
+    "path": "skills/agent-reach",
+    "name": "agent-reach",
+    "description": "Universal internet capability router for AI Agents. Search, read, and extract content across 16 platforms (Twitter/X, Reddit, Facebook, Instagram, YouTube, GitHub, Bilibili, XiaoHongShu, LinkedIn, Boss\u76f4\u8058, V2EX, Xueqiu, RSS, Exa web search, Jina Reader). Use when the user wants to search, browse, research, or inspect any web URL or social media platform.",
+    "category": "general",
+    "risk": "safe",
+    "date_added": "2026-03-01"
+  },
+  {
     "id": "agy-ask",
     "path": "skills/agy-ask",
     "name": "agy-ask",
