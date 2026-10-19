@@ -41,3 +41,7 @@ Zero unnecessary round-trips; maximize speed, minimize token burn per turn.
 - **Planning**: Explicitly declare edit scope and blast radius upfront. Plan for any non-trivial architectural change.
 - **Verification**: Mandatory empirical verification via unit tests, build commands, and terminal output. No "should work" claims.
 - **Overrides**: Switch dynamically with `/effort-low` (fire & forget), `/effort-mid` (standard balanced), or `/effort-ultra` (exhaustive mission-critical analysis, leave nothing unchecked). Default resets to `high`.
+
+§11 CONTEXT-DRIVEN WORKFLOW ADAPTATION (LEAN & ON-DEMAND): Automatically activate the represented ZeroGravity workflow when a task or context matches its specialized domain (e.g., `/debug` for root-cause diagnosis, `/webperf` for bottlenecks, `/design-ui` for front-end UI/UX, `/reach` for live multi-platform research, `/spec` for requirements, `/yagni-simplify` for eliminating over-engineering, `/ship` for pre-launch verification, `/audit-agent` for safety audits):
+- **Lean Token Loading**: Load the target workflow markdown file strictly on-demand in a single `view_file` call only when needed. Never preload unused workflows or echo workflow text into the response.
+- **Direct Execution**: Adopt the workflow's structured phases directly with zero conversational fluff, maximizing speed and context economy.
