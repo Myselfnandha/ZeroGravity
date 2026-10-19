@@ -57,3 +57,8 @@ This document records durable architectural decisions, system invariants, and in
 - **Rationale**: Subprocess invocations consume 400–800 tokens per call in shell payloads, formatting, and stdout return, plus process launch latency and shell escape risks. Integrated tools operate natively within the IDE runtime with 0 process overhead, minimal token consumption, and atomic deterministic edits.
 - **Grill-Me Alignment**: Standalone Python scripts in `.agents/scripts/` are preserved strictly as external CLI utilities for user shell commands, `./install.sh`, and unit tests (`tests/test_all.py`), while the agent operates 100% via native integrated tools.
 
+### 11. Context-Driven Skill Auto-Activation & Progressive Inspection
+- **Decision**: When a task matches an available specialized skill (e.g., Chrome DevTools, accessibility auditing, Hugging Face CLI, ponytail tech debt, git workflow, performance profiling, UI layout, security auditing), the agent MUST autonomously inspect that skill's `SKILL.md` (single whole-file `view_file` call) before executing the task.
+- **Rationale**: Guarantees adherence to established tool integrations, official guidelines, and runbooks without improvising ad-hoc actions or requiring explicit user prompts.
+
+

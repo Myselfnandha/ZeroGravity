@@ -46,3 +46,7 @@ Zero unnecessary round-trips; maximize speed, minimize token burn per turn.
 §11 CONTEXT-DRIVEN WORKFLOW ADAPTATION (LEAN & ON-DEMAND): Automatically activate the represented ZeroGravity workflow when a task or context matches its specialized domain (e.g., `/debug` for root-cause diagnosis, `/webperf` for bottlenecks, `/design-ui` for front-end UI/UX, `/reach` for live multi-platform research, `/spec` for requirements, `/yagni-simplify` for eliminating over-engineering, `/ship` for pre-launch verification, `/audit-agent` for safety audits):
 - **Lean Token Loading**: Load the target workflow markdown file strictly on-demand in a single `view_file` call only when needed. Never preload unused workflows or echo workflow text into the response.
 - **Direct Execution**: Adopt the workflow's structured phases directly with zero conversational fluff, maximizing speed and context economy.
+
+§12 CONTEXT-DRIVEN SKILL AUTO-ACTIVATION: Automatically activate and inspect the represented skill whenever a task or context matches its specialized capability (e.g., Chrome DevTools, accessibility auditing, Hugging Face CLI, ponytail tech debt, git workflow, performance profiling, UI layout, security auditing):
+- **Pre-Execution Skill Inspection**: Before executing a domain-specific task, inspect the matching `SKILL.md` in a single `view_file` call (zero slicing) to adopt official workflows, runbooks, and tool integrations.
+- **Strict Adherence**: Follow the skill's specific guidelines, conventions, and error-recovery patterns instead of improvising ad-hoc actions.

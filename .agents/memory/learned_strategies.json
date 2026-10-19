@@ -114,6 +114,26 @@
       "hash": "8f3b14a9c02d6e71",
       "captured_at": "2026-10-19T17:15:00.000000+00:00",
       "synced": false
+    },
+    {
+      "id": "STR-0007",
+      "type": "tool_preference",
+      "type_label": "Tool Preferences & Workflows",
+      "title": "Context-Driven Skill Auto-Activation",
+      "content": "Autonomously identify and inspect matching available skills (SKILL.md) via single whole-file view_file call before executing specialized tasks (e.g. Chrome DevTools, accessibility, Hugging Face CLI, ponytail debt, performance, security). Eliminates ad-hoc guesswork and ensures compliance with official tool runbooks.",
+      "ecosystem": "general",
+      "tags": [
+        "skills",
+        "auto-activation",
+        "progressive-disclosure",
+        "context-driven",
+        "runbooks"
+      ],
+      "source": "agent",
+      "project": "agent",
+      "hash": "6b2a8d3e91f4c7a5",
+      "captured_at": "2026-10-19T17:45:00.000000+00:00",
+      "synced": false
     }
   ]
 }

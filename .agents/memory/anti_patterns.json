@@ -129,6 +129,14 @@
       "root_cause": "Spawning subprocesses consumes 400-800 tokens per call, creates shell escape issues, adds process startup latency, and bypasses native IDE primitives",
       "strategy": "Strictly use integrated IDE tools (view_file, write_to_file, replace_file_content, multi_replace_file_content, grep_search, ask_question) directly for all memory, configuration, checklist, and context operations",
       "invariant_rule": "NEVER invoke internal Python scripts for agent memory, checklist, or context tasks; use native integrated file and search tools."
+    },
+    {
+      "id": "AP-017",
+      "category": "agent_behavior",
+      "mistake": "Performing specialized domain tasks (accessibility, Chrome DevTools testing, HF Hub operations, performance audits) without inspecting and activating the matching available skill",
+      "root_cause": "Improvising ad-hoc actions or generic guesses instead of checking the progressive disclosure skill catalog and reading SKILL.md",
+      "strategy": "Context-Driven Skill Auto-Activation: Identify matching available skills from the index, inspect SKILL.md in a single view_file call, and execute following its documented workflows and runbooks",
+      "invariant_rule": "Always inspect and follow the matching SKILL.md before executing specialized domain tasks."
     }
   ]
 }
