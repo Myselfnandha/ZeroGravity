@@ -5,6 +5,10 @@ install.sh
 tests/
 .github/
 .agents/tools/scripts/tests/
+CHANGELOG.md
+ARCHITECTURE.md
+*.tar.xz
+*.tar.gz
 
 # Build & temporary outputs
 dist/

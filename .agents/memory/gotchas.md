@@ -1,33 +1,6 @@
-# 🛡️ ZeroGravity OS: Anti-Patterns Matrix & Known Gotchas
+# 🛡️ ZeroGravity OS: Known Gotchas & Immunization Protocol
 
-This document serves as the **Persistent Anti-Patterns Matrix** for ZeroGravity OS.
-Before taking any architectural, coding, or tooling action, the agent must sweep this matrix (Stage 1) to immunize itself against known failure modes.
-
----
-
-## 📊 Anti-Patterns & Invariant Prevention Matrix
-
-| ID | ⚠️ Mistake / Anti-Pattern | 🔍 Root Cause & Triggers | 🛡️ Invariant Prevention Strategy |
-| :--- | :--- | :--- | :--- |
-| **AP-001** | **Unchecked npx execution polluting JSON-RPC stdout with colored notices and ANSI escape sequences** | npx in modern npm writes colored notices to stdout when not silenced, breaking JSON-RPC parsing (invalid character '\x1b') | Always wrap Node-based MCP servers using mcp-npx with NO_COLOR=1, npm_config_loglevel=silent, and --silent flag |
-| **AP-002** | **Sentry MCP server falling back to interactive OAuth device code flow and hanging** | @sentry/mcp-server defaults to interactive device code login if --access-token or SENTRY_ACCESS_TOKEN is omitted | Pass --access-token ${SENTRY_AUTH_TOKEN} explicitly in CLI arguments and provide environment fallback |
-| **AP-003** | **Codebase indexer scanning self-extracting archive payload and inflating codebase database to 40MB+** | Scanning binary payloads or packed archive files in analyze.py treats binary blobs as source text | Exclude *.tar.gz, *.tar.xz, install.sh, and dist/ in codebase indexing routines |
-| **AP-004** | **Leaving MCP servers running permanently in background consuming CPU and RAM** | Static mcp_config.json with default background servers creates memory bloat and port collisions | Zero-Default profile: start with empty mcpServers ({}), enable dynamically on-demand, and auto-close upon task completion |
-| **AP-005** | **Agent looping over view_file sequentially to understand an entire folder codebase** | Sequential view_file calls waste context tokens and cause high latency | Execute analyze.py --check --auto-heal --inject-ki and read the consolidated codebase_summary.md in a single read |
-| **AP-006** | **Refactoring code outside the user's requested scope** | Agent interprets adjacent code as needing improvement or unsolicited optimization. | Blast Radius Lock: Declare edit scope upfront; only edit within declared scope; flag out-of-scope issues as follow-up recommendations. |
-| **AP-007** | **Claiming success without running verification commands** | Token-pressure or speed bias leads agent to skip test runs and pattern-match 'this looks right' or use speculative language. | Evidence Gate: Always run tests or re-read files, report actual terminal output, never say 'should work'. |
-| **AP-008** | **Editing files based on stale cached memory instead of current on-disk state** | Files read early in long sessions get modified externally or by background tasks while agent remembers old lines. | Freshness Gate: Re-read target file if >5 tool calls since last read; run git status before multi-file edits. |
-| **AP-009** | **Using invented library functions that don't exist in installed packages** | LLM hallucination on fast-moving libraries or niche frameworks where training memory contains plausible APIs. | Hallucination Guard: Verify every unfamiliar API symbol via tool inspection, REPL check, or docs before using. |
-| **AP-010** | **Polling in loops or setting redundant timers while waiting for background tasks or command completion** | Failing to utilize the system's reactive wakeup and task notification event loop, resulting in busy-wait polling and wasted timer wakeups | Always use 'Waiting for a task notification' with live status. Avoid unnecessary timers; do not poll; stop calling tools and await direct completion signal |
-| **AP-011** | **Reading a single file in multiple sliced chunks or piecemeal line ranges when analyzing it** | Unnecessary line range slicing on single-file analysis resulting in fragmented context and multiple redundant tool calls | When a single file needs to be analyzed, read the entire file in one call (single view_file without line slicing) |
-| **AP-012** | **Suboptimal or haphazard tool selection resulting in excessive latency, token waste, or context bloat** | Executing operations reflexively using generic shell commands or piecemeal calls without pre-evaluating the optimal specialized tool | Pre-Flight Tool Evaluation: Consciously select the most direct tool (grep_search over shell search, view_file over cat, multi_replace over fragmented edits, reactive async task over polling) before initiating execution |
-| **AP-013** | **Adding extraneous YAML frontmatter keys (disable-model-invocation, metadata, license) or mismatched name fields to workflows, or syncing global workflows only to ~/.gemini/config/workflows/** | Antigravity IDE expects strict description-only frontmatter matching the filename stem, and native global workflow discovery watches ~/.gemini/antigravity-ide/global_workflows/ | Workflows must strictly contain description-only YAML frontmatter matching their file stems, and global workflows must dual-sync to ~/.gemini/antigravity-ide/global_workflows/ and ~/.gemini/config/workflows/ |
-| **AP-014** | **Invoking generic shell commands, sliced reads, or polling loops instead of specialized tool primitives** | Omitting pre-flight goal, task, and context analysis, leading to unbounded token blowouts, multi-turn latency, and broken shell quoting | Pre-Execution Tool Optimization: Evaluate represented goal, task, and context to select the exact optimal primitive (grep_search for search, full view_file for inspection, multi_replace_file_content for batch edits, tuned run_command for sync execution, reactive wakeup for async tasks) |
-| **AP-015** | **Reinventing ad-hoc procedures or ignoring existing domain workflows (e.g. /webperf, /debug, /design-ui, /reach, /yagni-simplify) when a task matches them, or dumping entire workflow text into the conversation context** | Failing to recognize task domain patterns, or loading workflows verbosely rather than reading and executing on-demand | Context-Driven Workflow Adaptation: Match the task domain to the specialized ZeroGravity workflow, read on-demand in a single view_file call, and execute its checklist directly without conversational preamble |
-| **AP-016** | **Agent executing Python scripts (analyze.py, auto_evolve.py, checklist.py, harness.py, ki_injector.py, learn.py, mcp.py, session_manager.py, summarizer.py, sync_knowledge.py) for internal memory updates, context sweeps, or configuration tasks** | Spawning subprocesses consumes 400-800 tokens per call, creates shell escape issues, adds process startup latency, and bypasses native IDE primitives | Strictly use integrated IDE tools (view_file, write_to_file, replace_file_content, multi_replace_file_content, grep_search, ask_question) directly for all memory, configuration, checklist, and context operations |
-| **AP-017** | **Performing specialized domain tasks (accessibility, Chrome DevTools testing, HF Hub operations, performance audits) without inspecting and activating the matching available skill** | Improvising ad-hoc actions or generic guesses instead of checking the progressive disclosure skill catalog and reading SKILL.md | Context-Driven Skill Auto-Activation: Identify matching available skills from the index, inspect SKILL.md in a single view_file call, and execute following its documented workflows and runbooks |
-
-
+Anti-patterns (AP-001 through AP-017) are maintained in the machine-readable single source of truth: [`anti_patterns.json`](file:///home/nandha/Desktop/agent/.agents/memory/anti_patterns.json).
 
 ---
 
@@ -48,8 +21,8 @@ Before taking any architectural, coding, or tooling action, the agent must sweep
 ---
 
 ## 🔄 The 2-Way Immunization Protocol
-1. **Pre-Action Check**: Before executing a tool call or creating a component, verify against this matrix.
+1. **Pre-Action Check**: Before executing a tool call or creating a component, verify against `anti_patterns.json`.
 2. **Post-Failure Distillation**: When a mistake, test failure, or user correction occurs:
    - Identify the exact root cause.
    - Formulate an Invariant Prevention Strategy.
-   - Append to this matrix and `anti_patterns.json` via `zg learn add`.
+   - Append to `anti_patterns.json` via `zg learn add`.

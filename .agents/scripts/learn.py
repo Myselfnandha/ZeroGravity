@@ -43,25 +43,10 @@ def save_anti_patterns(data):
 
 def sync_to_gotchas_markdown(data):
     lines = [
-        "# 🛡️ ZeroGravity OS: Anti-Patterns Matrix & Known Gotchas\n",
-        "This document serves as the **Persistent Anti-Patterns Matrix** for ZeroGravity OS.",
-        "Before taking any architectural, coding, or tooling action, the agent must sweep this matrix (Stage 1) to immunize itself against known failure modes.\n",
-        "---",
-        "",
-        "## 📊 Anti-Patterns & Invariant Prevention Matrix\n",
-        "| ID | ⚠️ Mistake / Anti-Pattern | 🔍 Root Cause & Triggers | 🛡️ Invariant Prevention Strategy |",
-        "| :--- | :--- | :--- | :--- |",
-    ]
-
-    for item in data.get("anti_patterns", []):
-        ap_id = item.get("id", "AP-???")
-        mistake = item.get("mistake", "").replace("|", "\\|")
-        cause = item.get("root_cause", "").replace("|", "\\|")
-        strategy = item.get("strategy", "").replace("|", "\\|")
-        lines.append(f"| **{ap_id}** | **{mistake}** | {cause} | {strategy} |")
-
-    lines.extend([
-        "",
+        "# 🛡️ ZeroGravity OS: Known Gotchas & Immunization Protocol\n",
+        "Anti-patterns (AP-001 through AP-{:03d}) are maintained in the machine-readable single source of truth: `anti_patterns.json`.\n".format(
+            len(data.get("anti_patterns", []))
+        ),
         "---",
         "",
         "## 🛠️ Platform & Tooling Gotchas",
@@ -81,12 +66,12 @@ def sync_to_gotchas_markdown(data):
         "---",
         "",
         "## 🔄 The 2-Way Immunization Protocol",
-        "1. **Pre-Action Check**: Before executing a tool call or creating a component, verify against this matrix.",
+        "1. **Pre-Action Check**: Before executing a tool call or creating a component, verify against `anti_patterns.json`.",
         "2. **Post-Failure Distillation**: When a mistake, test failure, or user correction occurs:",
         "   - Identify the exact root cause.",
         "   - Formulate an Invariant Prevention Strategy.",
-        "   - Append to this matrix and `anti_patterns.json` via `zg learn add`."
-    ])
+        "   - Append to `anti_patterns.json` via `zg learn add`."
+    ]
 
     with open(GOTCHAS_MD, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
