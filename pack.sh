@@ -298,13 +298,16 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         chmod +x "$LOCAL_DEST/scripts/"*.sh 2>/dev/null || true
         echo -e "  ${C_GREEN}✔ Installed rules, skills, workflows, scripts, and MCP catalog to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
 
-        # Synchronize core rules and workflows to global config
+        # Synchronize core rules and all workflows to global config one time
         GLOBAL_CONFIG="$HOME/.gemini/config"
-        mkdir -p "$GLOBAL_CONFIG/rules" "$GLOBAL_CONFIG/workflows"
-        cp "$TEMP_EXTRACT/.agents/rules/core.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
-        cp "$TEMP_EXTRACT/.agents/rules/effort.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
+        GLOBAL_IDE="$HOME/.gemini/antigravity-ide/global_workflows"
+        mkdir -p "$GLOBAL_CONFIG/rules" "$GLOBAL_CONFIG/workflows" "$GLOBAL_IDE"
+        # Enforce always_on for global rules to apply to all projects
+        sed 's/trigger: model_decision/trigger: always_on/' "$TEMP_EXTRACT/.agents/rules/core.md" > "$GLOBAL_CONFIG/rules/core.md" 2>/dev/null || cp "$TEMP_EXTRACT/.agents/rules/core.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
+        sed 's/trigger: model_decision/trigger: always_on/' "$TEMP_EXTRACT/.agents/rules/effort.md" > "$GLOBAL_CONFIG/rules/effort.md" 2>/dev/null || cp "$TEMP_EXTRACT/.agents/rules/effort.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
         cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_CONFIG/workflows/" 2>/dev/null || true
-        echo -e "  ${C_GREEN}✔ Core rules & workflows active globally in:${C_RESET} ${C_BOLD}$GLOBAL_CONFIG${C_RESET}"
+        cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_IDE/" 2>/dev/null || true
+        echo -e "  ${C_GREEN}✔ All 30 workflows & global rules active in:${C_RESET} ${C_BOLD}$GLOBAL_CONFIG${C_RESET}"
     fi
 fi
 
@@ -327,6 +330,8 @@ if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
         fi
         if [ -d "$TEMP_EXTRACT/.agents/workflows" ]; then
             cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_DEST/workflows/" 2>/dev/null || true
+            mkdir -p "$HOME/.gemini/antigravity-ide/global_workflows"
+            cp -a "$TEMP_EXTRACT/.agents/workflows/." "$HOME/.gemini/antigravity-ide/global_workflows/" 2>/dev/null || true
         fi
         if [ -d "$TEMP_EXTRACT/.agents/plugins" ]; then
             cp -a "$TEMP_EXTRACT/.agents/plugins/." "$GLOBAL_DEST/plugins/" 2>/dev/null || true

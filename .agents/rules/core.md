@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: model_decision
 ---
 
 # Core Developer Agent Rules (Context & Time Optimization)

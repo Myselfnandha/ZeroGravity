@@ -381,6 +381,96 @@ function syncOtherWorkspaces(sourceDir, currentWorkspace, dryRun) {
   return updated;
 }
 
+function syncGlobalPayload(sourceDir, dryRun) {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const globalDest = path.join(homeDir, '.gemini', 'config');
+  const ideGlobalWorkflowsDir = path.join(homeDir, '.gemini', 'antigravity-ide', 'global_workflows');
+
+  if (dryRun) {
+    console.log(`[DRY-RUN] Would sync global workflows & rules to ${globalDest} and ${ideGlobalWorkflowsDir}`);
+    return;
+  }
+
+  try {
+    // 1. Dual-sync all workflows globally one time
+    const globalWorkflowsDir = path.join(globalDest, 'workflows');
+    fs.mkdirSync(globalWorkflowsDir, { recursive: true });
+    fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
+    const workflowsSrc = path.join(sourceDir, 'workflows');
+    if (fs.existsSync(workflowsSrc)) {
+      copyDirSync(workflowsSrc, globalWorkflowsDir);
+      copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
+    }
+
+    // 2. Global rules with trigger: always_on (ensuring global rules are unconditionally active)
+    const globalRulesDir = path.join(globalDest, 'rules');
+    fs.mkdirSync(globalRulesDir, { recursive: true });
+    const rulesSrc = path.join(sourceDir, 'rules');
+    if (fs.existsSync(rulesSrc)) {
+      const ruleFiles = fs.readdirSync(rulesSrc);
+      for (const rf of ruleFiles) {
+        if (rf.endsWith('.md')) {
+          let content = fs.readFileSync(path.join(rulesSrc, rf), 'utf8');
+          // Global rules must be always_on to apply to every project
+          content = content.replace(/^---\r?\ntrigger:\s*[^\r\n]+/m, '---\ntrigger: always_on');
+          fs.writeFileSync(path.join(globalRulesDir, rf), content, 'utf8');
+        }
+      }
+    }
+
+    // 3. Ensure global auto-context rules
+    const autoContextPath = path.join(globalRulesDir, 'auto_codebase_context.md');
+    if (!fs.existsSync(autoContextPath)) {
+      fs.writeFileSync(autoContextPath, `---
+trigger: always_on
+---
+
+# Auto Codebase Context (Global)
+
+For any workspace containing a .agent/ or .agents/ directory:
+
+1. **On conversation start**, leverage the injected KI codebase context and .agents/codebase_summary.md directly via integrated tools (view_file, grep_search). Do NOT spawn background Python analyzer scripts.
+
+2. **Result**: Zero process startup latency and zero token waste on conversation start.
+
+> The persistent KI is stored per-project in ~/.gemini/antigravity-ide/knowledge/codebase-context-<project>/.
+`, 'utf8');
+    }
+
+    // 4. Skills, plugins, scripts, and metadata
+    const skillsSrc = path.join(sourceDir, 'skills');
+    if (fs.existsSync(skillsSrc)) {
+      copyDirSync(skillsSrc, path.join(globalDest, 'skills'));
+    }
+    const pluginsSrc = path.join(sourceDir, 'plugins');
+    if (fs.existsSync(pluginsSrc)) {
+      copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
+    }
+    const scriptsSrc = path.join(sourceDir, 'scripts');
+    if (fs.existsSync(scriptsSrc)) {
+      copyDirSync(scriptsSrc, path.join(globalDest, 'scripts'));
+    }
+    const versionSrc = path.join(sourceDir, 'VERSION');
+    if (fs.existsSync(versionSrc)) {
+      fs.copyFileSync(versionSrc, path.join(globalDest, 'VERSION'));
+    }
+    const indexSrc = path.join(sourceDir, 'skills_index.json');
+    if (fs.existsSync(indexSrc)) {
+      fs.copyFileSync(indexSrc, path.join(globalDest, 'skills_index.json'));
+    }
+
+    // 5. Zero-Default clean MCP profile
+    const mcpConfigDest = path.join(globalDest, 'mcp_config.json');
+    if (!fs.existsSync(mcpConfigDest)) {
+      fs.writeFileSync(mcpConfigDest, JSON.stringify({ mcpServers: {} }, null, 2));
+    }
+    console.log(`  ${C.green}✔ All 30 workflows & global configuration active in:${C.reset} ${globalDest}`);
+  } catch (err) {
+    console.error(`  ${C.yellow}⚠ Warning: Global sync encountered an issue: ${err.message}${C.reset}`);
+  }
+}
+
+
 async function resolveSourcePayload() {
   const scriptDir = path.resolve(__dirname, '..');
   const localRepoAgents = path.join(scriptDir, '.agents');
@@ -669,45 +759,8 @@ async function main() {
       // Register current workspace in central registry
       registerWorkspace(targetDir);
 
-      // Always synchronize full global config to ~/.gemini/config
-      try {
-        const globalRulesDir = path.join(globalDest, 'rules');
-        fs.mkdirSync(globalRulesDir, { recursive: true });
-        const rulesSrc = path.join(sourceDir, 'rules');
-        if (fs.existsSync(rulesSrc)) {
-          copyDirSync(rulesSrc, globalRulesDir);
-        }
-        const globalWorkflowsDir = path.join(globalDest, 'workflows');
-        fs.mkdirSync(globalWorkflowsDir, { recursive: true });
-        const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
-        fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
-        const workflowsSrc = path.join(sourceDir, 'workflows');
-        if (fs.existsSync(workflowsSrc)) {
-          copyDirSync(workflowsSrc, globalWorkflowsDir);
-          copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
-        }
-        const skillsSrc = path.join(sourceDir, 'skills');
-        if (fs.existsSync(skillsSrc)) {
-          copyDirSync(skillsSrc, path.join(globalDest, 'skills'));
-        }
-        const pluginsSrc = path.join(sourceDir, 'plugins');
-        if (fs.existsSync(pluginsSrc)) {
-          copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
-        }
-        const scriptsSrc = path.join(sourceDir, 'scripts');
-        if (fs.existsSync(scriptsSrc)) {
-          copyDirSync(scriptsSrc, path.join(globalDest, 'scripts'));
-        }
-        const versionSrc = path.join(sourceDir, 'VERSION');
-        if (fs.existsSync(versionSrc)) {
-          fs.copyFileSync(versionSrc, path.join(globalDest, 'VERSION'));
-        }
-        const indexSrc = path.join(sourceDir, 'skills_index.json');
-        if (fs.existsSync(indexSrc)) {
-          fs.copyFileSync(indexSrc, path.join(globalDest, 'skills_index.json'));
-        }
-        console.log(`  ${C.green}✔ Global payload synchronized in:${C.reset} ${globalDest}`);
-      } catch (_) {}
+      // Always synchronize full global config and all 30 workflows to global
+      syncGlobalPayload(sourceDir, false);
 
       // Automatically synchronize all other registered workspaces on the machine
       const otherWorkspaces = syncOtherWorkspaces(sourceDir, targetDir, false);
@@ -782,63 +835,8 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       }
     }
 
-    // Synchronize auto_codebase_context hook to ~/.gemini/config/rules
-    try {
-      const globalRulesDir = path.join(globalDest, 'rules');
-      fs.mkdirSync(globalRulesDir, { recursive: true });
-      // Only copy global auto-context rule; avoid duplicating core.md/effort.md which are loaded from local .agents/rules/
-      const autoContextSrc = path.join(sourceDir, 'scripts', 'auto_codebase_context.md');
-      if (fs.existsSync(autoContextSrc)) {
-        fs.copyFileSync(autoContextSrc, path.join(globalRulesDir, 'auto_codebase_context.md'));
-      }
-      const globalWorkflowsDir = path.join(globalDest, 'workflows');
-      fs.mkdirSync(globalWorkflowsDir, { recursive: true });
-      const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
-      fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
-      const workflowsSrc = path.join(sourceDir, 'workflows');
-      if (fs.existsSync(workflowsSrc)) {
-        copyDirSync(workflowsSrc, globalWorkflowsDir);
-        copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
-      }
-      console.log(`  ${C.green}✔ Global rules & workflows active in:${C.reset} ${globalDest}`);
-    } catch (_) {}
-
-    if (args.mode === 'global' || args.mode === 'all') {
-      console.log(`\n${C.bold}🌐 Installing Full Global Configuration...${C.reset}`);
-      fs.mkdirSync(path.join(globalDest, 'rules'), { recursive: true });
-      fs.mkdirSync(path.join(globalDest, 'skills'), { recursive: true });
-      fs.mkdirSync(path.join(globalDest, 'workflows'), { recursive: true });
-      fs.mkdirSync(path.join(globalDest, 'plugins'), { recursive: true });
-
-      const rulesSrc = path.join(sourceDir, 'rules');
-      if (fs.existsSync(rulesSrc)) {
-        copyDirSync(rulesSrc, path.join(globalDest, 'rules'));
-      }
-
-      const skillsSrc = path.join(sourceDir, 'skills');
-      if (fs.existsSync(skillsSrc)) {
-        copyDirSync(skillsSrc, path.join(globalDest, 'skills'));
-      }
-      
-      const workflowsSrc = path.join(sourceDir, 'workflows');
-      if (fs.existsSync(workflowsSrc)) {
-        copyDirSync(workflowsSrc, path.join(globalDest, 'workflows'));
-        const ideGlobalWorkflowsDir = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'global_workflows');
-        fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
-        copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
-      }
-
-      const pluginsSrc = path.join(sourceDir, 'plugins');
-      if (fs.existsSync(pluginsSrc)) {
-        copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
-      }
-
-      const mcpConfigDest = path.join(globalDest, 'mcp_config.json');
-      if (!fs.existsSync(mcpConfigDest)) {
-        fs.writeFileSync(mcpConfigDest, JSON.stringify({ mcpServers: {} }, null, 2));
-      }
-      console.log(`  ${C.green}✔ Global configuration installed to:${C.reset} ${C.bold}${globalDest}${C.reset}`);
-    }
+    // Always synchronize full global config and all 30 workflows to global
+    syncGlobalPayload(sourceDir, args.dryRun);
 
     console.log(`
 ${C.green}${C.bold}============================================================
