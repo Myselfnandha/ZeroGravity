@@ -460,7 +460,7 @@ async function resolveSourcePayload() {
   const scriptDir = path.resolve(__dirname, '..');
   const localRepoAgents = path.join(scriptDir, '.agents');
 
-  if (fs.existsSync(localRepoAgents) && fs.existsSync(path.join(localRepoAgents, 'rules'))) {
+  if (fs.existsSync(localRepoAgents) && fs.existsSync(path.join(localRepoAgents, 'workflows'))) {
     return { sourceDir: localRepoAgents, tempDirToClean: null };
   }
 
