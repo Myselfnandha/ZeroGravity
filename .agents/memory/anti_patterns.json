@@ -137,6 +137,14 @@
       "root_cause": "Improvising ad-hoc actions or generic guesses instead of checking the progressive disclosure skill catalog and reading SKILL.md",
       "strategy": "Context-Driven Skill Auto-Activation: Identify matching available skills from the index, inspect SKILL.md in a single view_file call, and execute following its documented workflows and runbooks",
       "invariant_rule": "Always inspect and follow the matching SKILL.md before executing specialized domain tasks."
+    },
+    {
+      "id": "AP-018",
+      "category": "environment",
+      "mistake": "Opening multiple independent IDE windows instead of unified multi-root workspace causing system memory exhaustion and swap lag",
+      "root_cause": "Multiple Electron instances duplicate renderers, extension hosts, and language servers, exhausting RAM and triggering slow disk swap thrashing",
+      "strategy": "Consolidate active projects into a single multi-root workspace using ide-open, prune stale processes with ide-prune, and expand ZRAM to 12GB",
+      "invariant_rule": "Consolidate concurrent development projects into unified multi-root workspaces to avoid Electron process multiplication."
     }
   ]
 }
