@@ -280,5 +280,11 @@
     "path": "skills-registry/using-agent-skills",
     "name": "using-agent-skills",
     "description": "Meta-skill to discover, select, and invoke the right agent workflow for a task."
+  },
+  {
+    "id": "zerogravity-init",
+    "path": "skills/zerogravity-init",
+    "name": "zerogravity-init",
+    "description": "Display a compact, single-page quick-access dashboard of all ZeroGravity workflows and skills on session start."
   }
 ]
