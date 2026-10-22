@@ -216,8 +216,14 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
     return { updatedItems: ['(source repository up to date)'], preservedItems: [] };
   }
 
-  const syncFolders = ['workflows', 'rules', 'scripts', 'mcp-registry', 'skills', 'skills-registry', 'plugins', 'knowledge', 'hooks'];
+  const syncFolders = ['workflows', 'scripts', 'mcp-registry', 'skills', 'skills-registry', 'plugins', 'knowledge', 'hooks'];
   const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
+
+  // Clean up retired rules directory in target workspace
+  const oldRulesDir = path.join(targetAgentsDir, 'rules');
+  if (fs.existsSync(oldRulesDir) && !dryRun) {
+    try { fs.rmSync(oldRulesDir, { recursive: true, force: true }); } catch (_) {}
+  }
 
   for (const folder of syncFolders) {
     const srcFolder = path.join(sourceDir, folder);
@@ -402,42 +408,13 @@ function syncGlobalPayload(sourceDir, dryRun) {
       copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
     }
 
-    // 2. Global rules with trigger: model_decision (ensuring rules are loaded strictly on-demand)
+    // 2. Pure zero-rules architecture: purge all global rules to eliminate prompt token bloat
     const globalRulesDir = path.join(globalDest, 'rules');
-    fs.mkdirSync(globalRulesDir, { recursive: true });
-    const rulesSrc = path.join(sourceDir, 'rules');
-    if (fs.existsSync(rulesSrc)) {
-      const ruleFiles = fs.readdirSync(rulesSrc);
-      for (const rf of ruleFiles) {
-        if (rf.endsWith('.md')) {
-          let content = fs.readFileSync(path.join(rulesSrc, rf), 'utf8');
-          // Rules must be model_decision to load strictly on-demand without auto prompt token bloat
-          content = content.replace(/^---\r?\ntrigger:\s*[^\r\n]+/m, '---\ntrigger: model_decision');
-          fs.writeFileSync(path.join(globalRulesDir, rf), content, 'utf8');
-        }
-      }
+    if (fs.existsSync(globalRulesDir)) {
+      try { fs.rmSync(globalRulesDir, { recursive: true, force: true }); } catch (_) {}
     }
 
-    // 3. Ensure single canonical codebase_context rule with trigger: model_decision
-    const autoContextPath = path.join(globalRulesDir, 'auto_codebase_context.md');
-    if (fs.existsSync(autoContextPath)) {
-      try { fs.unlinkSync(autoContextPath); } catch (_) {}
-    }
-
-    const contextRulePath = path.join(globalRulesDir, 'codebase_context.md');
-    fs.writeFileSync(contextRulePath, `---
-trigger: model_decision
----
-
-# Codebase Context Auto-Loader
-
-For workspaces with .agent/ or .agents/:
-1. Injected codebase-context-* KI provides index and recent patches at start.
-2. Inspect directory/code directly via view_file and grep_search. Use .agents/codebase_summary.md for directory overviews.
-3. NEVER spawn background Python analyzer scripts. Access persistent KI and summary natively with zero overhead.
-`, 'utf8');
-
-    // 4. Skills, skills-registry, plugins, scripts, and metadata
+    // 3. Skills, skills-registry, plugins, scripts, and metadata
     const skillsSrc = path.join(sourceDir, 'skills');
     if (fs.existsSync(skillsSrc)) {
       const globalSkillsDir = path.join(globalDest, 'skills');
