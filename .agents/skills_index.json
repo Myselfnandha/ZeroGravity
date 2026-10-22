@@ -180,6 +180,12 @@
     "description": "Search, enable, or disable on-demand MCP servers from 12 verified and 2,600+ catalog."
   },
   {
+    "id": "mistake-immunization",
+    "path": "skills-registry/mistake-immunization",
+    "name": "mistake-immunization",
+    "description": "Check anti-patterns before acting and record lessons into memory after fixes."
+  },
+  {
     "id": "observability-and-instrumentation",
     "path": "skills-registry/observability-and-instrumentation",
     "name": "observability-and-instrumentation",
@@ -240,6 +246,12 @@
     "description": "Search, inspect, and add 1,105+ ReUI/shadcn React blocks, charts, and motion icons."
   },
   {
+    "id": "safety-gates",
+    "path": "skills-registry/safety-gates",
+    "name": "safety-gates",
+    "description": "Safeguard against accidental deletions, force pushes, and destructive operations."
+  },
+  {
     "id": "security-and-hardening",
     "path": "skills-registry/security-and-hardening",
     "name": "security-and-hardening",
@@ -276,10 +288,22 @@
     "description": "Drive code changes using the Red-Green-Refactor test-driven development loop."
   },
   {
+    "id": "tool-optimization",
+    "path": "skills-registry/tool-optimization",
+    "name": "tool-optimization",
+    "description": "Pick the fastest, most token-efficient tool for searching, reading, editing, and running commands."
+  },
+  {
     "id": "using-agent-skills",
     "path": "skills-registry/using-agent-skills",
     "name": "using-agent-skills",
     "description": "Meta-skill to discover, select, and invoke the right agent workflow for a task."
+  },
+  {
+    "id": "verification-gate",
+    "path": "skills-registry/verification-gate",
+    "name": "verification-gate",
+    "description": "Verify code changes empirically with unit tests and linters before committing."
   },
   {
     "id": "zerogravity-init",
