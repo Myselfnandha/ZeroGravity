@@ -3,45 +3,16 @@ name: zerogravity-init
 description: "Display a compact, single-page quick-access dashboard of all ZeroGravity workflows and skills on session start."
 ---
 
-# ZeroGravity OS — Session Init & Quick-Access Dashboard
+# ZeroGravity OS — Ultra-Compact Command Matrix
 
-When invoked at conversation start, on user greeting, or when asked for ZeroGravity details, display the **Compact Quick-Access Matrix**.
+When invoked, render all 34 slash commands in this stacked, zero-scroll table:
 
-The table must fit in a single screen view without scrolling, giving immediate access to every core workflow and skill:
-
-```markdown
-### 🚀 ZeroGravity OS — Quick-Access Command Matrix
-
-| Category | Slash Command | What It Does |
-| :--- | :--- | :--- |
-| **Build & Plan** | `/build-feature` | 5-stage feature pipeline (Memory → Blueprint → Code → Test → Sync) |
-| | `/create` | Start a brand new app from scratch with step-by-step guidance |
-| | `/enhance` | Add a feature or improve existing code in this project |
-| | `/spec` | Write product requirements and technical specs before coding |
-| | `/plan` | Interactive native step-by-step planning mode |
-| **Verify & Test** | `/verify` | Run unit tests, linters, and build checks with real terminal output |
-| | `/test` | Generate and run AAA unit/integration test suites |
-| | `/review` | 5-axis code quality review (correctness, security, perf, style) |
-| | `/safety-check` | Safeguard against destructive commands, force pushes, and leaks |
-| **Debug & Tune** | `/debug` | Find root cause of bugs, crashes, or test failures and fix them |
-| | `/yagni-simplify`| Remove over-engineering and bloat; standard library first |
-| | `/webperf` | Audit web speed, bundle size, and Core Web Vitals |
-| | `/tools` | Pick fastest native tool (`grep_search`, `view_file`, `replace_file_content`) |
-| | `/immunize` | Sweep `anti_patterns.json` traps and record lessons to memory |
-| **Research & UI** | `/reach` | Live multi-platform search (Twitter, Reddit, YouTube, Web) |
-| | `/mcp` | Enable/search 2,600+ on-demand MCP tools and databases |
-| | `/react-components`| Browse and copy 1,100+ production-ready React & shadcn components |
-| | `/design-ui` | Design modern, responsive, aesthetic dark/light interfaces |
-| | `/skill <name>` | Activate any of 50+ specialized engineering skills on demand |
-| **Control & Tone** | `/effort-<level>` | Set reasoning depth: `low` (fast), `mid`, `high` (default), `ultra` |
-| | `/compress-tokens`| Speak in ultra-short sentences to save 75% prompt tokens |
-| | `/humanize-text` | Rewrite robotic AI text into natural, clear human voice |
-| | `/ship` & `/deploy`| Pre-launch verification checks and production deployment |
+| Domain | Stacked Slash Commands | Actions / Key Use Case |
+|:---|:---|:---|
+| **🏗️ Build & Plan** | `/build-feature`<br>`/create` · `/enhance`<br>`/spec` · `/plan` | • **Pipeline**: Autonomous 5-stage feature engine<br>• **Scaffolding**: Brand new app vs. feature enhancement<br>• **Blueprints**: Technical specifications & interactive planning |
+| **🧪 Verify & Quality**| `/verify` · `/test`<br>`/review` · `/safety-check`<br>`/audit-agent` | • **Testing**: AAA unit tests, linters, & compiler proof<br>• **Review**: 5-axis code audit (correctness, security, perf)<br>• **Gates**: Prevent destructive ops, force-pushes, & leaks |
+| **🔍 Debug & Optimize**| `/debug` · `/tools`<br>`/immunize` · `/yagni-simplify`<br>`/webperf` | • **Fix**: Root-cause diagnosis & fastest native tool choice<br>• **Memory**: Sweep anti-pattern traps & eliminate code bloat<br>• **Speed**: Core Web Vitals, load time, & bundle diet |
+| **🌐 Research & UI** | `/reach` · `/mcp`<br>`/react-components`<br>`/design-ui` · `/skill` | • **Search**: Multi-platform research (Twitter, Reddit, YouTube, Web)<br>• **Tools**: 2,600+ on-demand MCPs & 1,105+ React components<br>• **Aesthetics**: Modern dark/light UI & 50+ on-demand skills |
+| **⚡ Engine & Flow** | `/effort-<level>`<br>`/compress-tokens`<br>`/humanize-text` · `/focus`<br>`/ship` · `/deploy` | • **Depth**: `/effort-low` · `mid` · `high` · `ultra`<br>• **Tone**: 75% token reduction or natural human writing<br>• **Launch**: Pre-flight verification & production deployment |
 
 💡 *Zero-Default Architecture: 0 background rules. Everything runs strictly on demand.*
-```
-
-## Guidelines for Output
-1. Output the table directly in the conversation for immediate copy/click access.
-2. If the user requests a persistent guide, write the complete walkthrough to an artifact `zerogravity_walkthrough.md`.
-3. Keep the presentation crisp, conclusion-first, with no redundant conversational padding.
