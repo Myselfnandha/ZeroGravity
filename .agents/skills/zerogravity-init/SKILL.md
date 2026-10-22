@@ -1,15 +1,27 @@
 ---
 name: zerogravity-init
-description: "Display a compact, single-page quick-access dashboard of all ZeroGravity workflows and skills on session start."
+description: "Initialize ZeroGravity: create the single-page walkthrough artifact and display the stacked command matrix."
 ---
 
-# ZeroGravity OS — Unified System Walkthrough (Zero-Scroll)
+# ZeroGravity OS — Initialization & Walkthrough Protocol
 
-When invoked, render all 39 slash commands and 52 individual skills in this stacked, zero-scroll table:
+When the user says `init`, runs `/init`, or starts a new session:
+
+## 1. Create the Walkthrough Artifact
+Always use `write_to_file` to create the persistent single-page walkthrough artifact at:
+`<appDataDir>/brain/<conversation-id>/zerogravity_walkthrough.md`
+
+Artifact Content includes:
+- Overview of ZeroGravity OS (Zero-Default on-demand architecture: 0 background rules, 541 baseline prompt tokens).
+- The complete stacked matrix mapping all 39 slash commands and 52 individual skills.
+- The 12 on-demand MCP servers and offline catalog instructions.
+
+## 2. Output the Stacked Matrix in Chat
+Render the unified 6-row zero-scroll table directly in the conversation:
 
 | Domain | Stacked Slash Commands | Matching Individual Skills (On-Demand) | Purpose & Quick Runbook |
 |:---|:---|:---|:---|
-| **🏗️ Define & Spec** | **`/build-feature`**<br>`/create` · `/enhance`<br>`/spec` · `/plan` · `/goal` | `interview-me` · `idea-refine`<br>`spec-driven-development`<br>`planning-and-task-breakdown`<br>`constraint-driven-development` | • **Requirements**: Extract exact user needs before code<br>• **Ideation**: Refine ideas & establish quality bar/contracts<br>• **Execution**: 5-stage autonomous pipeline or iterative app builder |
+| **🏗️ Define & Spec** | **`/build-feature`**<br>`/create` · `/enhance`<br>`/spec` · `/plan` · `/goal` | `interview-me` · `idea-refine`<br>`spec-driven-development`<br>`planning-and-task-breakdown`<br>`constraint-driven-development` | • **Requirements**: Extract exact user needs before writing code<br>• **Ideation**: Refine ideas & establish quality bar/contracts<br>• **Execution**: 5-stage autonomous pipeline or iterative app builder |
 | **📐 Architecture** | `/codebase-design`<br>`/domain-model`<br>`/brainstorm` · `/orchestrate` | `api-and-interface-design`<br>`context-engineering`<br>`documentation-and-adrs`<br>`doubt-driven-development` | • **Interfaces**: Deep module design & clean testable seams<br>• **Models**: Business entities, database schemas, & ADRs<br>• **Review**: Adversarial cross-examination of high-stakes architecture |
 | **🧪 Verify & Quality**| **`/verify`** · **`/test`**<br>`/review` · `/safety-check`<br>`/audit-agent` | `verification-gate` · `test-driven-development`<br>`code-review-and-quality`<br>`safety-gates` · `security-and-hardening`<br>`browser-testing-with-devtools` | • **Testing**: TDD cycle + AAA unit test proof with terminal output<br>• **Review**: 5-axis code quality audit & OWASP security hardening<br>• **Guards**: Block destructive drops, force-pushes, & secret leaks |
 | **🔍 Debug & Optimize**| **`/debug`** · **`/tools`**<br>`/immunize` · `/harness`<br>`/yagni-simplify` · `/webperf` | `debugging-and-error-recovery`<br>`tool-optimization` · `mistake-immunization`<br>`code-simplification` · `performance-optimization`<br>`harness` · `coding-interview` | • **Fix**: Systematic root-cause bug isolation & fastest tool choice<br>• **Memory**: Check `anti_patterns.json` traps & auto-tune agent harness<br>• **Speed & YAGNI**: Cut over-engineering with stdlib & boost Core Web Vitals |
