@@ -17,14 +17,11 @@ help: ## Show this help menu
 pack: ## Build self-extracting install.sh and dist/ tarball (1.3MB XZ)
 	@./pack.sh
 
-install: ## Run full installer (Local workspace + Global configuration)
-	@./install.sh --all -y
-
-install-local: ## Install only to the local workspace (.agents/)
+install: ## Run installer in local workspace (.agents/)
 	@./install.sh --local -y
 
-install-global: ## Install only to global Antigravity config (~/.gemini/config/)
-	@./install.sh --global -y
+install-local: ## Install to the local workspace (.agents/)
+	@./install.sh --local -y
 
 npm-link: ## Link zerogravity CLI globally (npx @nandhaalagesan/zerogravity / zg)
 	@npm link

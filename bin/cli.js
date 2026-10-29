@@ -46,6 +46,7 @@ ${C.bold}Usage:${C.reset}
 ${C.bold}Commands:${C.reset}
   install (default)       Install ZeroGravity (.agents/) into target workspace
   update, upgrade         Update existing .agents/ to latest (preserves memory)
+  init-local              Create .agents-local/memory/ for project-specific patterns
   mcp                     Manage on-demand MCP servers (list, enable, disable, status, sync)
   harness                 Recursive Agent Harnessing (status, inspect, validate, propose, ledger)
 
@@ -55,8 +56,6 @@ ${C.bold}Arguments:${C.reset}
 ${C.bold}Options:${C.reset}
   -t, --target <path>     Explicit target directory path
   -l, --local             Target local workspace (.agents/) only (default)
-  -g, --global            Target global Antigravity configuration (~/.gemini/config/)
-  -a, --all               Target both local (.agents/) and global configuration
   -A, --all-workspaces    Update all registered active workspaces on the system
   -f, --force             Overwrite without prompting
   -y, --yes               Non-interactive mode (auto-accept all prompts)
@@ -69,7 +68,7 @@ ${C.bold}Examples:${C.reset}
   npx zerogravity ./my-project -y           # Install to ./my-project non-interactively
   npx zerogravity update                    # Update .agents/ in current directory
   npx zerogravity update /apps/web -y       # Update /apps/web non-interactively
-  npx zerogravity --global -y               # Install global configuration only
+  npx zerogravity init-local                # Create .agents-local/ in current directory
 `);
 }
 
@@ -124,6 +123,9 @@ function parseArgs(argv) {
       positional.shift();
     } else if (first === 'install') {
       args.command = 'install';
+      positional.shift();
+    } else if (first === 'init-local') {
+      args.command = 'init-local';
       positional.shift();
     } else if (first === 'mcp') {
       args.command = 'mcp';
@@ -216,13 +218,22 @@ function updateAgentsDir(sourceDir, targetAgentsDir, dryRun, targetDir) {
     return { updatedItems: ['(source repository up to date)'], preservedItems: [] };
   }
 
-  const syncFolders = ['workflows', 'scripts', 'mcp-registry', 'skills', 'skills-registry', 'plugins', 'knowledge', 'hooks'];
+  const syncFolders = ['workflows', 'scripts', 'mcp-registry', 'skills', 'skills-registry', 'plugins', 'knowledge', 'hooks', 'templates'];
   const syncFiles = ['skills_index.json', 'antigravity.json', 'hooks.json', 'ARCHITECTURE.md', 'CHANGELOG.md', 'VERSION', 'AGENTS.md'];
 
   // Clean up retired rules directory in target workspace
   const oldRulesDir = path.join(targetAgentsDir, 'rules');
   if (fs.existsSync(oldRulesDir) && !dryRun) {
     try { fs.rmSync(oldRulesDir, { recursive: true, force: true }); } catch (_) {}
+  }
+
+  // Clean up retired legacy memory files in target workspace
+  const retiredMemoryFiles = ['anti_patterns.json', 'build_flows.json', 'learned_strategies.json', 'harness_ledger.json'];
+  for (const rmf of retiredMemoryFiles) {
+    const destRmf = path.join(targetAgentsDir, 'memory', rmf);
+    if (fs.existsSync(destRmf) && !dryRun) {
+      try { fs.unlinkSync(destRmf); } catch (_) {}
+    }
   }
 
   for (const folder of syncFolders) {
@@ -387,71 +398,34 @@ function syncOtherWorkspaces(sourceDir, currentWorkspace, dryRun) {
   return updated;
 }
 
-function syncGlobalPayload(sourceDir, dryRun) {
+function purgeGlobalPayload(dryRun) {
   const homeDir = process.env.HOME || process.env.USERPROFILE || '';
   const globalDest = path.join(homeDir, '.gemini', 'config');
   const ideGlobalWorkflowsDir = path.join(homeDir, '.gemini', 'antigravity-ide', 'global_workflows');
 
-  if (dryRun) {
-    console.log(`[DRY-RUN] Would sync global workflows & rules to ${globalDest} and ${ideGlobalWorkflowsDir}`);
-    return;
-  }
+  const targets = [
+    path.join(globalDest, 'workflows'),
+    path.join(globalDest, 'rules'),
+    path.join(globalDest, 'skills'),
+    path.join(globalDest, 'skills-registry'),
+    path.join(globalDest, 'plugins'),
+    path.join(globalDest, 'scripts'),
+    path.join(globalDest, 'sidecars'),
+    path.join(globalDest, 'skills_index.json'),
+    path.join(globalDest, 'VERSION'),
+    ideGlobalWorkflowsDir
+  ];
 
-  try {
-    // 1. Dual-sync all workflows globally one time
-    const globalWorkflowsDir = path.join(globalDest, 'workflows');
-    fs.mkdirSync(globalWorkflowsDir, { recursive: true });
-    fs.mkdirSync(ideGlobalWorkflowsDir, { recursive: true });
-    const workflowsSrc = path.join(sourceDir, 'workflows');
-    if (fs.existsSync(workflowsSrc)) {
-      copyDirSync(workflowsSrc, globalWorkflowsDir);
-      copyDirSync(workflowsSrc, ideGlobalWorkflowsDir);
+  for (const target of targets) {
+    if (fs.existsSync(target)) {
+      if (dryRun) {
+        console.log(`[DRY-RUN] Would remove global customization: ${target}`);
+      } else {
+        try {
+          fs.rmSync(target, { recursive: true, force: true });
+        } catch (_) {}
+      }
     }
-
-    // 2. Pure zero-rules architecture: purge all global rules to eliminate prompt token bloat
-    const globalRulesDir = path.join(globalDest, 'rules');
-    if (fs.existsSync(globalRulesDir)) {
-      try { fs.rmSync(globalRulesDir, { recursive: true, force: true }); } catch (_) {}
-    }
-
-    // 3. Skills, skills-registry, plugins, scripts, and metadata
-    const skillsSrc = path.join(sourceDir, 'skills');
-    if (fs.existsSync(skillsSrc)) {
-      const globalSkillsDir = path.join(globalDest, 'skills');
-      fs.rmSync(globalSkillsDir, { recursive: true, force: true });
-      copyDirSync(skillsSrc, globalSkillsDir);
-    }
-    const skillsRegSrc = path.join(sourceDir, 'skills-registry');
-    if (fs.existsSync(skillsRegSrc)) {
-      const globalRegDir = path.join(globalDest, 'skills-registry');
-      fs.rmSync(globalRegDir, { recursive: true, force: true });
-      copyDirSync(skillsRegSrc, globalRegDir);
-    }
-    const pluginsSrc = path.join(sourceDir, 'plugins');
-    if (fs.existsSync(pluginsSrc)) {
-      copyDirSync(pluginsSrc, path.join(globalDest, 'plugins'));
-    }
-    const scriptsSrc = path.join(sourceDir, 'scripts');
-    if (fs.existsSync(scriptsSrc)) {
-      copyDirSync(scriptsSrc, path.join(globalDest, 'scripts'));
-    }
-    const versionSrc = path.join(sourceDir, 'VERSION');
-    if (fs.existsSync(versionSrc)) {
-      fs.copyFileSync(versionSrc, path.join(globalDest, 'VERSION'));
-    }
-    const indexSrc = path.join(sourceDir, 'skills_index.json');
-    if (fs.existsSync(indexSrc)) {
-      fs.copyFileSync(indexSrc, path.join(globalDest, 'skills_index.json'));
-    }
-
-    // 5. Zero-Default clean MCP profile
-    const mcpConfigDest = path.join(globalDest, 'mcp_config.json');
-    if (!fs.existsSync(mcpConfigDest)) {
-      fs.writeFileSync(mcpConfigDest, JSON.stringify({ mcpServers: {} }, null, 2));
-    }
-    console.log(`  ${C.green}✔ All 30 workflows & global configuration active in:${C.reset} ${globalDest}`);
-  } catch (err) {
-    console.error(`  ${C.yellow}⚠ Warning: Global sync encountered an issue: ${err.message}${C.reset}`);
   }
 }
 
@@ -653,6 +627,153 @@ async function handleHarnessCommand(args, agentsDir) {
   }
 }
 
+function handleInitLocal(targetDir, agentsDir, dryRun) {
+  const localDir = path.join(targetDir, '.agents-local', 'memory');
+  const templatesDir = path.join(agentsDir, 'templates', 'local-memory');
+
+  if (fs.existsSync(localDir)) {
+    console.log(`  ${C.yellow}⚠ .agents-local/memory/ already exists in: ${targetDir}${C.reset}`);
+    const existing = fs.readdirSync(localDir);
+    console.log(`  ${C.cyan}Existing files:${C.reset} ${existing.join(', ')}`);
+    return;
+  }
+
+  if (dryRun) {
+    console.log(`[DRY-RUN] Would create .agents-local/memory/ in: ${targetDir}`);
+    return;
+  }
+
+  fs.mkdirSync(localDir, { recursive: true });
+
+  // Copy templates if available
+  if (fs.existsSync(templatesDir)) {
+    const templates = fs.readdirSync(templatesDir);
+    for (const t of templates) {
+      fs.copyFileSync(path.join(templatesDir, t), path.join(localDir, t));
+    }
+    console.log(`  ${C.green}✔ Created .agents-local/memory/ with templates:${C.reset} ${templates.join(', ')}`);
+  } else {
+    // Fallback: create minimal patterns.json
+    fs.writeFileSync(path.join(localDir, 'patterns.json'), JSON.stringify({
+      version: '2.0.0', updated_at: '', patterns: []
+    }, null, 2));
+    console.log(`  ${C.green}✔ Created .agents-local/memory/patterns.json${C.reset}`);
+  }
+
+  // Add .agents-local/ to .gitignore if not already present
+  const gitignorePath = path.join(targetDir, '.gitignore');
+  const gitignoreEntry = '.agents-local/';
+  if (fs.existsSync(gitignorePath)) {
+    const content = fs.readFileSync(gitignorePath, 'utf8');
+    if (!content.includes(gitignoreEntry)) {
+      fs.appendFileSync(gitignorePath, `\n# ZeroGravity local memory (per-workspace, not shared)\n${gitignoreEntry}\n`);
+      console.log(`  ${C.green}✔ Added ${gitignoreEntry} to .gitignore${C.reset}`);
+    }
+  } else {
+    fs.writeFileSync(gitignorePath, `# ZeroGravity local memory (per-workspace, not shared)\n${gitignoreEntry}\n`);
+    console.log(`  ${C.green}✔ Created .gitignore with ${gitignoreEntry}${C.reset}`);
+  }
+
+  console.log(`\n${C.green}${C.bold}✔ Local memory initialized.${C.reset}`);
+  console.log(`  The agent will read .agents-local/memory/patterns.json before file edits.`);
+  console.log(`  Use ${C.cyan}/learn${C.reset} to record project-specific patterns.`);
+}
+
+function promoteUniversalPatterns(targetDir, agentsDir) {
+  const localPatternsPath = path.join(targetDir, '.agents-local', 'memory', 'patterns.json');
+  const sharedPatternsPath = path.join(agentsDir, 'memory', 'patterns.json');
+
+  if (!fs.existsSync(localPatternsPath) || !fs.existsSync(sharedPatternsPath)) return [];
+
+  let localData, sharedData;
+  try {
+    localData = JSON.parse(fs.readFileSync(localPatternsPath, 'utf8'));
+    sharedData = JSON.parse(fs.readFileSync(sharedPatternsPath, 'utf8'));
+  } catch (_) { return []; }
+
+  if (!Array.isArray(localData.patterns) || !Array.isArray(sharedData.patterns)) return [];
+
+  // Normalize a rule string to a set of meaningful words for comparison
+  const normalize = (rule) => {
+    return new Set(
+      rule.toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !['the', 'and', 'for', 'use', 'all', 'not', 'with', 'any', 'via', 'when'].includes(w))
+    );
+  };
+
+  // Jaccard similarity between two word sets
+  const similarity = (setA, setB) => {
+    if (setA.size === 0 && setB.size === 0) return 1;
+    let intersection = 0;
+    for (const w of setA) { if (setB.has(w)) intersection++; }
+    return intersection / (setA.size + setB.size - intersection);
+  };
+
+  const existingNormalized = sharedData.patterns.map(p => ({
+    rule: p.rule,
+    words: normalize(p.rule)
+  }));
+
+  const isDuplicate = (candidateRule) => {
+    const candidateWords = normalize(candidateRule);
+    for (const existing of existingNormalized) {
+      // Exact match
+      if (existing.rule === candidateRule) return true;
+      // Fuzzy match: >70% word overlap = duplicate
+      if (similarity(candidateWords, existing.words) > 0.7) return true;
+    }
+    return false;
+  };
+
+  const promoted = [];
+  const skippedDupes = [];
+  const remaining = [];
+  let maxId = Math.max(0, ...sharedData.patterns.map(p => parseInt(p.id.replace('P-', ''), 10) || 0));
+
+  for (const pattern of localData.patterns) {
+    if (pattern.universal === true) {
+      if (isDuplicate(pattern.rule)) {
+        skippedDupes.push(pattern);
+        // Remove the universal flag since it's already covered
+        pattern.universal = undefined;
+        remaining.push(pattern);
+      } else {
+        maxId++;
+        const promotedPattern = {
+          id: `P-${String(maxId).padStart(3, '0')}`,
+          type: pattern.type,
+          category: pattern.category,
+          rule: pattern.rule
+        };
+        sharedData.patterns.push(promotedPattern);
+        existingNormalized.push({ rule: pattern.rule, words: normalize(pattern.rule) });
+        promoted.push(promotedPattern);
+      }
+    } else {
+      remaining.push(pattern);
+    }
+  }
+
+  if (promoted.length > 0 || skippedDupes.length > 0) {
+    if (promoted.length > 0) {
+      sharedData.updated_at = new Date().toISOString();
+      fs.writeFileSync(sharedPatternsPath, JSON.stringify(sharedData, null, 2) + '\n');
+    }
+    localData.patterns = remaining;
+    localData.updated_at = new Date().toISOString();
+    fs.writeFileSync(localPatternsPath, JSON.stringify(localData, null, 2) + '\n');
+  }
+
+  if (skippedDupes.length > 0) {
+    console.log(`  ${C.yellow}⚠ Skipped ${skippedDupes.length} duplicate pattern(s) (>70% word overlap with existing):${C.reset}`);
+    skippedDupes.forEach(p => console.log(`    • ${C.dim}${p.rule.substring(0, 80)}...${C.reset}`));
+  }
+
+  return promoted;
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   printBanner();
@@ -662,15 +783,17 @@ async function main() {
   const globalDest = path.join(process.env.HOME || process.env.USERPROFILE, '.gemini', 'config');
 
   console.log(`${C.blue}Command:${C.reset}      ${C.bold}${args.command.toUpperCase()}${C.reset}`);
-  console.log(`${C.blue}Target Scope:${C.reset} ${C.bold}${args.mode.toUpperCase()}${C.reset}`);
-  if (args.mode === 'local' || args.mode === 'all') {
-    console.log(`${C.blue}Workspace:${C.reset}    ${C.bold}${targetDir}${C.reset}`);
-    console.log(`${C.blue}Destination:${C.reset}  ${C.bold}${localAgentsDest}${C.reset}`);
-  }
-  if (args.mode === 'global' || args.mode === 'all') {
-    console.log(`${C.blue}Global Path:${C.reset}  ${C.bold}${globalDest}${C.reset}`);
-  }
+  console.log(`${C.blue}Workspace:${C.reset}    ${C.bold}${targetDir}${C.reset}`);
+  console.log(`${C.blue}Destination:${C.reset}  ${C.bold}${localAgentsDest}${C.reset}`);
   console.log('');
+
+  // -------------------------------------------------------------
+  // INIT-LOCAL COMMAND
+  // -------------------------------------------------------------
+  if (args.command === 'init-local') {
+    handleInitLocal(targetDir, localAgentsDest, args.dryRun);
+    return;
+  }
 
   // -------------------------------------------------------------
   // HARNESS COMMAND
@@ -744,8 +867,15 @@ async function main() {
       // Register current workspace in central registry
       registerWorkspace(targetDir);
 
-      // Always synchronize full global config and all 30 workflows to global
-      syncGlobalPayload(sourceDir, false);
+      // Purge any legacy global customizations to ensure strictly local workspace operation
+      purgeGlobalPayload(false);
+
+      // Promote universal patterns from local memory
+      const promoted = promoteUniversalPatterns(targetDir, localAgentsDest);
+      if (promoted.length > 0) {
+        console.log(`  ${C.green}✔ Promoted ${promoted.length} universal pattern(s) from local to shared:${C.reset}`);
+        promoted.forEach(p => console.log(`    • ${C.cyan}${p.id}${C.reset}: ${p.rule}`));
+      }
 
       // Automatically synchronize all other registered workspaces on the machine
       const otherWorkspaces = syncOtherWorkspaces(sourceDir, targetDir, false);
@@ -820,8 +950,8 @@ ${C.bold}Workspace Updated:${C.reset} ${C.cyan}${targetDir}${C.reset}
       }
     }
 
-    // Always synchronize full global config and all 30 workflows to global
-    syncGlobalPayload(sourceDir, args.dryRun);
+    // Purge any legacy global customizations to ensure strictly local workspace operation
+    purgeGlobalPayload(args.dryRun);
 
     console.log(`
 ${C.green}${C.bold}============================================================

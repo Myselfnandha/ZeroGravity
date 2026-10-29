@@ -125,9 +125,7 @@ usage() {
     echo -e "${C_BOLD}Usage:${C_RESET} $0 [OPTIONS]"
     echo ""
     echo -e "${C_BOLD}Options:${C_RESET}"
-    echo "  -a, --all               Install both Local (.agents/) and Global (~/.gemini/config/)"
-    echo "  -g, --global            Install Global configuration only (~/.gemini/config/)"
-    echo "  -l, --local             Install Local workspace (.agents/) in current directory"
+    echo "  -l, --local             Install Local workspace (.agents/) in current directory (default)"
     echo "  -t, --target <DIR>      Install Local workspace (.agents/) into specified directory"
     echo "  -y, --yes               Non-interactive mode (auto-accept prompts)"
     echo "  --dry-run               Simulate installation without making changes"
@@ -145,12 +143,8 @@ DRY_RUN=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -a|--all)
-            TARGET_MODE="all"
-            shift
-            ;;
-        -g|--global)
-            TARGET_MODE="global"
+        -a|--all|-g|--global)
+            TARGET_MODE="local"
             shift
             ;;
         -l|--local)
@@ -188,25 +182,21 @@ print_banner
 # Interactive selection if no mode specified
 if [ -z "$TARGET_MODE" ]; then
     echo -e "${C_BOLD}Select installation target:${C_RESET}"
-    echo -e "  ${C_CYAN}1)${C_RESET} ${C_BOLD}Both Local & Global${C_RESET} (Full Suite: current workspace + ~/.gemini/config/)"
-    echo -e "  ${C_CYAN}2)${C_RESET} ${C_BOLD}Global Only${C_RESET} (~/.gemini/config/)"
-    echo -e "  ${C_CYAN}3)${C_RESET} ${C_BOLD}Local Workspace Only${C_RESET} (.agents/ in current directory: $(pwd))"
-    echo -e "  ${C_CYAN}4)${C_RESET} ${C_BOLD}Custom Workspace Directory${C_RESET}"
-    echo -e "  ${C_CYAN}5)${C_RESET} Cancel / Exit"
+    echo -e "  ${C_CYAN}1)${C_RESET} ${C_BOLD}Local Workspace Only${C_RESET} (.agents/ in current directory: $(pwd))"
+    echo -e "  ${C_CYAN}2)${C_RESET} ${C_BOLD}Custom Workspace Directory${C_RESET}"
+    echo -e "  ${C_CYAN}3)${C_RESET} Cancel / Exit"
     echo ""
-    read -r -p "Enter choice [1-5] (default: 1): " user_choice
+    read -r -p "Enter choice [1-3] (default: 1): " user_choice
     user_choice="${user_choice:-1}"
 
     case "$user_choice" in
-        1) TARGET_MODE="all" ;;
-        2) TARGET_MODE="global" ;;
-        3) TARGET_MODE="local" ;;
-        4)
+        1) TARGET_MODE="local" ;;
+        2)
             TARGET_MODE="custom"
             read -r -p "Enter absolute or relative path for target workspace: " custom_path
             TARGET_DIR="$(cd "$custom_path" 2>/dev/null && pwd || echo "$custom_path")"
             ;;
-        5|q|Q)
+        3|q|Q)
             echo "Installation cancelled."
             exit 0
             ;;
@@ -217,13 +207,8 @@ if [ -z "$TARGET_MODE" ]; then
     esac
 fi
 
-echo -e "${C_BLUE}Target Scope:${C_RESET} ${C_BOLD}$TARGET_MODE${C_RESET}"
-if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" == "all" ]]; then
-    echo -e "${C_BLUE}Local Workspace Target:${C_RESET} ${C_BOLD}$TARGET_DIR/.agents${C_RESET}"
-fi
-if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
-    echo -e "${C_BLUE}Global Target:${C_RESET} ${C_BOLD}$HOME/.gemini/config${C_RESET}"
-fi
+echo -e "${C_BLUE}Target Scope:${C_RESET} ${C_BOLD}workspace-local${C_RESET}"
+echo -e "${C_BLUE}Local Workspace Target:${C_RESET} ${C_BOLD}$TARGET_DIR/.agents${C_RESET}"
 echo ""
 
 # 1. Dependency Checks
@@ -298,50 +283,8 @@ if [[ "$TARGET_MODE" == "local" || "$TARGET_MODE" == "custom" || "$TARGET_MODE" 
         chmod +x "$LOCAL_DEST/scripts/"*.sh 2>/dev/null || true
         echo -e "  ${C_GREEN}✔ Installed rules, skills, workflows, scripts, and MCP catalog to:${C_RESET} ${C_BOLD}$LOCAL_DEST${C_RESET}"
 
-        # Synchronize core rules and all workflows to global config one time
-        GLOBAL_CONFIG="$HOME/.gemini/config"
-        GLOBAL_IDE="$HOME/.gemini/antigravity-ide/global_workflows"
-        mkdir -p "$GLOBAL_CONFIG/rules" "$GLOBAL_CONFIG/workflows" "$GLOBAL_IDE"
-        # Enforce always_on for global rules to apply to all projects
-        sed 's/trigger: model_decision/trigger: always_on/' "$TEMP_EXTRACT/.agents/rules/core.md" > "$GLOBAL_CONFIG/rules/core.md" 2>/dev/null || cp "$TEMP_EXTRACT/.agents/rules/core.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
-        sed 's/trigger: model_decision/trigger: always_on/' "$TEMP_EXTRACT/.agents/rules/effort.md" > "$GLOBAL_CONFIG/rules/effort.md" 2>/dev/null || cp "$TEMP_EXTRACT/.agents/rules/effort.md" "$GLOBAL_CONFIG/rules/" 2>/dev/null || true
-        cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_CONFIG/workflows/" 2>/dev/null || true
-        cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_IDE/" 2>/dev/null || true
-        echo -e "  ${C_GREEN}✔ All 30 workflows & global rules active in:${C_RESET} ${C_BOLD}$GLOBAL_CONFIG${C_RESET}"
-    fi
-fi
-
-# 4. Perform Global Installation
-if [[ "$TARGET_MODE" == "global" || "$TARGET_MODE" == "all" ]]; then
-    echo -e "\n${C_BOLD}🌐 Installing Global Configuration...${C_RESET}"
-    GLOBAL_DEST="$HOME/.gemini/config"
-
-    if [ "$DRY_RUN" = true ]; then
-        echo -e "${C_YELLOW}[DRY-RUN] Would install to: $GLOBAL_DEST${C_RESET}"
-    else
-        mkdir -p "$GLOBAL_DEST/rules" "$GLOBAL_DEST/skills" "$GLOBAL_DEST/workflows" "$GLOBAL_DEST/plugins"
-
-        # Copy global rules, skills, workflows, and plugins
-        if [ -d "$TEMP_EXTRACT/.agents/rules" ]; then
-            cp -a "$TEMP_EXTRACT/.agents/rules/." "$GLOBAL_DEST/rules/" 2>/dev/null || true
-        fi
-        if [ -d "$TEMP_EXTRACT/.agents/skills" ]; then
-            cp -a "$TEMP_EXTRACT/.agents/skills/." "$GLOBAL_DEST/skills/" 2>/dev/null || true
-        fi
-        if [ -d "$TEMP_EXTRACT/.agents/workflows" ]; then
-            cp -a "$TEMP_EXTRACT/.agents/workflows/." "$GLOBAL_DEST/workflows/" 2>/dev/null || true
-            mkdir -p "$HOME/.gemini/antigravity-ide/global_workflows"
-            cp -a "$TEMP_EXTRACT/.agents/workflows/." "$HOME/.gemini/antigravity-ide/global_workflows/" 2>/dev/null || true
-        fi
-        if [ -d "$TEMP_EXTRACT/.agents/plugins" ]; then
-            cp -a "$TEMP_EXTRACT/.agents/plugins/." "$GLOBAL_DEST/plugins/" 2>/dev/null || true
-        fi
-
-        # Ensure zero-default clean profile
-        if [ ! -f "$GLOBAL_DEST/mcp_config.json" ]; then
-            echo '{"mcpServers": {}}' > "$GLOBAL_DEST/mcp_config.json"
-        fi
-        echo -e "  ${C_GREEN}✔ Global configuration installed to:${C_RESET} ${C_BOLD}$GLOBAL_DEST${C_RESET}"
+        # Purge legacy global customization directories if they exist
+        rm -rf "$HOME/.gemini/config/workflows" "$HOME/.gemini/config/rules" "$HOME/.gemini/config/skills" "$HOME/.gemini/config/skills-registry" "$HOME/.gemini/config/plugins" "$HOME/.gemini/config/scripts" "$HOME/.gemini/config/sidecars" "$HOME/.gemini/config/skills_index.json" "$HOME/.gemini/config/VERSION" "$HOME/.gemini/antigravity-ide/global_workflows" 2>/dev/null || true
     fi
 fi
 
@@ -446,6 +389,6 @@ echo -e "2. Standalone XZ Archive     : ${C_BOLD}$OUTPUT_TARBALL${C_RESET} (${C_
 echo ""
 echo -e "To install on any system, run:"
 echo -e "  ${C_CYAN}./install.sh${C_RESET}               (Interactive menu)"
-echo -e "  ${C_CYAN}./install.sh --all -y${C_RESET}      (Non-interactive local & global install)"
+echo -e "  ${C_CYAN}./install.sh --local -y${C_RESET}    (Non-interactive workspace install)"
 echo -e "  ${C_CYAN}./install.sh --target /path${C_RESET} (Install into custom workspace)"
 echo ""

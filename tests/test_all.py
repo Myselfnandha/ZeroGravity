@@ -50,21 +50,9 @@ CLI_SCRIPTS = {
 
 # JSON data files and their required top-level keys
 JSON_SCHEMAS: Dict[str, Dict[str, type]] = {
-    "anti_patterns.json": {
+    "patterns.json": {
         "version": str,
-        "anti_patterns": list,
-    },
-    "build_flows.json": {
-        "version": str,
-        "flows": list,
-    },
-    "learned_strategies.json": {
-        "version": str,
-        "strategies": list,
-    },
-    "harness_ledger.json": {
-        "version": str,
-        "runs": list,
+        "patterns": list,
     },
 }
 

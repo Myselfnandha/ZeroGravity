@@ -1,6 +1,8 @@
 # 🛡️ ZeroGravity OS: Known Gotchas & Immunization Protocol
 
-Anti-patterns (AP-001 through AP-017) are maintained in the machine-readable single source of truth: [`anti_patterns.json`](file:///home/nandha/Desktop/agent/.agents/memory/anti_patterns.json).
+All patterns (anti-patterns + learned strategies) are maintained in the machine-readable single source of truth: [`patterns.json`](file:///home/nandha/Desktop/agent/.agents/memory/patterns.json).
+
+Project-specific patterns live in `.agents-local/memory/patterns.json` (per-workspace, not in npm package).
 
 ---
 
@@ -21,8 +23,9 @@ Anti-patterns (AP-001 through AP-017) are maintained in the machine-readable sin
 ---
 
 ## 🔄 The 2-Way Immunization Protocol
-1. **Pre-Action Check**: Before executing a tool call or creating a component, verify against `anti_patterns.json`.
+1. **Pre-Action Check**: Before first file edit, read `patterns.json` and `.agents-local/memory/patterns.json`.
 2. **Post-Failure Distillation**: When a mistake, test failure, or user correction occurs:
    - Identify the exact root cause.
-   - Formulate an Invariant Prevention Strategy.
-   - Append to `anti_patterns.json` via `zg learn add`.
+   - Formulate a one-sentence rule.
+   - Append to `.agents-local/memory/patterns.json` (project-specific) or `.agents/memory/patterns.json` (universal).
+   - Flag with `"universal": true` if the pattern applies across all projects.

@@ -26,13 +26,10 @@ npx @nandhaalagesan/zerogravity
 # Deploy into a specific project
 npx @nandhaalagesan/zerogravity /path/to/my-project -y
 
-# Deploy everywhere (workspace + global config)
-npx @nandhaalagesan/zerogravity --all -y
-
 # Update existing workspace (preserves your memory & configs)
 npx @nandhaalagesan/zerogravity update
 
-# Or install globally
+# Or install CLI globally
 npm install -g @nandhaalagesan/zerogravity
 ```
 
@@ -48,9 +45,8 @@ cp -r .agents /path/to/any/project/
 
 #### Self-extracting installer
 ```bash
-./install.sh --local -y    # Workspace only
-./install.sh --global -y   # Global (~/.gemini/config/)
-./install.sh --all -y      # Both
+./install.sh --local -y    # Workspace install
+./install.sh --target /path/to/project -y
 ```
 ```
 
